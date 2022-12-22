@@ -1,10 +1,10 @@
 class Solution {
     public int pivotIndex(int[] nums) {
-        int left = 0, right = 0;
-        for (int num : nums) right += num;
+        int leftsum = 0, sum = 0;
+        for (int num : nums) sum += num;
         for (int i = 0; i < nums.length; i++) {
-            if (left == right - left - nums[i]) return i;
-            left += nums[i];
+            if (leftsum == sum - leftsum - nums[i]) return i;
+            leftsum += nums[i];
         }
         return -1;
     }
