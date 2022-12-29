@@ -1,4 +1,0 @@
-- 1. Calculate the sum of the array.
-- 2. Increase "leftsum".
-- 3. When leftsum = sum - leftsum - nums[i], i is the pivot index.
-- 4. Above could view as nums[i] = sum - leftsum - rightsum.

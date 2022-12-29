@@ -1,3 +1,0 @@
-- 1. Increase nums[i] by the previous index's running sum.
-- 2. We repeat step 1 for all indices from 1 to n-1.
-- => num[i] = num[i] + num[i-1]
