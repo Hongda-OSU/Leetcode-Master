@@ -1,6 +1,6 @@
 class Solution {
     public List<List<Integer>> combine(int n, int k) {
-        List<List<Integer>> result = new ArrayList<>();
+        List<List<Integer>> result = new LinkedList<>();
         backtrack(result, new LinkedList<>(), 1, n, k);
         return result;
     }
