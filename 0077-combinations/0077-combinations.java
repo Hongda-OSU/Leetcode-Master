@@ -5,12 +5,12 @@ class Solution {
         return result;
     }
     
-    public void backtrack(List<List<Integer>> result, LinkedList<Integer> current, int first, int n, int k) {
-        if (current.size() == k) result.add(new LinkedList<>(current));
+    public void backtrack(List<List<Integer>> result, LinkedList<Integer> curr, int first, int n, int k) {
+        if (curr.size() == k) result.add(new LinkedList<>(curr));
         for (int i = first; i < n + 1; i++) {
-            current.add(i);
-            backtrack(result, current, i + 1, n, k);
-            current.removeLast();
+            curr.add(i);
+            backtrack(result, curr, i + 1, n, k);
+            curr.removeLast();
         }
     }
 }
