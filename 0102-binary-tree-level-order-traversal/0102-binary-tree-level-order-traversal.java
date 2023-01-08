@@ -16,15 +16,15 @@
 class Solution {
     public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> result = new ArrayList<List<Integer>>();
-        if (root != null) traverseInLevelOrder(root, result, 0);
+        if (root != null) levelOrderTraversal(root, result, 0);
         return result;
     }
     
-    public void traverseInLevelOrder(TreeNode node, List<List<Integer>> result, int level) {
-        if (result.size() == level) result.add(new ArrayList<Integer>());
-        result.get(level).add(node.val);
+    public void levelOrderTraversal(TreeNode root, List<List<Integer>> result, int level) {
+        if (result.size() == level) result.add(new ArrayList<>());
+        result.get(level).add(root.val);
         level++;
-        if (node.left != null) traverseInLevelOrder(node.left, result, level);
-        if (node.right != null) traverseInLevelOrder(node.right, result, level);
+        if (root.left != null) levelOrderTraversal(root.left, result, level);
+        if (root.right != null) levelOrderTraversal(root.right, result, level);
     }
 }
