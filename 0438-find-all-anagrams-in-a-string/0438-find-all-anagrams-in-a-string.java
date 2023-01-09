@@ -9,9 +9,12 @@ class Solution {
             pMapping[p.charAt(i) - 'a']++;
         }
         for (int j = 0; j < sLen; j++) {
+            // add one more letter on the right side of the window
             sMapping[s.charAt(j) - 'a']++;
+            // remove one letter from the left side of the window
             if (j >= pLen) 
                 sMapping[s.charAt(j - pLen) - 'a']--;
+            // compare array in the sliding window with the reference array
             if (Arrays.equals(sMapping, pMapping))
                 result.add(j - pLen + 1);
         }
