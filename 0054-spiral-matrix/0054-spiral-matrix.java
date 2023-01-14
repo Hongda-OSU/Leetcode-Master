@@ -4,18 +4,22 @@ class Solution {
         int up = 0, left = 0, down = rows - 1, right = columns - 1;
         List<Integer> result = new ArrayList<>();
         while (result.size() < rows * columns) {
+            // Traverse Right
             for (int column = left; column <= right; column++) {
                 result.add(matrix[up][column]);
             }
+            // Traverse Down
             for (int row = up + 1; row <= down; row++) {
                 result.add(matrix[row][right]);
             } 
             if (up != down) {
+                // Traverse Left
                 for (int column = right - 1; column >= left; column--) {
                     result.add(matrix[down][column]);
                 }
             }
             if (left != right) {
+                // Traver Up
                 for (int row = down - 1; row > up; row--) {
                     result.add(matrix[row][left]);
                 }
