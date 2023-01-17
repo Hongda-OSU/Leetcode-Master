@@ -7,9 +7,11 @@ class Solution {
             String reverse = new StringBuilder(word).reverse().toString();
             if (map.getOrDefault(reverse, 0) > 0) {
                 pairs++;
+                // decrease reverse
                 map.merge(reverse, -1, (a, b) -> a + b);
                 symmetrics -= word.charAt(0) == word.charAt(1) ? 1 : 0;
             } else {
+                // increase word
                 map.merge(word, 1, (a, b) -> a + b);
                 symmetrics += word.charAt(0) == word.charAt(1) ? 1 : 0;
             } 
