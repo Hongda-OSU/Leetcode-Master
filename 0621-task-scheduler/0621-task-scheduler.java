@@ -13,7 +13,7 @@ class Solution {
                 maxCount = 1;
             }
         }
-        // intervals is the interval between "the most appearing chars"
+        // intervals: count the number of intervals between "the most appearing chars"
         // ex:"AXXAXXA" -> intervals = 2, intervalLength = 2
         int intervals = max - 1;
         int intervalLength = n - (maxCount - 1);
