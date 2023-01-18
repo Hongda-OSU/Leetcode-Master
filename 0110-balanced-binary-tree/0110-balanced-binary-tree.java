@@ -23,8 +23,11 @@ class Solution {
         if (root == null) return 0;
         int left = height(root.left);
         int right = height(root.right);
+        // In case of left subtree or right subtree unbalanced, return -1...
         if (left == -1 || right == -1) return -1;
+        // If their heights differ by more than ‘1’, return -1...
         if (Math.abs(left - right) > 1) return -1;
+        // Otherwise, return the height of this subtree as max(leftHeight, rightHight) + 1...
         return Math.max(left, right) + 1;
     }
 }
