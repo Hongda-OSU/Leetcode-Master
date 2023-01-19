@@ -16,6 +16,7 @@
 class Solution {
     private int count = 0;
     private HashMap<Long, Integer> map = new HashMap();
+    
     public int pathSum(TreeNode root, int targetSum) {
         preorder(root, targetSum, 0L);
         return count;
