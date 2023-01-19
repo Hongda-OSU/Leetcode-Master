@@ -14,21 +14,44 @@
  * }
  */
 class Solution {
-    private int count = 0;
-    public int pathSum(TreeNode root, int targetSum) {
-        if (root == null) return 0;
-        getSum(root, targetSum, 0);
-        pathSum(root.left, targetSum);
-        pathSum(root.right, targetSum);
-        return count;
-    }
+     int count = 0;
+    int k;
+    HashMap<Long, Integer> h = new HashMap();
     
-    public void getSum(TreeNode root, int targetSum, long currentSum) {
-        if (root == null) return;
-        currentSum += root.val;
-        if (currentSum == targetSum)
+    public void preorder(TreeNode node, long currSum) {
+        if (node == null)
+            return;
+        
+        // current prefix sum
+        currSum += node.val;
+
+        // here is the sum we're looking for
+        if (currSum == k)
             count++;
-        getSum(root.left, targetSum, currentSum);
-        getSum(root.right, targetSum, currentSum);
+        
+        // number of times the curr_sum − k has occured already, 
+        // determines the number of times a path with sum k 
+        // has occured upto the current node
+        count += h.getOrDefault(currSum - k, 0);
+        
+        // add the current sum into hashmap
+        // to use it during the child nodes processing
+        h.put(currSum, h.getOrDefault(currSum, 0) + 1);
+
+        // process left subtree
+        preorder(node.left, currSum);
+        // process right subtree
+        preorder(node.right, currSum);
+
+        // remove the current sum from the hashmap
+        // in order not to use it during 
+        // the parallel subtree processing
+        h.put(currSum, h.get(currSum) - 1);
+    }    
+            
+    public int pathSum(TreeNode root, int sum) {
+        k = sum;
+        preorder(root, 0L);
+        return count;
     }
 }
