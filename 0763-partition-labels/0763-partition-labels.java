@@ -11,7 +11,9 @@ class Solution {
             partitionEnd = Math.max(partitionEnd, mapping[s.charAt(i) - 'a']);
             // Reached current partition end index
             if (i == partitionEnd) {
+                // Add partition length to output list
                 partitions.add(partitionEnd - patitionStart + 1);
+                // Reset partition
                 patitionStart = i + 1;
                 partitionEnd = i + 1;
             }
