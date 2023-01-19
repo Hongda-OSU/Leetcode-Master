@@ -20,17 +20,17 @@ class Solution {
         return root;
     }
     
-    public void invert(TreeNode root) {
+    public void invert(TreeNode node) {
         TreeNode leftNode = null, rightNode = null;
-        if (root.left != null) {
-            leftNode = root.left;
+        if (node.left != null) {
+            leftNode = node.left;
             invert(leftNode);
         }
-        if (root.right != null) {
-            rightNode = root.right;
+        if (node.right != null) {
+            rightNode = node.right;
             invert(rightNode);
         }
-        root.left = rightNode;
-        root.right = leftNode;
+        node.left = rightNode;
+        node.right = leftNode;
     }
 }
