@@ -14,34 +14,26 @@
  * }
  */
 public class BSTIterator {
+    private TreeNode visit;
     private Stack<TreeNode> stack;
     
     public BSTIterator(TreeNode root) {
-        stack = new Stack<>();
-        TreeNode curr = root;
-        while (curr != null) {
-            stack.push(curr);
-            curr = curr.left;
-        }
+        visit = root;
+        stack = new Stack();
     }
 
-    /** @return whether we have a next smallest number */
     public boolean hasNext() {
-        return !stack.isEmpty();
+        return visit != null || !stack.empty();
     }
 
-    /** @return the next smallest number */
     public int next() {
-        TreeNode node = stack.pop();
-        
-        // Traversal cur node's right branch
-        TreeNode curr = node.right;
-        while (curr != null){
-            stack.push(curr);
-            curr = curr.left;
+        while (visit != null) {
+            stack.push(visit);
+            visit = visit.left;
         }
-        
-        return node.val;
+        TreeNode next = stack.pop();
+        visit = next.right;
+        return next.val;
     }
 }
 
