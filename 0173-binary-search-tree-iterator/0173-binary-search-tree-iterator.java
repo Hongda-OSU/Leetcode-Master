@@ -33,14 +33,12 @@ public class BSTIterator {
     /** @return the next smallest number */
     public int next() {
         TreeNode node = stack.pop();
-        
         // Traversal cur node's right branch
         TreeNode curr = node.right;
         while (curr != null){
             stack.push(curr);
             curr = curr.left;
         }
-        
         return node.val;
     }
 }
