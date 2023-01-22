@@ -10,6 +10,7 @@ class Solution {
     public void backtrack(List<List<Integer>> result, List<Integer> subset, int[] nums, int index) {
         result.add(new ArrayList<>(subset));
         for (int i = index; i < nums.length; i++) {
+            // If the current element is a duplicate, ignore.
             if (i != index && nums[i] == nums[i - 1]) {
                 continue;
             }
