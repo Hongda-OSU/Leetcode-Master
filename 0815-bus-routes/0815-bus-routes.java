@@ -26,10 +26,15 @@ class Solution {
             int size = queue.size();
             while (size > 0) {
                 int rem = queue.removeFirst();
+                // if the removed bus stop is equal to our target bus stop, then return the cost
                 if (rem == target) return cost;
+                //use the hashmap to get the list of buses we can get form the bus stop on which we currently stand
                 ArrayList<Integer> buses = map.get(rem);
+                //think as if we are trying to catch and explore a new bus from the bus stop on which we are
                 for (int bus : buses) {
+                    //already visited then don't do anything, just continue to explore new buses
                     if (busVisited.contains(bus)) continue;
+                    //new bus found, catch this bus and see where can you reach target from this bus
                     int[] stops = routes[bus];
                     for (int busStop : stops) {
                         if (busStopVisited.contains(busStop)) continue;
