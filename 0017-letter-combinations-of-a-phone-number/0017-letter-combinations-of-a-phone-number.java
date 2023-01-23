@@ -4,17 +4,17 @@ class Solution {
         // 0, 1, 2...
         String[] dict = new String[] {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
         if (digits.length() == 0) return result;
-        backtrack(result, digits.toCharArray(), "", dict);
+        backtrack(result, digits, "", dict);
         return result;
     } 
     
-    public void backtrack(List<String> result, char[] digits, String str, String[] dict) {
-        if (str.length() == digits.length) {
+    public void backtrack(List<String> result, String digits, String str, String[] dict) {
+        if (str.length() == digits.length()) {
             result.add(str);
             return;
         }
-        int len = str.length();
-        int digit = digits[len] - '0';
+        int i = str.length();
+        int digit = digits.charAt(i) - '0';
         for (char letter : dict[digit].toCharArray()) {
             backtrack(result, digits, str + Character.toString(letter), dict);
         }
