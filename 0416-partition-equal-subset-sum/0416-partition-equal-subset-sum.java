@@ -4,18 +4,14 @@ class Solution {
         for (int num : nums) sum += num;
         // if totalSum is odd, it cannot be partitioned into equal sum subset
         if (sum % 2 != 0) return false;
-        int subSetSum = sum / 2, len = nums.length;
-        boolean[][] dp = new boolean[len + 1][subSetSum + 1];
-        dp[0][0] = true;
-        for (int i = 1; i <= len; i++) {
-            int curr = nums[i - 1];
-            for (int j = 0; j <= subSetSum; j++) {
-                if (j < curr)
-                    dp[i][j] = dp[i - 1][j];
-                else 
-                    dp[i][j] = dp[i - 1][j] || dp[i - 1][j - curr];
+        int subSetSum = sum / 2;
+        boolean dp[] = new boolean[subSetSum + 1];
+        dp[0] = true;
+        for (int curr : nums) {
+            for (int j = subSetSum; j >= curr; j--) {
+                dp[j] |= dp[j - curr];
             }
         }
-        return dp[len][subSetSum];
+        return dp[subSetSum];
     } 
 }
