@@ -8,6 +8,7 @@ class Solution {
             if (ch == '(') {
                 stack.push(i);
             } else {
+                // remove the paired '(' or append the unnecessary ')' [or keep the pushed '(' unchange]
                 if (!stack.isEmpty() && s.charAt(stack.peek()) == '(')
                     stack.pop();
                 else
