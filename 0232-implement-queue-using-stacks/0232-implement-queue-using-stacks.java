@@ -3,6 +3,7 @@ class MyQueue {
     Stack<Integer> s2 = new Stack<>();
     
     public void push(int x) {
+        // LIFO
         // revert what's in s1 in s2
         while (!s1.isEmpty()) {
             s2.push(s1.pop());
