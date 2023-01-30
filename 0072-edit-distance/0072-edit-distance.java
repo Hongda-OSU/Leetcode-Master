@@ -15,9 +15,9 @@ class Solution {
         if (word1.charAt(w1 - 1) == word2.charAt(w2 - 1)) {
             return minDistanceHelper(word1, word2, w1 - 1, w2 - 1, memo);
         } else {
-            int delete = 1 + minDistanceHelper(word1, word2, w1 - 1, w2, memo);
-            int replace = 1 + minDistanceHelper(word1, word2, w1 - 1, w2 - 1, memo);
-            int insert = 1 + minDistanceHelper(word1, word2, w1, w2 - 1, memo);
+            int delete = 1 + minDistanceHelper(word1, word2, w1 - 1, w2, memo); // delete operation
+            int replace = 1 + minDistanceHelper(word1, word2, w1 - 1, w2 - 1, memo); // replace operation
+            int insert = 1 + minDistanceHelper(word1, word2, w1, w2 - 1, memo); // insert operation
             return memo[w1][w2] = Math.min(delete, Math.min(replace, insert));
         }
     }
