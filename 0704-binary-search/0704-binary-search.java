@@ -3,9 +3,12 @@ class Solution {
         int left = 0, right = nums.length - 1, pivot;
         while (left <= right) {
             pivot = left + (right - left) / 2;
-            if (nums[pivot] == target) return pivot;
-            if (target < nums[pivot]) right--;
-            else left++;
+            if (nums[pivot] == target) 
+                return pivot;
+            else if (nums[pivot] < target) 
+                left++;
+            else 
+                right--;
         }
         return -1;
     }
