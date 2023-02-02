@@ -6,9 +6,9 @@ class Solution {
             if (nums[pivot] == target) 
                 return pivot;
             else if (nums[pivot] < target) 
-                left++;
+                left = pivot + 1;
             else 
-                right--;
+                right = pivot - 1;
         }
         return -1;
     }
