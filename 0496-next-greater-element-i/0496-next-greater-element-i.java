@@ -3,6 +3,7 @@ class Solution {
         Stack<Integer> stack = new Stack<>(); //LIFO
         HashMap<Integer, Integer> map = new HashMap<>();
         for (int num : nums2) {
+            // if num is greater than top elements in stack then it is the next greater element in nums2
             while (!stack.isEmpty() && stack.peek() < num) 
                 // store num (key) next great number (value)
                 map.put(stack.pop(), num);
