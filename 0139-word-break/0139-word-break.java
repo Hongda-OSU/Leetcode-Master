@@ -1,18 +1,23 @@
 class Solution {
-    public boolean wordBreak(String s, List<String> wordDict) {
-        if (s == null || s.length() == 0) return false;
-        int len = s.length();
-        // dp[i] represents whether s[0...i] can be formed by dict
-        boolean[] dp = new boolean[len];
-        for (int i = 0; i < len; i++) {
-            for (int j = 0; j <= i; j++) {
-                String str = s.substring(j, i + 1);
-                if (wordDict.contains(str) && (j == 0 || dp[j - 1])) {
-                    dp[i] = true;
-                    break;
-                }
+   public boolean wordBreak(String s, List<String> wordDict) {
+        Set<String> set = new HashSet<>();
+        for (String word : wordDict) {
+            set.add(word);
+        }
+        Map<String, Boolean> cache = new HashMap<>();
+        return recurFind(set, s, cache);
+    }
+    
+    private boolean recurFind(Set<String> set, String s, Map<String, Boolean> cache) {
+        if (cache.containsKey(s)) return cache.get(s);
+        if (set.contains(s)) return true;
+        for (int i = 1; i < s.length(); i++) {
+            if (set.contains(s.substring(0, i)) && recurFind(set, s.substring(i, s.length()), cache)) {
+                cache.put(s, true);
+                return true;   
             }
         }
-        return dp[len - 1];
-    } 
+        cache.put(s, false);
+        return false;
+    }
 }
