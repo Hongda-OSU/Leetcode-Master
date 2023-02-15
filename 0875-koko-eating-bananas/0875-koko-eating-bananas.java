@@ -7,6 +7,7 @@ class Solution {
             int pivot = (left + right) >>> 1;
             int hour = 0;
             for (int pile : piles)
+                // round up
                 hour += Math.ceil((double)pile / pivot);
             if (hour <= h)
                 right = pivot;
