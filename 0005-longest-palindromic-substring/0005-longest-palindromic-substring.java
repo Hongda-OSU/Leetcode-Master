@@ -1,27 +1,39 @@
 class Solution {
+    private Boolean[][] memo ;
     public String longestPalindrome(String s) {
-        if (s.length() == 0) return "";
-        int left = 0, right = 0, len = s.length();
-        boolean[][] dp = new boolean[len][len];
-        for (int i = 0; i < len; i++) {
-            for (int j = i; j >= 0; j--) {
-                boolean startEqEnd = s.charAt(i) == s.charAt(j);
-                if (i == j) 
-                    //If the same char: 'a' is palindrome
-                    dp[i][j] = true;
-                else if (i - j == 1)
-                    //If length 2: 'ab' is palindrome when 'a' == 'b'
-                    dp[i][j] = startEqEnd;
-                else if (startEqEnd && dp[i - 1][j + 1]) 
-                    //Otherwise: string is palindrome if s(i) == s(j) and substring s(j + 1, i - 1) is palindrome
-                    dp[i][j] = true;
-                
-                if (dp[i][j] && i - j > right - left) {
-                    right = i;
-                    left = j;
-                }
+        int len = s.length();
+        int maxLen = 0;
+        String res = "";
+        memo = new Boolean[len][len];
+        for (int left = 0; left < len; left++){
+            for (int right = left; right < len; right++){
+                if (s.charAt(left) == s.charAt(right) && isPalin(s,left + 1, right -1)) {
+                    if (maxLen < right - left + 1) {
+                        maxLen = right - left + 1;
+                        res = s.substring(left, right + 1);
+                    }
+                }   
             }
         }
-        return s.substring(left, right + 1);
+        return res;
+    }
+    
+    
+    public boolean isPalin(String s, int left, int right){
+        if (left >= right){
+            return true;
+        }
+        if (memo[left][right] != null){
+            return memo[left][right] ;
+        }
+        if (s.charAt(left) != s.charAt(right)) {
+            return memo[left][right] = false;
+        }
+        if (right - left <= 2){
+            return memo[left][right] = true;
+        }
+        memo[left][right] = isPalin(s,left + 1, right - 1);
+        return memo[left][right];
+        
     }
 }
