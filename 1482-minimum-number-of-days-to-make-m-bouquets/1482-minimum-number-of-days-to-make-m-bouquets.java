@@ -1,44 +1,33 @@
 class Solution {
-     public int minDays(int[] bloomDay, int m, int k) {
-        int low  = Arrays.stream(bloomDay).min().getAsInt();
-        int high =  Arrays.stream(bloomDay).max().getAsInt();
-
-        int  ans = -1;
-
-        while (low<=high){
-            int mid = low+(high-low)/2;
-
-            if(isPossible(bloomDay,mid,k,m)){
-                ans=mid;
-                high=mid-1;
-            }
-            else {
-
-                low=mid+1;
+    public int minDays(int[] bloomDay, int m, int k) {
+        int low = Arrays.stream(bloomDay).min().getAsInt(), 
+            high = Arrays.stream(bloomDay).max().getAsInt(), 
+            result = -1;
+        while (low <= high) {
+            int pivot = (low + high) >>> 1;
+            if(makeBouquest(bloomDay, m, k, pivot)) {
+                result = pivot;
+                high = pivot - 1;
+            } else {
+                low = pivot + 1;
             }
         }
-
-        return ans;
+        return result;
     }
-
-    private boolean isPossible(int[] bloomDay, int mid, int k,int booket) {
+    
+    public boolean makeBouquest(int[] bloomDay, int m, int k, int pivot) {
         int bouquets = 0, flowersCollected = 0;
         for (int value : bloomDay) {
-            if (value <= mid) {
-//                If the current flower can be taken with in days then increase the flower flowersCollected.
+            if (value <= pivot) 
                 flowersCollected++;
-            } else {
-//                If there is a flower in between that takes more number of days then the given day, then resent the counter.
+            else 
                 flowersCollected = 0;
-            }
-//            If the flowersCollected is same as the required flower per bookie, then increase the bouquets count;
+            
             if (flowersCollected == k) {
                 bouquets++;
                 flowersCollected = 0;
             }
         }
-
-        return bouquets>=booket;
-
+        return bouquets >= m;
     }
 }
