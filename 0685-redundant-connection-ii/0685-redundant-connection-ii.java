@@ -48,7 +48,9 @@ class Solution {
     }  
     
     public int find(int x, int[] parent) {
-        if(x == parent[x]) return x;
-        else return find(parent[x], parent);
+        if (x == parent[x]) 
+            return x;
+        else 
+            return find(parent[x], parent);
     }
 }
