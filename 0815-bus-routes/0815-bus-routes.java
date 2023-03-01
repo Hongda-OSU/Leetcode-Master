@@ -1,33 +1,36 @@
 class Solution {
     public int numBusesToDestination(int[][] routes, int S, int T) {
-        int n = routes.length;
-        HashMap<Integer, HashSet<Integer>> to_routes = new HashMap<>();
-        for (int i = 0; i < routes.length; ++i) {
-            for (int j : routes[i]) {
-                if (!to_routes.containsKey(j))
-                    to_routes.put(j, new HashSet<Integer>());
-                to_routes.get(j).add(i);
-            }
+        HashSet<Integer> visited = new HashSet<>();
+       Queue<Integer> q = new LinkedList<>();
+       HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
+       int ret = 0; 
+        
+       if (S==T) return 0; 
+        
+       for(int i = 0; i < routes.length; i++){
+            for(int j = 0; j < routes[i].length; j++){
+                ArrayList<Integer> buses = map.getOrDefault(routes[i][j], new ArrayList<>());
+                buses.add(i);
+                map.put(routes[i][j], buses);                
+            }       
         }
-        Queue<int[]> bfs = new ArrayDeque();
-        bfs.offer(new int[] {S, 0});
-        HashSet<Integer> seen = new HashSet<>();
-        seen.add(S);
-        boolean[] seen_routes = new boolean[n];
-        while (!bfs.isEmpty()) {
-            int stop = bfs.peek()[0], bus = bfs.peek()[1];
-            bfs.poll();
-            if (stop == T) return bus;
-            for (int i : to_routes.get(stop)) {
-                if (seen_routes[i]) continue;
-                for (int j : routes[i]) {
-                    if (!seen.contains(j)) {
-                        seen.add(j);
-                        bfs.offer(new int[] {j, bus + 1});
-                    }
-                }
-                seen_routes[i] = true;
-            }
+                
+       q.offer(S); 
+       while (!q.isEmpty()) {
+           int len = q.size();
+           ret++;
+           for (int i = 0; i < len; i++) {
+               int cur = q.poll();
+               ArrayList<Integer> buses = map.get(cur);
+               for (int bus: buses) {
+                    if (visited.contains(bus)) continue;
+                    visited.add(bus);
+                    for (int j = 0; j < routes[bus].length; j++) {
+                        if (routes[bus][j] == T) return ret;
+                        q.offer(routes[bus][j]);  
+                   }
+               }
+           }
         }
         return -1;
     }
