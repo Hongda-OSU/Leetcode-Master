@@ -1,34 +1,22 @@
 class Solution {
-    HashMap<String, Integer> map = new HashMap<>();
-    
     public int romanToInt(String s) {
-        map.put("I", 1);
-        map.put("V", 5);
-        map.put("X", 10);
-        map.put("L", 50);
-        map.put("C", 100);
-        map.put("D", 500);
-        map.put("M", 1000);
-        map.put("IV", 4);
-        map.put("IX", 9);
-        map.put("XL", 40);
-        map.put("XC", 90);
-        map.put("CD", 400);
-        map.put("CM", 900);
+        HashMap<Character, Integer> hMap = new HashMap<Character, Integer>();
+        hMap.put('I', 1);
+        hMap.put('V', 5);
+        hMap.put('X', 10);
+        hMap.put('L', 50);
+        hMap.put('C', 100);
+        hMap.put('D', 500);
+        hMap.put('M', 1000);
         
-        int result = 0, i = 0;
-        while (i < s.length()) {
-            if (i < s.length() - 1) {
-                String doubleStr = s.substring(i, i + 2);
-                if (map.containsKey(doubleStr)) {
-                    result += map.get(doubleStr);
-                    i += 2;
-                    continue;
-                }
+        int result = hMap.get(s.charAt(0));
+        for(int i = 1;i < s.length(); i++){
+            if(hMap.get(s.charAt(i)) <= hMap.get(s.charAt(i - 1))){
+                result += hMap.get(s.charAt(i));
+            } else {
+                //减去上一个循环中多加的数字
+                result = result - 2 * hMap.get(s.charAt(i - 1)) + hMap.get(s.charAt(i));
             }
-            String singleStr = s.substring(i, i + 1);
-            result += map.get(singleStr);
-            i += 1;
         }
         return result;
     }
