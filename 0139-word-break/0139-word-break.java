@@ -1,18 +1,23 @@
 class Solution {
     public boolean wordBreak(String s, List<String> wordDict) {
-        if (s == null || s.length() == 0) return false;
-        int len = s.length();
-        // dp[i] represents whether s[0...i] can be formed by dict
-        boolean[] dp = new boolean[len];
-        for (int i = 0; i < len; i++) {
-            for (int j = 0; j <= i; j++) {
-                String str = s.substring(j, i + 1);
-                if (wordDict.contains(str) && (j == 0 || dp[j - 1])) {
-                    dp[i] = true;
-                    break;
-                }
-            }
+        Set<Integer> set = new HashSet<>();
+        return dfs(s, 0, wordDict, set);
+    }
+    
+    public boolean dfs(String s, int idx, List<String> dict, Set<Integer> set) {
+        if (idx == s.length())
+            return true;
+        if (set.contains(idx))
+            return false;
+        for (int i = idx + 1; i <= s.length(); i++) {
+            String str = s.substring(idx, i);
+            if (dict.contains(str)) 
+                if (dfs(s, i, dict, set))
+                    return true;
+                else 
+                    set.add(i);
         }
-        return dp[len - 1];
-    } 
+        set.add(idx);
+        return false;
+    }
 }
