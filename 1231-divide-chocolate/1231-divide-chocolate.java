@@ -4,7 +4,7 @@ class Solution {
         int left = Arrays.stream(sweetness).min().getAsInt();
         int right = Arrays.stream(sweetness).sum() / numPeople;
         while (left < right) {
-            int pivot = (left + right + 1) >>> 1;
+            int pivot = (left + right + 1) / 2;
             int currSweetness = 0;
             int peopleWithChocolate = 0;
             for (int s : sweetness) {
