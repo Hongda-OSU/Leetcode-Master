@@ -1,11 +1,10 @@
 class Solution {
     public boolean isPrintable(int[][] targetGrid) {
         Map<Integer, int[]> pos = new HashMap<>();
-        int n = targetGrid.length;
-        int m = targetGrid[0].length;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                pos.putIfAbsent(targetGrid[i][j], new int[]{n, m, -1, -1});
+        int row = targetGrid.length, col = targetGrid[0].length;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                pos.putIfAbsent(targetGrid[i][j], new int[]{row, col, -1, -1});
                 int[] coord = pos.get(targetGrid[i][j]);
                 coord[0] = Math.min(coord[0], i);
                 coord[1] = Math.min(coord[1], j);
@@ -17,24 +16,21 @@ class Solution {
         while (!colors.isEmpty()) {
             Set<Integer> next = new HashSet<>();
             for (int color : colors) {
-                if (!erase(targetGrid, pos.get(color), color)) {
+                if (!erase(targetGrid, pos.get(color), color))
                     next.add(color);
-                }
             }
-            if (colors.size() == next.size()) {
+            if (colors.size() == next.size())
                 return false;
-            }
             colors = next;
         }
         return true;
     }
     
-    private boolean erase(int[][] targetGrid, int[] coord, int color) {
+    public boolean erase(int[][] targetGrid, int[] coord, int color) {
         for (int i = coord[0]; i <= coord[2]; i++) {
             for (int j = coord[1]; j <= coord[3]; j++) {
-                if (targetGrid[i][j] > 0 && targetGrid[i][j] != color) {
+                if (targetGrid[i][j] > 0 && targetGrid[i][j] != color)
                     return false;
-                }
             }
         }
         for (int i = coord[0]; i <= coord[2]; i++) {
