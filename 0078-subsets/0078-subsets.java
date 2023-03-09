@@ -15,10 +15,10 @@ class Solution {
         }
         // case 1 : we pick the element
         temp.add(nums[index]);
-        getSubSets(nums, temp, index+1); // move ahead
-        temp.remove(temp.size()-1);
-        
+        getSubSets(nums, temp, index + 1); // move ahead
+        temp.remove(temp.size() - 1);
+         
 		// case 2 : we don't pick the element ( notice, we did not add the current element in our temporary list
-        getSubSets(nums, temp, index+1); // move ahead
+        getSubSets(nums, temp, index + 1); // move ahead
     }
 }
