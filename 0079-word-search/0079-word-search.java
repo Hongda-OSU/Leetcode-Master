@@ -15,7 +15,7 @@ class Solution {
         /* once we get past word.length, we are done. */
         if (word.length() <= start) return true;
         /* if off bounds, letter is seen, letter is unequal to word.charAt(start) return false */
-        if(row < 0 || column < 0 || row >= board.length || column >= board[0].length || board[row][column]=='0' || board[row][column] != word.charAt(start))
+        if(row < 0 || column < 0 || row >= board.length || column >= board[0].length || board[row][column] =='0' || board[row][column] != word.charAt(start))
             return false;
         /* set this board position to seen. (Because we can use this postion) */
         char ch = board[row][column];
