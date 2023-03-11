@@ -1,6 +1,6 @@
 class Solution {
     public int smallestCommonElement(int[][] mat) {
-         int n = mat.length, m = mat[0].length;
+        int n = mat.length, m = mat[0].length;
         for (int i = 0; i < m; i++) {
             boolean found = true;
             for (int j = 1; j < n && found; j++) 
