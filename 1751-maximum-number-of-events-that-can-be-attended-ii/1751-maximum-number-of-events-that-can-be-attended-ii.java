@@ -16,13 +16,15 @@ class Solution {
         return dp[n][k];
     }
     
-    public int binarySearch(int[][] a, int x) {
-         int l = -1, r = a.length;
-        while (r - l > 1) {
-            int m = (l + r) / 2;
-            if (a[m][1] < x) l = m;
-            else r = m;
+    public int binarySearch(int[][] events, int x) {
+        int left = -1, right = events.length;
+        while (right - left > 1) {
+            int pivot = (left + right) >>> 1;
+            if (events[pivot][1] < x) 
+                left = pivot;
+            else 
+                right = pivot;
         }
-        return l;
+        return left;
     }
 }
