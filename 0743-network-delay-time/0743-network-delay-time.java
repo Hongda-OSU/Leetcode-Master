@@ -18,11 +18,13 @@ class Solution {
             visited[node] = true;
             result = dist;
             n--;
+            if (n == 0)
+                return result;
             if (map.containsKey(node)) {
                 for (int next : map.get(node).keySet())
                     pq.add(new int[]{dist + map.get(node).get(next), next});
             }
         } 
-        return n == 0 ? result : -1;
+        return -1;
     }
 }
