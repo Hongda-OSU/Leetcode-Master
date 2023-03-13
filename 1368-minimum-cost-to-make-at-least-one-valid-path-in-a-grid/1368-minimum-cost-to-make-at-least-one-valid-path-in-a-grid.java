@@ -1,5 +1,5 @@
 class Solution {
-    int[][] dirs = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    public int[][] dirs = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
     
     public int minCost(int[][] grid) {
         int rows = grid.length, cols = grid[0].length;
