@@ -1,15 +1,15 @@
 class Solution {
     public int minEatingSpeed(int[] piles, int h) {
-        int l = 1, r = 1000000000;
-        while (l < r) {
-            int m = (l + r) / 2, total = 0;
-            for (int p : piles)
-                total += (p + m - 1) / m;
+        int left = 1, right = 1_000_000_007;
+        while (left < right) {
+            int pivot = (left + right) >>> 1, total = 0;
+            for (int pile : piles) 
+                total += (pile + pivot - 1) / pivot;
             if (total > h)
-                l = m + 1;
+                left = pivot + 1;
             else
-                r = m;
+                right = pivot;
         }
-        return l;
+        return left;
     }
 }
