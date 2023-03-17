@@ -5,7 +5,7 @@ class Solution {
     public int sumOfFlooredPairs(int[] nums) {
         int[] counts = new int[MAX + 1];
         for (int num : nums)
-            ++counts[num];
+            counts[num] += 1;
         for (int i = 1; i <= MAX; i++) 
             counts[i] += counts[i - 1];
         long total = 0;
