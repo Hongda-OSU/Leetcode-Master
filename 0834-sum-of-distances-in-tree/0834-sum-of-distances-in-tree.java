@@ -1,39 +1,49 @@
 class Solution {
-    int[] ans, count;
-    List<Set<Integer>> graph;
-    int N;
-    public int[] sumOfDistancesInTree(int N, int[][] edges) {
-        this.N = N;
-        graph = new ArrayList<Set<Integer>>();
-        ans = new int[N];
-        count = new int[N];
-        Arrays.fill(count, 1);
-
-        for (int i = 0; i < N; ++i)
-            graph.add(new HashSet<Integer>());
-        for (int[] edge: edges) {
-            graph.get(edge[0]).add(edge[1]);
-            graph.get(edge[1]).add(edge[0]);
+    public int[] sumOfDistancesInTree(int n, int[][] edges) {
+        ArrayList<Integer>[] graph = new ArrayList[n];
+        for (int i = 0; i < n; i++) 
+            graph[i] = new ArrayList<>();
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1];
+            graph[u].add(v);
+            graph[v].add(u);
         }
-        dfs(0, -1);
-        dfs2(0, -1);
-        return ans;
+        int[] countArr = new int[n];
+        countNodes(graph, 0, countArr, new boolean[n]);
+        int[] distance = new int[n];
+        distance[0] = rootDistance(graph, 0, countArr, new boolean[n]);
+        calcDistances(graph, 0, countArr, distance, new boolean[n]);
+        return distance;
     }
-
-    public void dfs(int node, int parent) {
-        for (int child: graph.get(node))
-            if (child != parent) {
-                dfs(child, node);
-                count[node] += count[child];
-                ans[node] += ans[child] + count[child];
-            }
+    
+    public int countNodes(ArrayList<Integer>[] graph, int idx, int[] countArr, boolean[] visited) {
+        visited[idx] = true;
+        int count = 1;
+        for (int neighbor : graph[idx]) {
+            if (visited[neighbor] == false)
+                count += countNodes(graph, neighbor, countArr, visited);
+        }
+        countArr[idx] = count;
+        return count;
     }
-
-    public void dfs2(int node, int parent) {
-        for (int child: graph.get(node))
-            if (child != parent) {
-                ans[child] = ans[node] - count[child] + N - count[child];
-                dfs2(child, node);
+    
+    public int rootDistance(ArrayList<Integer>[] graph, int idx, int[] countArr, boolean[] visited) {
+        visited[idx] = true;
+        int dist = 0;
+        for (int neighbor : graph[idx]) {
+            if (visited[neighbor] == false)
+                dist += rootDistance(graph, neighbor, countArr, visited) + countArr[neighbor];
+        }
+        return dist;
+    }
+    
+    public void calcDistances(ArrayList<Integer>[] graph, int idx, int[] countArr, int[] distance, boolean[] visited) {
+        visited[idx] = true;
+        for (int neighbor : graph[idx]) {
+            if (visited[neighbor] == false) {
+                distance[neighbor] = distance[idx] + graph.length - 2 * countArr[neighbor];
+                calcDistances(graph, neighbor, countArr, distance, visited);
             }
+        }
     }
 }
