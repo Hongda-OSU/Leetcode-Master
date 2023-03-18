@@ -19,7 +19,7 @@ class Solution {
         int availableCourses = 0;
         for (int i = 0; i < n; i += 1) {
             if ((mask & prereq[i]) == prereq[i]) {
-                if( (mask & (1<<i))>0 )
+                if((mask & (1 << i)) > 0)
                     continue;
                 availableCourses |= 1 << i;
             }
