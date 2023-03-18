@@ -1,39 +1,35 @@
 class Solution {
-    public int minNumberOfSemesters(int n, int[][] relations, int k) {
-        int[] pres = new int[n];
-        for (int[] r : relations) {
-            int prev = r[0] - 1;
-            int next = r[1] - 1;
-            pres[next] |= (1 << prev);
+      public int minNumberOfSemesters(int n, int[][] relations, int k) {
+        int[] prereq = new int[n];
+        for (int[] req : relations) {
+            prereq[req[1] - 1] |= 1 << (req[0] - 1);
         }
-        
-        int[] dp = new int[1 << n];
-        Arrays.fill(dp, n);
-        dp[0] = 0;
-        
-        for (int mask = 0; mask < dp.length; mask++) {
-            int canTake = 0;
-            for (int i = 0; i < n; i++) {
-                // already taken
-                if ((mask & (1 << i)) != 0) {
+        int[] dp = new int[(1 << n)];
+        Arrays.fill(dp, -1);
+        return solve(0, n, k, prereq, dp);
+    }
+
+    private int solve(int mask, int n, int k, int[] prereq, int[] dp) {
+        if (mask == (1 << n) - 1) {
+            return 0;
+        }
+        if (dp[mask] != -1) {
+            return dp[mask];
+        }
+        int availableCourses = 0;
+        for (int i = 0; i < n; i += 1) {
+            if ((mask & prereq[i]) == prereq[i]) {
+                if( (mask & (1<<i))>0 )
                     continue;
-                }
-                // satisfy all pres
-                if ((mask & pres[i]) == pres[i]) {
-                    canTake |= (1 << i);
-                }
-            }
-            
-            // loop each sub-masks
-            for (int take = canTake; take > 0; take = (take - 1) & canTake) {
-                if (Integer.bitCount(take) > k) {
-                    continue;
-                }
-                dp[take | mask] = Math.min(dp[take | mask], dp[mask] + 1);
+                availableCourses |= 1 << i;
             }
         }
-        
-        return dp[(1 << n) - 1];
-    
+        int best = Integer.MAX_VALUE / 2;
+        for (int submask = availableCourses; submask > 0; submask = (submask - 1) & availableCourses) {
+            if (Integer.bitCount(submask) <= k) {
+                best = Math.min(best, 1 + solve(mask | submask, n, k, prereq, dp));
+            }
+        }
+        return dp[mask] = best;
     }
 }
