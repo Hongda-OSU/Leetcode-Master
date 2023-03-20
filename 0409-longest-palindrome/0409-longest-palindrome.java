@@ -1,15 +1,18 @@
 class Solution {
     public int longestPalindrome(String s) {
-        Set<Character> set = new HashSet<>();
-        int length = 0;
-        for (char ch : s.toCharArray()) {
-            if (!set.contains(ch)) {
-                set.add(ch);
-            } else {
-                set.remove(ch);
-                length++;
+       int[] count = new int[256];
+        for (char ch : s.toCharArray())
+            count[ch]++;
+        boolean bool = false;
+        int len = 0;
+        for (int c : count) {
+            if (c % 2 == 0)
+                len += c;
+            else {
+                len += c - 1;
+                bool = true;
             }
         }
-        return set.isEmpty() ? 2 * length : 2 * length + 1;
+        return bool ? len + 1 : len;
     }
 }
