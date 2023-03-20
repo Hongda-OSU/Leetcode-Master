@@ -22,7 +22,8 @@ class Solution {
             int idx = (i + direction) % str.length();
             result[idx] = str.charAt(i);
         }
-         for (char c : result) sb.append(c);
+        for (char ch : result) 
+            sb.append(ch);
         return sb.toString();
     }
 }
