@@ -1,35 +1,37 @@
 class SummaryRanges {
-    public TreeSet<int[]> set;
+    public TreeMap<Integer, Integer> intervals;
 
     public SummaryRanges() {
-        set = new TreeSet<>((a, b) -> a[0] == b[0] ? a[1] - b[1] : a[0] - b[0]);
+        intervals = new TreeMap<>();
     }
     
     public void addNum(int value) {
-        int[] interval = new int[]{value, value};
-        if (set.contains(interval))
-            return;
-        int[] high = set.higher(interval);
-        int[] low = set.lower(interval);
-        if (high != null && high[0] == value + 1 && low != null && low[1] == value - 1) {
-            high[0] = low[0];
-            set.remove(low);
-        } else if (high != null && high[0] == value + 1) {
-            high[0]--;
-        } else if (low != null && low[1] == value - 1) {
-            low[1]++;
-        } else if((high != null && high[0] == value) || (low != null && low[1] >= value && low[0] <= value)) {
-            return;
-        } else {
-            set.add(interval);
+        Map.Entry<Integer, Integer> minEntry = intervals.floorEntry(value);
+        int left = value, right = value;
+        if (minEntry != null) {
+            int rightEntry = minEntry.getValue();
+            if (rightEntry >= value)
+                return;
+            if (rightEntry == value - 1)
+                left = minEntry.getKey();
         }
+        Map.Entry<Integer, Integer> maxEntry = intervals.higherEntry(value);
+        if (maxEntry != null && maxEntry.getKey() == value + 1) {
+           right = maxEntry.getValue();
+            intervals.remove(value + 1);
+        }
+        intervals.put(left, right);
     }
     
     public int[][] getIntervals() {
-        List<int[]> list = new ArrayList<>();
-        for (int[] interval : set) 
-            list.add(interval);
-        return list.toArray(new int[0][]);
+        int[][] result = new int[intervals.size()][2];
+        int i = 0;
+        for (Map.Entry<Integer, Integer> entry : intervals.entrySet()) {
+            result[i][0] = entry.getKey();
+            result[i][1] = entry.getValue();
+            i++;
+        }
+        return result;
     }
 }
 
