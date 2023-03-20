@@ -1,24 +1,29 @@
 class Solution {
-    Map<Integer, Integer> m;
-    Random r;
-    int wlen;
+    public Map<Integer, Integer> map;
+    public Random rnd;
+    public int m;
 
-    public Solution(int n, int[] b) {
-        m = new HashMap<>();
-        r = new Random();
-        wlen = n - b.length;
-        Set<Integer> w = new HashSet<>();
-        for (int i = wlen; i < n; i++) w.add(i);
-        for (int x : b) w.remove(x);
-        Iterator<Integer> wi = w.iterator();
-        for (int x : b)
-            if (x < wlen)
-                m.put(x, wi.next());
+    public Solution(int n, int[] blacklist) {
+        map = new HashMap<>();
+        for (int b : blacklist)
+            map.put(b, -1);
+        m = n - map.size();
+        for (int b : blacklist) {
+            if (b < m) {
+                while (map.containsKey(n - 1))
+                    n--;
+                map.put(b, n - 1);
+                n--;
+            }
+        }
+        rnd = new Random();
     }
-
+    
     public int pick() {
-        int k = r.nextInt(wlen);
-        return m.getOrDefault(k, k);
+        int p = rnd.nextInt(m);
+        if (map.containsKey(p))
+            return map.get(p);
+        return p;
     }
 }
 
