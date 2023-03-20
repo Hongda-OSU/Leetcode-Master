@@ -1,13 +1,20 @@
 class Solution {
     public int missingElement(int[] nums, int k) {
-        int left = 0, right = nums.length - 1;
-        while (left <= right) {
+        int n = nums.length;
+        int left = 0, right = n - 1;
+        int missingNum = nums[right] - nums[left] - (right - left);
+        if (missingNum < k)
+            return nums[right] + k - missingNum;
+        while (right - left > 1) {
             int pivot = (left + right) >>> 1;
-            if (nums[pivot] - nums[0] - pivot < k) 
-                left = pivot + 1;
-            else 
-                right = pivot - 1;
+            missingNum = nums[pivot] - nums[left] - (pivot - left);
+            if (k > missingNum) {
+                k -= missingNum;
+                left = pivot;
+            } else {
+                right = pivot;
+            }
         }
-        return k + right + nums[0];
+        return nums[left] + k;
     }
 }
