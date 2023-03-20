@@ -1,74 +1,44 @@
 class Solution {
-    public int maximizeSweetness(int[] sweetness, int k) {
-        // Invalid Input
-        if (sweetness == null || k < 0 || sweetness.length < k) {
-            throw new IllegalArgumentException("Input is invalid");
+    public int maximizeSweetness(int[] sweetness, int K) {
+		// Minimum and maximum level of sweetness to use in binary search.
+        int l = 0;
+        int hi = 0;
+        
+        for (int s : sweetness) {
+            hi += s;
         }
-
-        int len = sweetness.length;
-        // If length is zero then cannot cut the chocolate bar
-        if (len == 0) {
-            return 0;
-        }
-
-        // Find minimum sweetness and sum of all sweetness. This will help us in
-        // defining the search space of the binary search
-        int min = sweetness[0];
-        int sum = sweetness[0];
-        for (int i = 1; i < len; i++) {
-            min = Math.min(min, sweetness[i]);
-            sum += sweetness[i];
-        }
-
-        // If number of friends is zero, then return sum. You can eat the whole chocolate bar.
-        if (k == 0) {
-            return sum;
-        }
-        // Length is same as the number of pieces required, then each piece will have
-        // one chunk. You will get the chuck with minimum sweetness.
-        if (len == k + 1) {
-            return min;
-        }
-
-        // Search space will start from the minimum sweetness and end at maximum
-        // possible sweetness of a piece.
-        int start = min;
-        int end = sum / (k + 1); // This is maximum possible sweetness of a piece if the bar is divided into k+1 pieces.
-        while (start < end) {
-			// Here +1 is required to avoid Infinite Loop
-            int mid = start + (end + 1 - start) / 2;
-            if (canDivideChocolate(sweetness, k, mid)) {
-                start = mid;
+        
+        while (l <= hi) {
+		    // hypothesize that we can cut into at least `k + 1`  parts, each has `level` or more sum of sweetness.
+            int level = (l + hi) / 2;
+            
+			// Test if we can cut into `k + 1`  or more parts
+            if (canCutIntoK(sweetness, level, K + 1)) {
+				// hypothesis was correct, try again with greater level of sweetness
+                l = level + 1;
             } else {
-                end = mid - 1;
+				// hypothesis was false, try again with smaller level of sweetness
+                hi = level -1;
             }
         }
-
-        return start;
+        
+		// `l` increases by 1 after every correct sweet level, so the final correct answer must be `l - 1`
+        return l - 1;
     }
-
-    /**
-     * Checking if the chocolate bar can be divided into k+1 pieces, where each
-     * piece will have at least minDesiredSweetness.
-     *
-     * canDivideChocolate() function will scan the whole array each time. Thus it
-     * will take O(N) time.
-     */
-    private boolean canDivideChocolate(int[] sweetness, int k, int minDesiredSweetness) {
-        int sum = 0;
+    
+    boolean canCutIntoK(int[] sweetness, int level, int K) {
+        int cnt = 0;
+        int curr = 0;
+        
         for (int i = 0; i < sweetness.length; i++) {
-            sum += sweetness[i];
-            // As soon as the minimum desired sweetness is met, cut the piece and start
-            // finding the next piece.
-            if (sum >= minDesiredSweetness) {
-                if (k == 0) {
-                    return true;
-                }
-                k--;
-                sum = 0;
+            curr += sweetness[i];
+            
+            if (curr >= level) {
+                curr = 0;
+                cnt++;
             }
         }
-
-        return false;
+        
+        return cnt >= K;
     }
 }
