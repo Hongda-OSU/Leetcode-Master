@@ -1,23 +1,26 @@
-class Solution { // 0 ms, faster than 100%
-    int m, n;
+class Solution {
     public int kthSmallest(int[][] matrix, int k) {
-        m = matrix.length; n = matrix[0].length; // For general, the matrix need not be a square
-        int left = matrix[0][0], right = matrix[m-1][n-1], ans = -1;
+        int m = matrix.length, n = matrix[0].length;
+        int left = matrix[0][0], right = matrix[m - 1][n - 1], result = -1;
         while (left <= right) {
-            int mid = (left + right) >> 1;
-            if (countLessOrEqual(matrix, mid) >= k) {
-                ans = mid;
-                right = mid - 1; // try to looking for a smaller value in the left side
-            } else left = mid + 1; // try to looking for a bigger value in the right side
+            int pivot = (left + right) >> 1;
+            if (countLessOrEquel(matrix, pivot, m, n) >= k) {
+                result = pivot;
+                right = pivot - 1;
+            } else {
+                left = pivot + 1;
+            }
         }
-        return ans;
+        return result;
     }
-    int countLessOrEqual(int[][] matrix, int x) {
-        int cnt = 0, c = n - 1; // start with the rightmost column
+    
+    public int countLessOrEquel(int[][] matrix, int pivot, int m, int n) {
+        int count = 0, c = n - 1;
         for (int r = 0; r < m; ++r) {
-            while (c >= 0 && matrix[r][c] > x) --c;  // decrease column until matrix[r][c] <= x
-            cnt += (c + 1);
+            while (c >= 0 && matrix[r][c] > pivot)
+                --c;
+            count += (c + 1);
         }
-        return cnt;
+        return count;
     }
 }
