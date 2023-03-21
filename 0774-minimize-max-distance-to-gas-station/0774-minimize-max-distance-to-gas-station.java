@@ -1,20 +1,20 @@
 class Solution {
-    public double minmaxGasDist(int[] stations, int K) {
-        double lo = 0, hi = 1e8;
-        while (hi - lo > 1e-6) {
-            double mi = (lo + hi) / 2.0;
-            if (possible(mi, stations, K))
-                hi = mi;
+    public double minmaxGasDist(int[] stations, int k) {
+        double low = 0, high = 1e8;
+        while (high - low > 1e-6) {
+            double pivot = low + (high - low) / 2.0;
+            if (possible(pivot, stations, k))
+                high = pivot;
             else
-                lo = mi;
+                low = pivot;
         }
-        return lo;
+        return low;
     }
 
-    public boolean possible(double D, int[] stations, int K) {
-        int used = 0;
-        for (int i = 0; i < stations.length - 1; ++i)
-            used += (int) ((stations[i+1] - stations[i]) / D);
-        return used <= K;
+    public boolean possible(double pivot, int[] stations, int k) {
+        int count = 0;
+        for (int i = 0; i < stations.length - 1; i++)
+            count += (int)((stations[i + 1] - stations[i]) / pivot);
+        return count <= k;
     }
 }
