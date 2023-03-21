@@ -16,9 +16,9 @@ class Solution {
     
     public int countLessOrEquel(int[][] matrix, int pivot, int m, int n) {
         int count = 0, c = n - 1;
-        for (int r = 0; r < m; ++r) {
+        for (int r = 0; r < m; r++) {
             while (c >= 0 && matrix[r][c] > pivot)
-                --c;
+                c--;
             count += (c + 1);
         }
         return count;
