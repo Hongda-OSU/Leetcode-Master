@@ -12,17 +12,17 @@ class Solution {
     public ListNode plusOne(ListNode head) {
         ListNode dummy = new ListNode(0);
         dummy.next = head;
-        ListNode special = dummy;
+        ListNode notNine = dummy;
         while (head != null) {
             if (head.val != 9)
-                special = head;
+                notNine = head;
             head = head.next;
         }
-        special.val++;
-        special = special.next;
-        while (special != null) {
-            special.val = 0;
-            special = special.next;
+        notNine.val++;
+        notNine = notNine.next;
+        while (notNine != null) {
+            notNine.val = 0;
+            notNine = notNine.next;
         }
         return dummy.val != 0 ? dummy : dummy.next;
     }
