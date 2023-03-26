@@ -1,17 +1,18 @@
 class Solution {
     public int[] dailyTemperatures(int[] temperatures) {
-        Stack<Integer> s = new Stack<>();
         int n = temperatures.length;
+        int hottest = 0;
         int[] result = new int[n];
-        for (int i = n - 1; i >= 0; i--) {
-            // Popping all indices with a lower or equal temperature than the current index
-            while (!s.isEmpty() && temperatures[i] >= temperatures[s.peek()])
-                s.pop();
-            // If the stack still has elements, then the next warmer temperature exists!
-            if (!s.isEmpty())
-                result[i] = s.peek() - i;
-            // Inserting current index in the stack: monotonicity is maintained!
-            s.push(i);
+        for (int currDay = n - 1; currDay >= 0; currDay--) {
+            int temperature = temperatures[currDay];
+            if (temperature >= hottest) {
+                hottest = temperature;
+                continue;
+            }
+            int days = 1;
+            while (temperatures[currDay + days] <= temperature) 
+                days += result[currDay + days];
+            result[currDay] = days;
         }
         return result;
     }
