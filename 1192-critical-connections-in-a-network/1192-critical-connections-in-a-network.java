@@ -1,80 +1,40 @@
 class Solution {
-    
-    private Map<Integer, List<Integer>> graph;
-    private Map<Integer, Integer> rank;
-    private Map<Pair<Integer, Integer>, Boolean> connDict;
-    
+    int T = 1;
     public List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {
-       
-        this.formGraph(n, connections);
-        this.dfs(0, 0);
-        
-        List<List<Integer>> result = new ArrayList<List<Integer>>();
-        for (Pair<Integer, Integer> criticalConnection : this.connDict.keySet()) {
-            result.add(new ArrayList<Integer>(Arrays.asList(criticalConnection.getKey(), criticalConnection.getValue())));
-        }
-        
-        return result;
-    }
-    
-    private int dfs(int node, int discoveryRank) {
-        
-        // That means this node is already visited. We simply return the rank.
-        if (this.rank.get(node) != null) {
-            return this.rank.get(node);
-        }
-        
-        // Update the rank of this node.
-        this.rank.put(node, discoveryRank);
-        
-        // This is the max we have seen till now. So we start with this instead of INT_MAX or something.
-        int minRank = discoveryRank + 1;
-        
-        for (Integer neighbor : this.graph.get(node)) {
-            
-            // Skip the parent.
-            Integer neighRank = this.rank.get(neighbor);
-            if (neighRank != null && neighRank == discoveryRank - 1) {
-                continue;
-            }
-            
-            // Recurse on the neighbor.
-            int recursiveRank = this.dfs(neighbor, discoveryRank + 1);
-            
-            // Step 1, check if this edge needs to be discarded.
-            if (recursiveRank <= discoveryRank) {
-                int sortedU = Math.min(node, neighbor), sortedV = Math.max(node, neighbor);
-                this.connDict.remove(new Pair<Integer, Integer>(sortedU, sortedV));
-            }
-            
-            // Step 2, update the minRank if needed.
-            minRank = Math.min(minRank, recursiveRank);
-        }
-        
-        return minRank;
-    }
-    
-    private void formGraph(int n, List<List<Integer>> connections) {
-        
-        this.graph = new HashMap<Integer, List<Integer>>();
-        this.rank = new HashMap<Integer, Integer>();
-        this.connDict = new HashMap<Pair<Integer, Integer>, Boolean>();
-        
-        // Default rank for unvisited nodes is "null"
+        // use a timestamp, for each node, check the samllest timestamp that can reach from the node
+        // construct the graph first
+        List[] graph = new ArrayList[n];
         for (int i = 0; i < n; i++) {
-            this.graph.put(i, new ArrayList<Integer>());
-            this.rank.put(i, null);
+            graph[i] = new ArrayList<Integer>();
+        }
+        for (List<Integer> conn : connections) {
+            graph[conn.get(0)].add(conn.get(1));
+            graph[conn.get(1)].add(conn.get(0));
         }
         
-        for (List<Integer> edge : connections) {
-            
-            // Bidirectional edges
-            int u = edge.get(0), v = edge.get(1);
-            this.graph.get(u).add(v);
-            this.graph.get(v).add(u);
-            
-            int sortedU = Math.min(u, v), sortedV = Math.max(u, v);
-            connDict.put(new Pair<Integer, Integer>(sortedU, sortedV), true);
+        int[] timestamp = new int[n]; // an array to save the timestamp that we meet a certain node
+        
+        // for each node, we need to run dfs for it, and return the smallest timestamp in all its children except its parent
+        List<List<Integer>> criticalConns = new ArrayList<>();
+        dfs(n, graph, timestamp, 0, -1, criticalConns);
+        return criticalConns;
+    }
+    
+    // return the minimum timestamp it ever visited in all the neighbors
+    private int dfs(int n, List[] graph, int[] timestamp, int i, int parent, List<List<Integer>> criticalConns) {
+        if (timestamp[i] != 0) return timestamp[i];
+        timestamp[i] = T++;
+
+        int minTimestamp = Integer.MAX_VALUE;
+        for (int neighbor : (List<Integer>) graph[i]) {
+            if (neighbor == parent) continue; // no need to check the parent
+            int neighborTimestamp = dfs(n, graph, timestamp, neighbor, i, criticalConns);
+            minTimestamp = Math.min(minTimestamp, neighborTimestamp);
         }
+        
+        if (minTimestamp >= timestamp[i]) {
+            if (parent >= 0) criticalConns.add(Arrays.asList(parent, i));
+        }
+        return Math.min(timestamp[i], minTimestamp);
     }
 }
