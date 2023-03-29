@@ -1,62 +1,47 @@
 class Solution {
-    private int size;
-    private List<List<String>> solutions = new ArrayList<List<String>>();
-    
+    List<List<String>> result = new ArrayList<>();
     public List<List<String>> solveNQueens(int n) {
-        size = n;
-        char emptyBoard[][] = new char[size][size];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                emptyBoard[i][j] = '.';
-            }
-        }
-
-        backtrack(0, new HashSet<>(), new HashSet<>(), new HashSet<>(), emptyBoard);
-        return solutions;
-    }
-    
-    // Making use of a helper function to get the
-    // solutions in the correct output format
-    private List<String> createBoard(char[][] state) {
-        List<String> board = new ArrayList<String>();
-        for (int row = 0; row < size; row++) {
-            String current_row = new String(state[row]);
-            board.add(current_row);
-        }
+        boolean[] visited = new boolean[n];
+        //2*n-1个斜对角线
+        boolean[] dia1 = new boolean[2*n-1];
+        boolean[] dia2 = new boolean[2*n-1];
         
-        return board;
+        fun(n, new ArrayList<String>(),visited,dia1,dia2,0);
+        
+        return result;
     }
     
-    private void backtrack(int row, Set<Integer> diagonals, Set<Integer> antiDiagonals, Set<Integer> cols, char[][] state) {
-        // Base case - N queens have been placed
-        if (row == size) {
-            solutions.add(createBoard(state));
+    private void fun(int n,List<String> list,boolean[] visited,boolean[] dia1,boolean[] dia2,int rowIndex){
+        if(rowIndex == n){
+            result.add(new ArrayList<String>(list));
             return;
         }
         
-        for (int col = 0; col < size; col++) {
-            int currDiagonal = row - col;
-            int currAntiDiagonal = row + col;
-            // If the queen is not placeable
-            if (cols.contains(col) || diagonals.contains(currDiagonal) || antiDiagonals.contains(currAntiDiagonal)) {
-                continue;    
-            }
+        for(int i=0;i<n;i++){
+            //这一行、正对角线、反对角线都不能再放了，如果发现是true，停止本次循环
+            if(visited[i] || dia1[rowIndex+i] || dia2[rowIndex-i+n-1])
+                continue;
             
-            // "Add" the queen to the board
-            cols.add(col);
-            diagonals.add(currDiagonal);
-            antiDiagonals.add(currAntiDiagonal);
-            state[row][col] = 'Q';
+            //init一个长度为n的一维数组，里面初始化为'.'
+            char[] charArray = new char[n];
+            Arrays.fill(charArray,'.');
+            
+            charArray[i] = 'Q';
+            String stringArray = new String(charArray);
+            list.add(stringArray);
+            visited[i] = true;
+            dia1[rowIndex+i] = true;
+            dia2[rowIndex-i+n-1] = true;
 
-            // Move on to the next row with the updated board state
-            backtrack(row + 1, diagonals, antiDiagonals, cols, state);
+            fun(n,list,visited,dia1,dia2,rowIndex+1);
 
-            // "Remove" the queen from the board since we have already
-            // explored all valid paths using the above function call
-            cols.remove(col);
-            diagonals.remove(currDiagonal);
-            antiDiagonals.remove(currAntiDiagonal);
-            state[row][col] = '.';
+            //reset 不影响回溯的下个目标
+            list.remove(list.size()-1);
+            charArray[i] = '.';
+            visited[i] = false;
+            dia1[rowIndex+i] = false;
+            dia2[rowIndex-i+n-1] = false;
         }
     }
+    
 }
