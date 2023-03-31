@@ -1,26 +1,17 @@
 class Solution {
-    public int shortestSubarray(int[] A, int K) {
-        if (A.length == 0) return -1;
-        TreeMap<Long, Integer> tree = new TreeMap<>();
-        long total = 0;
-        int minLen = Integer.MAX_VALUE;
-        for (int i = 0; i < A.length; i++) {
-            total += A[i];
-            Long num = tree.floorKey(total-K);
-            if (total >= K) {
-                if (i+1 < minLen) {
-                    minLen = i+1;
-                }
-            }
-            while (num != null) {
-                if (i-tree.get(num) < minLen) {
-                    minLen = i-tree.get(num);
-                }
-                tree.remove(num);
-                num = tree.lowerKey(num);
-            }
-            tree.put(total, i);
+    public int shortestSubarray(int[] nums, int k) {
+        int n = nums.length, result = n + 1;
+        long[] arr = new long[n + 1];
+        for (int i = 0; i < n; i++)
+            arr[i + 1] = arr[i] + nums[i];
+        Deque<Integer> deque = new ArrayDeque<>();
+        for (int i = 0; i < n + 1; i++) {
+            while (deque.size() > 0 && arr[i] - arr[deque.getFirst()] >= k)
+                result = Math.min(result, i - deque.pollFirst());
+            while (deque.size() > 0 && arr[i] <= arr[deque.getLast()])
+                deque.pollLast();
+            deque.addLast(i);
         }
-        return minLen == Integer.MAX_VALUE ? -1 : minLen;
+        return result <= n ? result : -1;
     } 
 }
