@@ -11,10 +11,12 @@ class Solution {
             if (s.charAt(i) == openParen) numOpenParen++;
             if (s.charAt(i) == closedParen) numClosedParen++;
             if (numClosedParen > numOpenParen) { // We have an extra closed paren we need to remove
-                for (int j = jStart; j <= i; j++) // Try removing one at each position, skipping duplicates
+                for (int j = jStart; j <= i; j++) {
+                 // Try removing one at each position, skipping duplicates
                     if (s.charAt(j) == closedParen && (j == jStart || s.charAt(j - 1) != closedParen))
                     // Recursion: iStart = i since we now have valid # closed parenthesis thru i. jStart = j prevents duplicates
                         removeHelper(s.substring(0, j) + s.substring(j + 1, s.length()), output, i, j, openParen, closedParen);
+                }
                 return; // Stop here. The recursive calls handle the rest of the string.
             }
         }
