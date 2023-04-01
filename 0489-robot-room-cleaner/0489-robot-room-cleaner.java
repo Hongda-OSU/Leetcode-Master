@@ -17,7 +17,7 @@
  */
 
 class Solution {
-    public int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+    public final static int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
     
     public void cleanRoom(Robot robot) {
         clean(robot, 0, 0, 0, new HashSet<>());
