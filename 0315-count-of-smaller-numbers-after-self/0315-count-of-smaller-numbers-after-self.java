@@ -1,62 +1,44 @@
-class Solution {
+public class Solution {
     public List<Integer> countSmaller(int[] nums) {
-        int n = nums.length;
-        int[] result = new int[n];
-        int[] indices = new int[n]; // record the index. we are going to sort this array
-        for (int i = 0; i < n; i++) {
-            indices[i] = i;
-        }
-        // sort indices with their corresponding values in nums, i.e., nums[indices[i]]
-        mergeSort(indices, 0, n, result, nums);
-        // change int[] to List to return
-        List<Integer> resultToReturn = new ArrayList<Integer>(n);
-        for (int i : result) {
-            resultToReturn.add(i);
-        }
-        return resultToReturn;
-    }
+        if(nums == null || nums.length == 0) return new ArrayList<>();
 
-    private void mergeSort(int[] indices, int left, int right, int[] result, int[] nums) {
-        if (right - left <= 1) {
-            return;
+        // find min value and minus min by each elements, plus 1 to avoid 0 element
+        int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+        for(int i = 0; i < nums.length; i++) min = Math.min(min, nums[i]);;
+        for(int i = 0; i < nums.length; i++) {
+            nums[i] = nums[i] - min + 1;
+            max = Math.max(max, nums[i]);
         }
-        int mid = (left + right) / 2;
-        mergeSort(indices, left, mid, result, nums);
-        mergeSort(indices, mid, right, result, nums);
-        merge(indices, left, right, mid, result, nums);
-    }
 
-    private void merge(int[] indices, int left, int right, int mid, int[] result, int[] nums) {
-        // merge [left, mid) and [mid, right)
-        int i = left; // current index for the left array
-        int j = mid; // current index for the right array
-        // use temp to temporarily store sorted array
-        List<Integer> temp = new ArrayList<Integer>(right - left);
-        while (i < mid && j < right) {
-            if (nums[indices[i]] <= nums[indices[j]]) {
-                // j - mid numbers jump to the left side of indices[i]
-                result[indices[i]] += j - mid;
-                temp.add(indices[i]);
-                i++;
-            } else {
-                temp.add(indices[j]);
-                j++;
-            }
+        List<Integer> res = new ArrayList<>();
+        int[] fenwickTree = new int[max + 1];
+        for(int i = nums.length - 1; i >= 0; i--) {
+            // the index of nums[i] is nums[i] - 1
+            // we need to find the sum (-INF, nums[i] - 1], so the index is nums[i] - 2
+            res.add(0, getSum(fenwickTree, nums[i] - 2));
+            
+            // after searching, we need to update the fenwick tree for the next round
+            // the new added number is nums[i], but its index of original is nums[i] - 1
+            updateFenwickTree(fenwickTree, nums[i] - 1, 1);
         }
-        // when one of the subarrays is empty
-        while (i < mid) {
-            // j - mid numbers jump to the left side of indices[i]
-            result[indices[i]] += j - mid;
-            temp.add(indices[i]);
-            i++;
+        return res;
+    }
+    
+    // the index is the index of original array
+    private void updateFenwickTree(int[] fenwickTree, int index, int value) {
+        // the index of fenwick tree is one larger than the index of original array
+        for(int i = index + 1; i < fenwickTree.length; i += i & (-i)) {
+            fenwickTree[i] += value;
         }
-        while (j < right) {
-            temp.add(indices[j]);
-            j++;
+    }
+    
+    // the index is the index of original array
+    private int getSum(int[] fenwickTree, int index) {
+        int sum = 0;
+        // the index of fenwick tree is one larger than the index of original array
+        for(int i = index + 1; i > 0; i -= i & (-i)) {
+            sum += fenwickTree[i];
         }
-        // restore from temp
-        for (int k = left; k < right; k++) {
-            indices[k] = temp.get(k - left);
-        }
+        return sum;
     }
 }
