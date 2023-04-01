@@ -1,15 +1,12 @@
 public class Solution {
     public List<Integer> countSmaller(int[] nums) {
         List<Integer> res = new LinkedList<Integer>();
-        if (nums == null || nums.length == 0) {
+        if (nums == null || nums.length == 0) 
             return res;
-        }
         // find min value and minus min by each elements, plus 1 to avoid 0 element
-        int min = Integer.MAX_VALUE;
-        int max = Integer.MIN_VALUE;
-        for (int i = 0; i < nums.length; i++) {
+        int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+        for (int i = 0; i < nums.length; i++) 
             min = (nums[i] < min) ? nums[i]:min;
-        }
         int[] nums2 = new int[nums.length];
         for (int i = 0; i < nums.length; i++) {
             nums2[i] = nums[i] - min + 1;
@@ -22,7 +19,8 @@ public class Solution {
         }
         return res;
     }
-    private int get(int i, int[] tree) {
+    
+    public int get(int i, int[] tree) {
         int num = 0;
         while (i > 0) {
             num +=tree[i];
@@ -30,7 +28,8 @@ public class Solution {
         }
         return num;
     }
-    private void update(int i, int[] tree) {
+    
+    public void update(int i, int[] tree) {
         while (i < tree.length) {
             tree[i] ++;
             i += i & (-i);
