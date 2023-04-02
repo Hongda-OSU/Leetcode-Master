@@ -1,36 +1,30 @@
 class Solution {
-    public boolean possibleBipartition(int N, int[][] dislikes) {        
-        List<Integer>[] graph = new List[N + 1];  
-
-        for (int i = 1; i <= N; ++i) graph[i] = new ArrayList<>();        
-
-        for (int[] dislike : dislikes) {
-            graph[dislike[0]].add(dislike[1]);
-            graph[dislike[1]].add(dislike[0]);
+    public boolean possibleBipartition(int N, int[][] dislikes) {
+        int[][] graph = new int[N][N];
+        for (int[] d : dislikes) {
+            graph[d[0] - 1][d[1] - 1] = 1;
+            graph[d[1] - 1][d[0] - 1] = 1;
         }
-
-        Integer[] colors = new Integer[N + 1];
-
-        for (int i = 1; i <= N; ++i) {
-            // If the connected component that node i belongs to hasn't been colored yet then try coloring it.
-            if (colors[i] == null && !dfs(graph, colors, i, 1)) return false;
-        }
-        return true;   
-    }
-
-    private boolean dfs(List<Integer>[] graph, Integer[] colors, int currNode, int currColor) {
-        colors[currNode] = currColor;
-
-        // Color all uncolored adjacent nodes.
-        for (Integer adjacentNode : graph[currNode]) {
-
-            if (colors[adjacentNode] == null) {
-                if (!dfs(graph, colors, adjacentNode, currColor * -1)) return false;     
-
-            } else if (colors[adjacentNode] == currColor) {
-                return false;                                     
+        int[] group = new int[N];
+        for (int i = 0; i < N; i++) {
+            if (group[i] == 0 && !dfs(graph, group, i, 1)) {
+                return false;
             }
         }
-        return true;        
+        return true;
+    }
+    private boolean dfs(int[][] graph, int[] group, int index, int g) {
+        group[index] = g;
+        for (int i = 0; i < graph.length; i++) {
+            if (graph[index][i] == 1) {
+                if (group[i] == g) {
+                    return false;
+                }
+                if (group[i] == 0 && !dfs(graph, group, i, -g)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
