@@ -1,26 +1,29 @@
-
 class Solution {
     public int longestStrChain(String[] words) {
-        Map<String, Integer> dp = new HashMap<>();
-
-        // Sorting the list in terms of the word length.
-        Arrays.sort(words, (a, b) -> a.length() - b.length());
-
-        int longestWordSequenceLength = 1;
-
-        for (String word : words) {
-            int presentLength = 1;
-            // Find all possible predecessors for the current word by removing one letter at a time.
-            for (int i = 0; i < word.length(); i++) {
-                StringBuilder temp = new StringBuilder(word);
-                temp.deleteCharAt(i);
-                String predecessor = temp.toString();
-                int previousLength = dp.getOrDefault(predecessor, 0);
-                presentLength = Math.max(presentLength, previousLength + 1);
+        Map<String, Integer> memo = new HashMap<>();
+        Set<String> wordsPresent = new HashSet<>();
+        Collections.addAll(wordsPresent, words);
+        int result = 0;
+        for (String word : words) 
+            result = Math.max(result, dfs(wordsPresent, memo, word));
+        return result;
+    }
+    
+    public int dfs(Set<String> words, Map<String, Integer> memo, String word) {
+        if (memo.containsKey(word))
+            return memo.get(word);
+        int maxLength = 1;
+        StringBuilder sb = new StringBuilder(word);
+        for (int i = 0; i < word.length(); i++) {
+            sb.deleteCharAt(i);
+            String newWord = sb.toString();
+            if (words.contains(newWord)) {
+                int currentLength = 1 + dfs(words, memo, newWord);
+                maxLength = Math.max(maxLength, currentLength);
             }
-            dp.put(word, presentLength);
-            longestWordSequenceLength = Math.max(longestWordSequenceLength, presentLength);
+            sb.insert(i, word.charAt(i));
         }
-        return longestWordSequenceLength;
+        memo.put(word, maxLength);
+        return maxLength;
     }
 }
