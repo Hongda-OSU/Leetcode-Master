@@ -1,28 +1,28 @@
 class Solution {
-    public boolean possibleBipartition(int N, int[][] dislikes) {
-        int[][] graph = new int[N][N];
-        for (int[] d : dislikes) {
-            graph[d[0] - 1][d[1] - 1] = 1;
-            graph[d[1] - 1][d[0] - 1] = 1;
+    public boolean possibleBipartition(int n, int[][] dislikes) {
+        List<Integer>[] graph = new List[n + 1];
+        for (int i = 1; i <= n; i++)
+            graph[i] = new ArrayList<>();
+        for (int[] dislike : dislikes) {
+            graph[dislike[0]].add(dislike[1]);
+            graph[dislike[1]].add(dislike[0]);
         }
-        int[] group = new int[N];
-        for (int i = 0; i < N; i++) {
-            if (group[i] == 0 && !dfs(graph, group, i, 1)) {
+        Integer[] colors = new Integer[n + 1];
+        for (int i = 1; i <= n; i++) {
+            if (colors[i] == null && !dfs(graph, colors, i, 1))
                 return false;
-            }
         }
         return true;
     }
-    private boolean dfs(int[][] graph, int[] group, int index, int g) {
-        group[index] = g;
-        for (int i = 0; i < graph.length; i++) {
-            if (graph[index][i] == 1) {
-                if (group[i] == g) {
+    
+    public boolean dfs(List<Integer>[] graph, Integer[] colors, int currNode, int currColor) {
+        colors[currNode] = currColor;
+        for (Integer adj : graph[currNode]) {
+            if (colors[adj] == null) {
+                if (!dfs(graph, colors, adj, currColor * -1))
                     return false;
-                }
-                if (group[i] == 0 && !dfs(graph, group, i, -g)) {
-                    return false;
-                }
+            } else if (colors[adj] == currColor) {
+                return false;
             }
         }
         return true;
