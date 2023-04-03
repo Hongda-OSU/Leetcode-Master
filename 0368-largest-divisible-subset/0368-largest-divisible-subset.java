@@ -1,27 +1,22 @@
-public class Solution {
-    
-    Map<Integer,List<Integer>> mem = new HashMap<>();
-    
-    private List<Integer> helper(int[] nums, int i) {
-        if(mem.containsKey(i))
-            return mem.get(i);
-        List<Integer> maxLenLst = new ArrayList<>();
-        int div = i==0 ? 1 : nums[i-1];
-        for(int k=i; k<nums.length; k++) {
-            if(nums[k] % div == 0) {
-                // make a copy is crucial here, so that we won't modify the returned List reference
-                List<Integer> lst = new ArrayList<>(helper(nums, k+1)); 
-                lst.add(nums[k]);
-                if(lst.size() > maxLenLst.size())
-                    maxLenLst = lst;
-            }
-        }
-        mem.put(i, maxLenLst);
-        return maxLenLst;
-    }
-    
+class Solution {
     public List<Integer> largestDivisibleSubset(int[] nums) {
+        List<Integer> res = new ArrayList<>();
         Arrays.sort(nums);
-        return helper(nums, 0);
+        List<Integer>[] map = new List[nums.length];
+        for(int i = 0; i < nums.length; i++){
+            map[i] = new ArrayList<Integer>();
+        }
+        for(int i = nums.length-1; i >= 0; i--){
+            List<Integer> largest = new ArrayList<>();
+            for(int j = i+1; j < nums.length; j++){
+                if(nums[j] % nums[i] == 0) {
+                    if(largest.size() < map[j].size()) largest = map[j];
+                }
+            }
+            map[i].add(nums[i]);
+            map[i].addAll(largest);
+            if(res.size() < map[i].size()) res = map[i];
+        }
+        return res;
     }
 }
