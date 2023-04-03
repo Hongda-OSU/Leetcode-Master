@@ -14,4 +14,3 @@ FROM
     World
 WHERE 
     population >= 25000000
-;
