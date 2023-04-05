@@ -1,57 +1,65 @@
 class Solution {
     public int maxNumEdgesToRemove(int n, int[][] edges) {
-        Arrays.sort(edges, (a, b) -> b[0] - a[0]);
-        int[] parentAlice = new int[n + 1];
-        int[] parentBob = new int[n + 1];
-        for (int i = 0; i < n + 1; i++) {
-            parentAlice[i] = i;
-            parentBob[i] = i;
-        }
-        int mergeAlice = 1, mergeBob = 1, removeEdge = 0;
-        for (int[] edge : edges) {
-            int category = edge[0], u = edge[1], v = edge[2];
-            if (category == 3) {
-                boolean alice = union(u, v, parentAlice);
-                boolean bob = union(u, v, parentBob);
-                if (alice == true)
-                    mergeAlice++;
-                if (bob == true)
-                    mergeBob++;
-                if (alice == false && bob == false)
-                    removeEdge++;
-            } else if (category == 2) {
-                boolean bob = union(u, v, parentBob);
-                if (bob == true)
-                    mergeBob++;
+        Arrays.sort(edges, (a, b) -> Integer.compare(b[0], a[0]));
+        
+        DSU alice = new DSU(n + 1);
+        DSU bob = new DSU(n + 1);
+        int removedEdges = 0, totalEdges = 0;
+        
+        for(int[] e : edges) {
+            if(e[0] == 3) {
+                boolean isEdgeValidForAlice = alice.union(e[1], e[2]);
+                boolean isEdgeValidForBob = bob.union(e[1], e[2]);
+                
+                if(isEdgeValidForAlice) totalEdges++;//made the edge 
+                if(isEdgeValidForBob) totalEdges++;//made the edge
+                
+                if(!isEdgeValidForAlice || !isEdgeValidForBob) removedEdges++;//remove the edge if it's not valid
+            } else if (e[0] == 1) {
+                boolean isEdgeValidForAlice = alice.union(e[1], e[2]);
+                if(isEdgeValidForAlice) 
+                    totalEdges++;
                 else
-                    removeEdge++;
+                    removedEdges++;
             } else {
-                boolean alice = union(u, v, parentAlice);
-                if (alice == true)
-                    mergeAlice++;
+                boolean isEdgeValidForBob = bob.union(e[1], e[2]);
+                if(isEdgeValidForBob)  
+                    totalEdges++;   
                 else
-                    removeEdge++;
+                    removedEdges++;
             }
         }
-        if (mergeAlice != n || mergeBob != n)
-            return -1;
-        return removeEdge;
+        
+        if(totalEdges != 2 * n - 2) return -1;//n - 1 for alice and n - 1 for bob
+                
+        return removedEdges;      
+    }
+}
+
+class DSU {
+    private int parent[];
+    
+    DSU(int n) {
+        parent = new int[n];
+        for(int i = 0; i < n; i++)
+            parent[i] = i;
     }
     
-    public boolean union(int u, int v, int[] parent) {
-        int fu = find(u, parent), fv = find(v, parent);
-        if (fu != fv) {
-            parent[fu] = fv;
-            return true;
-        } else 
-            return false;
+    public int find(int x) {
+        while(x != parent[x]) {
+            parent[x] = parent[parent[x]];//path compression
+            x = parent[x];
+        }
+        return x;
     }
     
-    public int find(int i, int[] parent) {
-        if (parent[i] == i)
-            return i;
-        int tmp = find(parent[i], parent);
-        parent[i] = tmp;
-        return tmp;
+    public boolean union(int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
+            
+        if(rootX == rootY) return false;
+        
+        parent[rootX] = rootY;
+        return true;
     }
 }
