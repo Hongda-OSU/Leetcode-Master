@@ -1,25 +1,25 @@
 class Solution {
+    private int low, maxLen;
+    
     public String longestPalindrome(String s) {
-        int start = 0, end = 0;
-        for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-            int left = i, right = i;
-            while (left >= 0 && s.charAt(left) == ch) 
-                left--;
-            while (right < s.length() && s.charAt(right) == ch)
-                right++;
-            while (left >= 0 && right < s.length()) {
-                if (s.charAt(left) != s.charAt(right))
-                    break;
-                left--;
-                right++;
-            }
-            left += 1;
-            if (end - start < right - left) {
-                start = left;
-                end = right;
-            }
+        int len = s.length();
+        if (len < 2)
+            return s;
+        for (int i = 0; i < len - 1; i++) {
+            extendPalindrome(s, i, i);
+            extendPalindrome(s, i, i + 1);
         }
-        return s.substring(start, end);
+        return s.substring(low, low + maxLen);
+    } 
+    
+    public void extendPalindrome(String str, int left, int right) {
+        while (left >= 0 && right < str.length() && str.charAt(left) == str.charAt(right)) {
+            left--;
+            right++;
+        }
+        if (maxLen < right - left - 1) {
+            low = left + 1;
+            maxLen = right - left - 1;
+        }
     }
 }
