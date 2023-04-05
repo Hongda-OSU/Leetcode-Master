@@ -1,73 +1,78 @@
 class Solution {
-    public List<Integer> numIslands2(int m, int n, int[][] positions) {
-        int x[] = { -1, 1, 0, 0 };
-        int y[] = { 0, 0, -1, 1 };
-        UnionFind uf = new UnionFind(m * n);
-        List<Integer> result = new ArrayList<>();
-        for (int[] position : positions) {
-            int landPos = position[0] * n + position[1];
-            uf.addLand(landPos);
-            for (int i = 0; i < 4; i++) {
-                int neighborX = position[0] + x[i];
-                int neighborY = position[1] + y[i];
-                int neighborPos = neighborX * n + neighborY;
-                if (neighborX >= 0 && neighborX < m && neighborY >= 0 && neighborY < n && uf.isLand(neighborPos))
-                    uf.union(landPos, neighborPos);
+    
+    private class UnionFind {
+        int[] parent;
+        int[] rank;
+        
+        public UnionFind(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            Arrays.fill(parent, -1);
+        }
+        
+        public boolean union(int p, int q) {
+            int pRoot = find(p);
+            int qRoot = find(q);
+            if (pRoot == qRoot) {
+                return false;
             }
-            result.add(uf.numLand());
+            if (rank[pRoot] < rank[qRoot]) {
+                parent[pRoot] = qRoot;
+            } else if (rank[pRoot] > rank[qRoot]) {
+                parent[qRoot] = pRoot;
+            } else {
+                parent[qRoot] = pRoot;
+                rank[pRoot]++;
+            }
+            return true;
+        }
+        
+        public int find(int index) {
+            while (index != parent[index]) {
+                parent[index] = parent[parent[index]];
+                index = parent[index];
+            }
+            return index;
+        }
+    }
+    
+    public List<Integer> numIslands2(int m, int n, int[][] positions) {
+        List<Integer> result = new ArrayList<>();
+        if (m == 0 || n == 0 || positions == null || positions.length == 0 || positions[0].length == 0) {
+            return result;
+        }
+        int[][] DIRS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        UnionFind uf = new UnionFind(m * n);
+        int count = 0;
+        for (int[] position : positions) {
+            int x = position[0];
+            int y = position[1];
+            int p = x * n + y;
+            if (uf.parent[p] != -1) {   // duplicate position
+                result.add(count);
+                continue;
+            }
+            uf.parent[p] = p;
+            count++;
+            for (int[] dir : DIRS) {
+                int r = x + dir[0];
+                int c = y + dir[1];
+                if (isValid(uf, m, n, r, c)) {
+                    int q = r * n + c;
+                    if (uf.union(p, q)) {
+                        count--;
+                    }
+                }
+            }
+            result.add(count);
         }
         return result;
     }
-}
-
-class UnionFind {
-    public int[] parent, rank;
-    public int count;
     
-    public UnionFind(int size) {
-        parent = new int[size];
-        rank = new int[size];
-        for (int i = 0; i < size; i++)
-            parent[i] = -1;
-        count = 0;
-    }
-    
-    public void union(int x, int y) {
-        int f1 = find(x), f2 = find(y);
-        if (f1 == f2)
-            return;
-        else if (rank[f1] < rank[f2])
-            parent[f1] = f2;
-        else if (rank[f1] > rank[f2])
-            parent[f2] = f1;
-        else  {
-            parent[f2] = f1;
-            rank[f1]++;
-        }
-        count--;
-    }
-    
-    public int find(int x) {
-        if (parent[x] != x)
-            parent[x] = find(parent[x]);
-        return parent[x];
-    }
-    
-    public void addLand(int x) {
-        if (parent[x] >= 0)
-            return;
-        parent[x] = x;
-        count++;
-    }
-    
-    public boolean isLand(int x) {
-        if (parent[x] >= 0)
-            return true;
-        else
+    private boolean isValid(UnionFind uf, int m, int n, int r, int c) {
+        if (r < 0 || c < 0 || r >= m || c >= n || uf.parent[r * n + c] == -1) {
             return false;
-    }
-    
-    public int numLand() {
-        return count;
+        }
+        return true;
     }
 }
