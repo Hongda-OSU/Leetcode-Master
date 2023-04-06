@@ -52,6 +52,8 @@ class UnionFind {
     }
     
     public int find(int x) {
-        return parent[x] = x == parent[x] ? x : find(parent[x]);
+        if (x != parent[x]) 
+            parent[x] = find(parent[x]);
+        return parent[x];
     }
 }
