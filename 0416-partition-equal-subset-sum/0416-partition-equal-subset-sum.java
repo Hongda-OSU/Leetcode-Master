@@ -8,9 +8,9 @@ class Solution {
         int subSetSum = sum / 2;
         boolean dp[] = new boolean[subSetSum + 1];
         dp[0] = true;
-        for (int curr : nums) {
-            for (int j = subSetSum; j >= curr; j--) {
-                dp[j] |= dp[j - curr];
+        for (int num : nums) {
+            for (int j = subSetSum; j >= num; j--) {
+                dp[j] |= dp[j - num];
             }
         }
         return dp[subSetSum];
