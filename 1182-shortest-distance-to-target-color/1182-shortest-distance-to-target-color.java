@@ -1,34 +1,47 @@
 class Solution {
     public List<Integer> shortestDistanceColor(int[] colors, int[][] queries) {
-        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        // initialization
+        List<Integer> queryResults = new ArrayList<>();
+        Map<Integer, List<Integer>> hashmap = new HashMap<>();
+
         for (int i = 0; i < colors.length; i++) {
-            int c = colors[i];
-            map.putIfAbsent(c, new ArrayList<>());
-            map.get(c).add(i);
+            hashmap.putIfAbsent(colors[i], new ArrayList<Integer>());
+            hashmap.get(colors[i]).add(i);
         }
-        List<Integer> result = new ArrayList<>();
-        for (int[] query : queries) {
-            int idx = query[0];
-            int c = query[1];
-            if (!map.containsKey(c))
-                result.add(-1);
-            else 
-                result.add(binarySearch(idx, map.get(c)));
+
+        // for each query, apply binary search
+        for (int i = 0; i < queries.length; i++) {
+            int target = queries[i][0], color = queries[i][1];
+            if (!hashmap.containsKey(color)) {
+                queryResults.add(-1);
+                continue;
+            }
+
+            List<Integer> indexList = hashmap.get(color);
+            int insert = Collections.binarySearch(indexList, target);
+
+            // due to its nature, we need to convert the returning values
+            // from Collections.binarySearch
+            // more details: https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/Collections.html#binarySearch(java.util.List,T)
+            if (insert < 0) {
+                insert = (insert + 1) * -1;
+            }
+
+            // Handling cases when:
+            // - the target index is smaller than all elements in the indexList
+            // - the target index is larger than all elements in the indexList
+            // - the target index sits between the left and right boundaries
+            if (insert == 0) {
+                queryResults.add(indexList.get(insert) - target);
+            } else if (insert == indexList.size()) {
+                queryResults.add(target - indexList.get(insert - 1));
+            } else {
+                int leftNearest = target - indexList.get(insert - 1);
+                int rightNearest = indexList.get(insert) - target;
+                queryResults.add(Math.min(leftNearest, rightNearest));
+            }
+
         }
-        return result;
-    }
-    
-    public int binarySearch(int idx, List<Integer> list) {
-        int left = 0, right = list.size() - 1;
-        while (right - left > 1) {
-            int pivot = (left + right) >>> 1;
-            if (list.get(pivot) < idx) 
-                left = pivot;
-            else 
-                right = pivot;
-        }
-        int leftDis = Math.abs(list.get(left) - idx);
-        int rightDis = Math.abs(list.get(right) - idx);
-        return leftDis <= rightDis ? leftDis : rightDis;
+        return queryResults;
     }
 }
