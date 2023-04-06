@@ -1,67 +1,57 @@
-class UF {
-    int[] parent;
-    
-    public UF(int n) {
-        parent = new int[n];
-        for (int i = 1; i < n; i++) {
-            parent[i] = i;
-        }
-    }
-    
-    public boolean union(int x, int y) {
-        int px = find(x);
-        int py = find(y);
-        if (px == py) {
-            return false;
-        }
-        parent[px] = py;
-        return true;
-    }
-    
-    private int find(int x) {
-        return parent[x] = x == parent[x] ? x : find(parent[x]);
-    }
-}
-
 class Solution {
     public int maxNumEdgesToRemove(int n, int[][] edges) {
-        int cnt1 = 0;
-        int cnt2 = 0;
-        int res = 0;
-        UF uf = new UF(n + 1);
+        int count1 = 0, count2 = 0, result = 0;
+        UnionFind uf = new UnionFind(n + 1);
         for (int[] edge : edges) {
             if (edge[0] == 3) {
                 if (uf.union(edge[1], edge[2])) {
-                    cnt1++;
-                    cnt2++;
-                }
-                else {
-                    res++;
+                    count1++;
+                    count2++;
+                } else {
+                    result++;
                 }
             }
         }
-        int[] parentcpy = uf.parent.clone();
+        int[] parent = uf.parent.clone();
         for (int[] edge : edges) {
             if (edge[0] == 1) {
-                if (uf.union(edge[1], edge[2])) {
-                    cnt1++;
-                }
-                else {
-                    res++;
-                }
+                if (uf.union(edge[1], edge[2]))
+                    count1++;
+                else
+                    result++;
             }
         }
-        uf.parent = parentcpy;
+        uf.parent = parent;
         for (int[] edge : edges) {
             if (edge[0] == 2) {
-                if (uf.union(edge[1], edge[2])) {
-                    cnt2++;
-                }
-                else {
-                    res++;
-                }
+                if (uf.union(edge[1], edge[2]))
+                    count2++;
+                else 
+                    result++;
             }
         }
-        return cnt1 == n - 1 && cnt2 == n - 1 ? res : -1;
+        return (count1 == n - 1 && count2 == n - 1) ? result : -1;
+    }
+}
+
+class UnionFind {
+    public int[] parent;
+    
+    public UnionFind(int n) {
+        this.parent = new int[n];
+        for (int i = 1; i < n; i++) 
+            parent[i] = i;
+    }
+    
+    public boolean union(int x, int y) {
+        int f1 = find(x), f2 = find(y);
+        if (f1 == f2) 
+            return false;
+        parent[f1] = f2;
+        return true;
+    }
+    
+    public int find(int x) {
+        return parent[x] = x == parent[x] ? x : find(parent[x]);
     }
 }
