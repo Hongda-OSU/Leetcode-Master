@@ -1,21 +1,24 @@
 class MedianFinder {
+    private PriorityQueue<Integer> max = new PriorityQueue<>(Collections.reverseOrder());
+    private PriorityQueue<Integer> min = new PriorityQueue<>();
     
-     // max queue is always larger or equal to min queue
-    PriorityQueue<Integer> min = new PriorityQueue();
-    PriorityQueue<Integer> max = new PriorityQueue(1000, Collections.reverseOrder());
-    // Adds a number into the data structure.
-    public void addNum(int num) {
-        max.offer(num);
-        min.offer(max.poll());
-        if (max.size() < min.size()){
-            max.offer(min.poll());
-        }
-    }
 
-    // Returns the median of current data stream
+    public MedianFinder() {
+        
+    }
+    
+    public void addNum(int num) {
+        min.offer(num);
+        max.offer(min.poll());
+        if (min.size() < max.size())
+            min.offer(max.poll());
+    }
+    
     public double findMedian() {
-        if (max.size() == min.size()) return (max.peek() + min.peek()) /  2.0;
-        else return max.peek();
+        if (min.size() == max.size())
+            return (min.peek() + max.peek()) / 2.0;
+        else
+            return min.peek();
     }
 }
 
