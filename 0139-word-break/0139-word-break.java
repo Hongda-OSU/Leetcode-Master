@@ -1,19 +1,23 @@
 class Solution {
-    // caching / memoization
-    HashMap<String, Boolean> map = new HashMap<>();
     public boolean wordBreak(String s, List<String> wordDict) {
-        if(wordDict.contains(s)) return true;
-        if(map.containsKey(s)) return map.get(s);
-        for(int i=0;i<s.length();i++) {
-            String prefix = s.substring(0,i+1);
-            String suffix = s.substring(i+1);
-            
-            if(wordDict.contains(prefix) && wordBreak(suffix, wordDict)) {
-                map.put(s, true);
-                return true;
+        HashMap<String, Boolean> map = new HashMap<>();
+        return canConstruct(s, wordDict, map);
+    }
+    
+    public boolean canConstruct(String str, List<String> wordDict, HashMap<String, Boolean> map) {
+        if (map.containsKey(str)) 
+            return map.get(str);
+        if (str.isEmpty())
+            return true;
+        for (String word : wordDict) {
+            if (str.startsWith(word)) {
+                if (canConstruct(str.substring(word.length()), wordDict, map)) {
+                    map.put(str, true);
+                    return true;
+                }
             }
         }
-        map.put(s, false);
+        map.put(str, false);
         return false;
     }
 }
