@@ -1,31 +1,54 @@
 class Solution {
-    public List<List<Integer>> getSkyline(int[][] B) {
-        //think of this array as bars representing borders of buildings
-        int[][] H = new int[2 * B.length][2];
-        for (int i = 0; i < B.length; i++) {
-            H[i * 2] = new int[]{B[i][0], -B[i][2]}; //left, -height
-            H[i * 2 + 1] = new int[]{B[i][1], B[i][2]}; //right, height
-        }
-        //sort the bars based on position, use height as tie-breaker
-        Arrays.sort(H, (a, b) -> a[0] != b[0] ? a[0] - b[0] : a[1] - b[1]);
-        //reason for not choosing priority queue is removal of given item other than root can be costly O(n)
-        //reason for not choosing TreeSet is to accommodate duplicates
-        var map = new TreeMap<Integer, Integer>(Comparator.reverseOrder()); //height is key, count is val
-        map.put(0, 1); //one building of zero height is needed
-        List<List<Integer>> res = new ArrayList<>();
-        int prev = 0;
-        for (int[] h : H) {
-            //-ve height for left bar meaning validity of this building is starting, add it
-            if (h[1] < 0) map.put(-h[1], map.getOrDefault(-h[1], 0) + 1);
-            else { //+ve height for right bar meaning end of validity, remove it
-                map.put(h[1], map.get(h[1]) - 1);
-                if (map.get(h[1]) == 0) map.remove(h[1]); //could have been costly for priority queue
-            }
-            if (map.firstKey() != prev) { //max height in curr position that is diff from prev, add to skyline
-                prev = map.firstKey();
-                res.add(List.of(h[0], prev));
-            }
-        }
-        return res;
-    }
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+		List<List<Integer>> res = new ArrayList<>();
+		if (buildings.length == 0) return res;
+		int n = buildings.length;
+		return findSkyline(buildings, 0, n - 1);
+	}
+
+	private List<List<Integer>> findSkyline(int[][] buildings, int lo, int hi) {
+		List<List<Integer>> res = new LinkedList<>();
+		if (lo == hi) {
+			res.add(Arrays.asList(buildings[lo][0], buildings[lo][2]));
+			res.add(Arrays.asList(buildings[lo][1], 0));
+			return res;
+		}
+		int mid = lo + (hi - lo) / 2;
+		List<List<Integer>> skyline1 = findSkyline(buildings, lo, mid);
+		List<List<Integer>> skyline2 = findSkyline(buildings, mid + 1, hi);
+		return mergeSkyline(skyline1, skyline2);
+	}
+
+	private List<List<Integer>> mergeSkyline(List<List<Integer>> skyline1, List<List<Integer>> skyline2) {
+		List<List<Integer>> res = new LinkedList<>();
+		int i = 0, j = 0;
+		int h1 = 0, h2 = 0;
+
+		while (i < skyline1.size() && j < skyline2.size()) {
+			int x1 = skyline1.get(i).get(0);
+			int x2 = skyline2.get(j).get(0);
+			int x;
+			if (x1 < x2) {
+				h1 = skyline1.get(i++).get(1);
+				x = x1;
+			} else if (x1 > x2) {
+				h2 = skyline2.get(j++).get(1);
+				x = x2;
+			} else {
+				h1 = skyline1.get(i++).get(1);
+				h2 = skyline2.get(j++).get(1);
+				x = x1;
+			}
+			int h = Math.max(h1, h2);
+
+			if (res.isEmpty() || h != res.get(res.size() - 1).get(1)) {
+				res.add(Arrays.asList(x, h));
+			}
+		}
+
+		while (i < skyline1.size()) res.add(skyline1.get(i++));
+		while (j < skyline2.size()) res.add(skyline2.get(j++));
+
+		return res;
+	}
 }
