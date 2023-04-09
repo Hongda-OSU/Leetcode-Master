@@ -14,19 +14,18 @@ class Interval {
 */
 
 class Solution {
-    public List<Interval> employeeFreeTime(List<List<Interval>> avails) {
+    public List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
         List<Interval> result = new ArrayList<>();
-        List<Interval> timeLine = new ArrayList<>();
-        avails.forEach(e -> timeLine.addAll(e));
-        Collections.sort(timeLine, ((a, b) -> a.start - b.start));
-
-        Interval temp = timeLine.get(0);
-        for(Interval each : timeLine) {
-            if(temp.end < each.start) {
-                result.add(new Interval(temp.end, each.start));
-                temp = each;
-            }else{
-                temp = temp.end < each.end ? each : temp;
+        List<Interval> timeline = new ArrayList<>();
+        schedule.forEach(e -> timeline.addAll(e));
+        Collections.sort(timeline, (a, b) -> a.start - b.start);
+        Interval interval = timeline.get(0);
+        for (Interval time : timeline) {
+            if (interval.end < time.start) {
+                result.add(new Interval(interval.end, time.start));
+                interval = time;
+            } else {
+                interval = interval.end < time.end ? time : interval;
             }
         }
         return result;
