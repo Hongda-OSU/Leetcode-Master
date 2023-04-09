@@ -17,7 +17,7 @@ class Solution {
     public List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
         List<Interval> result = new ArrayList<>();
         List<Interval> timeline = new ArrayList<>();
-        schedule.forEach(e -> timeline.addAll(e));
+        schedule.forEach((e) -> timeline.addAll(e));
         Collections.sort(timeline, (a, b) -> a.start - b.start);
         Interval interval = timeline.get(0);
         for (Interval time : timeline) {
