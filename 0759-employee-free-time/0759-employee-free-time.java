@@ -14,24 +14,21 @@ class Interval {
 */
 
 class Solution {
-     public List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> schedule.get(a[0]).get(a[1]).start - schedule.get(b[0]).get(b[1]).start);
-        for (int i = 0; i < schedule.size(); i++) {
-            pq.add(new int[] {i, 0});
-        }
-        List<Interval> res = new ArrayList<>();
-        int prev = schedule.get(pq.peek()[0]).get(pq.peek()[1]).start;
-        while (!pq.isEmpty()) {
-            int[] index = pq.poll();
-            Interval interval = schedule.get(index[0]).get(index[1]);
-            if (interval.start > prev) {
-                res.add(new Interval(prev, interval.start));
-            }
-            prev = Math.max(prev, interval.end);
-            if (schedule.get(index[0]).size() > index[1] + 1) {
-                pq.add(new int[] {index[0], index[1] + 1});
+    public List<Interval> employeeFreeTime(List<List<Interval>> avails) {
+        List<Interval> result = new ArrayList<>();
+        List<Interval> timeLine = new ArrayList<>();
+        avails.forEach(e -> timeLine.addAll(e));
+        Collections.sort(timeLine, ((a, b) -> a.start - b.start));
+
+        Interval temp = timeLine.get(0);
+        for(Interval each : timeLine) {
+            if(temp.end < each.start) {
+                result.add(new Interval(temp.end, each.start));
+                temp = each;
+            }else{
+                temp = temp.end < each.end ? each : temp;
             }
         }
-        return res;
+        return result;
     }
 }
