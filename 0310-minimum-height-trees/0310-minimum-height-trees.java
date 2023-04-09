@@ -1,52 +1,50 @@
 class Solution {
     public List<Integer> findMinHeightTrees(int n, int[][] edges) {
-
-        // edge cases
-        if (n < 2) {
-            ArrayList<Integer> centroids = new ArrayList<>();
-            for (int i = 0; i < n; i++)
-                centroids.add(i);
-            return centroids;
-        }
-
-        // Build the graph with the adjacency list
-        ArrayList<Set<Integer>> neighbors = new ArrayList<>();
-        for (int i = 0; i < n; i++)
-            neighbors.add(new HashSet<Integer>());
-
-        for (int[] edge : edges) {
-            Integer start = edge[0], end = edge[1];
-            neighbors.get(start).add(end);
-            neighbors.get(end).add(start);
-        }
-
-        // Initialize the first layer of leaves
-        ArrayList<Integer> leaves = new ArrayList<>();
-        for (int i = 0; i < n; i++)
-            if (neighbors.get(i).size() == 1)
-                leaves.add(i);
-
-        // Trim the leaves until reaching the centroids
-        int remainingNodes = n;
-        while (remainingNodes > 2) {
-            remainingNodes -= leaves.size();
-            ArrayList<Integer> newLeaves = new ArrayList<>();
-
-            // remove the current leaves along with the edges
-            for (Integer leaf : leaves) {
-                // the only neighbor left for the leaf node
-                Integer neighbor = neighbors.get(leaf).iterator().next();
-                // remove the edge along with the leaf node
-                neighbors.get(neighbor).remove(leaf);
-                if (neighbors.get(neighbor).size() == 1)
-                    newLeaves.add(neighbor);
-            }
-
-            // prepare for the next round
-            leaves = newLeaves;
-        }
-
-        // The remaining nodes are the centroids of the graph
-        return leaves;
+    List<Integer>[] edgeList = new List[n];
+    for (int i = 0; i < n; i++){
+        edgeList[i] = new ArrayList<>();
     }
+    for(int[] edge : edges){
+        edgeList[edge[0]].add(edge[1]);
+        edgeList[edge[1]].add(edge[0]);
+    }
+    
+    int[] prev = new int[n];
+    Arrays.fill(prev, -1);
+    int p0 = bfs(edgeList, 0, prev);
+
+    prev = new int[n];
+    Arrays.fill(prev, -1);
+    int p1 = bfs(edgeList, p0, prev);
+    
+    List<Integer> path = new ArrayList<>();
+    int i = p1;
+    while (i != p0) {
+        path.add(i);
+        i = prev[i];
+    }
+    path.add(p0);
+
+    List<Integer> res = new ArrayList<>();
+    res.add(path.get(path.size() / 2));
+    if (path.size() % 2 == 0) res.add(path.get(path.size() / 2 - 1));
+    return res;
+}
+
+private int bfs(List<Integer>[] edgeList, int start, int[] prev) {
+    Queue<Integer> q = new LinkedList<>();
+    q.add(start);
+    prev[start] = start;
+    int ret = start;
+    while (!q.isEmpty()) {
+        ret = q.poll();
+        for (int i : edgeList[ret]) {
+            if (prev[i] == -1) {
+                q.add(i);
+                prev[i] = ret;
+            } 
+        }
+    }
+    return ret;
+}
 }
