@@ -1,20 +1,24 @@
 class Solution {
-    Integer[][][] memo;
-    int m, n;
-    int[] DIR = new int[]{0, 1, 0, -1, 0};
+    private Integer[][][] memo;
+    private int rows, cols;
+    private int[] dirs = new int[]{0, 1, 0, -1, 0};
+    
     public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
-        memo = new Integer[m][n][maxMove+1];
-        this.m = m; this.n = n;
-        return dp(startRow, startColumn, maxMove);
+        memo = new Integer[m][n][maxMove + 1];
+        rows = m; cols = n;
+        return findPathsHelper(startRow, startColumn, maxMove);
     }
-    int dp(int r, int c, int maxMove) {
-        if (r < 0 || r == m || c < 0 || c == n) return 1; // Out of bound -> Count 1 way
-        if (memo[r][c][maxMove] != null) return memo[r][c][maxMove];
-        if (maxMove == 0) return 0;
-        int ans = 0;
-        for (int i = 0; i < 4; ++i) {
-            ans = (ans + dp(r + DIR[i], c + DIR[i + 1], maxMove - 1)) % 1_000_000_007;
-        }
-        return memo[r][c][maxMove] = ans;
+    
+    public int findPathsHelper(int row, int col, int maxMove) {
+        if (row < 0 || row == rows || col < 0 || col == cols)
+            return 1;
+        if (memo[row][col][maxMove] != null)
+            return memo[row][col][maxMove];
+        if (maxMove == 0)
+            return 0;
+        int result = 0;
+        for (int i = 0; i < 4; i++)
+            result = (result + findPathsHelper(row + dirs[i], col + dirs[i + 1], maxMove - 1)) % 1_000_000_007;
+        return memo[row][col][maxMove] = result;
     }
 }
