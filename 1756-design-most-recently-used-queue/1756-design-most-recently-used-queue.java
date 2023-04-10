@@ -1,46 +1,55 @@
-class ListNode {
-    int val;
-    ListNode next;
-
-    ListNode() {
-
-    }
-
-    ListNode(int val) { 
-        this.val = val; 
-    }
-}
-
 class MRUQueue {
-    ListNode head, tail;
+    public Node[] nodes;
+    public int bucket;
+
     public MRUQueue(int n) {
-        head = new ListNode();
-        
-        ListNode node = head;
-        for(int i = 0; i <= n; i++) {
-            node.next = new ListNode(i);
-            node = node.next;
-        }
-        
-        tail = node;
+        bucket = (int)Math.sqrt(n);
+        nodes = new Node[(n + bucket - 1) / bucket];
+        Arrays.asList(nodes).replaceAll(i -> new Node(-1));
+        for (int i = 1; i <= n; i++)
+            nodes[(i - 1) / bucket].prev.append(new Node(i));
     }
     
     public int fetch(int k) {
-        ListNode node = head;
-        for(int i = 0; i <= k-1; i++) {
-            node = node.next;
-        }
-        
-        int val = node.next.val;
-        
-        tail.next = node.next;
-        
-        tail = tail.next;
-        
-        node.next = tail.next;
-        
-        tail.next = null;
-        
-        return val;
+        k -= 1;
+        Node result = nodes[k / bucket].next;
+        for (int i = k % bucket; i > 0; i--) 
+            result = result.next;
+        result.remove();
+        for (int i = 1 + k / bucket; i < nodes.length; i++)
+            nodes[i - 1].prev.append(nodes[i].next.remove());
+        nodes[nodes.length - 1].prev.append(result);
+        return result.val;
     }
 }
+
+class Node {
+    public Node prev, next;
+    public int val;
+    
+    public Node(int val) {
+        this.val = val;
+        prev = this;
+        next = this;
+    }
+    
+    public void append(Node node) {
+        Node temp = next;
+        next = node;
+        node.prev = this;
+        node.next = temp;
+        temp.prev = node;
+    }
+    
+    public Node remove() {
+        prev.next = next;
+        next.prev = prev;
+        return next = prev = this;
+    }
+}
+
+/**
+ * Your MRUQueue object will be instantiated and called as such:
+ * MRUQueue obj = new MRUQueue(n);
+ * int param_1 = obj.fetch(k);
+ */
