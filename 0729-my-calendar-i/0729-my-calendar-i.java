@@ -1,5 +1,5 @@
 class MyCalendar {
-    public Node root;
+    private Node root;
 
     public MyCalendar() {
         this.root = null;
@@ -14,7 +14,7 @@ class MyCalendar {
         }
     }
     
-    public boolean insert(Node node, int start, int end) {
+    private boolean insert(Node node, int start, int end) {
         if (node.start >= end) {
             if (node.left == null) {
                 node.left = new Node(start, end);
