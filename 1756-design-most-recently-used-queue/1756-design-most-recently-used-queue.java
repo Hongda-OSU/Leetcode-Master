@@ -1,64 +1,56 @@
+/*
+Partition numbers into bucket = sqrt(n) long doubly linked lists (dll).
+
+Access directly the target/bucket-th bucket and seek
+to the anwser: target%bucket
+
+When removing the target from the dll, rebalance by appending
+each subsequent head to the end of the previous bucket.
+
+Append target to the last bucket dll.
+
+Use sentinel nodes to ease coding.
+*/
 class MRUQueue {
-    class Node {
+    Node[] nodes;
+    int bucket;
+    public MRUQueue(int n) {
+        bucket = (int)Math.sqrt(n);
+        nodes = new Node[(n+bucket-1)/bucket];
+        Arrays.asList(nodes).replaceAll(i->new Node(-1));
+        for(int i = 1; i <= n;++i){
+            nodes[(i-1)/bucket].pre.append(new Node(i));
+        }
+    }
+    public int fetch(int k) {
+        var ans = nodes[--k/bucket].nxt;
+        for(int i = k%bucket; i > 0; --i){//seek to target inside bucket
+            ans = ans.nxt;
+        }
+        ans.remove();
+        for(int i = 1+k/bucket; i < nodes.length; ++i){//rebalance
+            nodes[i-1].pre.append(nodes[i].nxt.remove());
+        }
+        nodes[nodes.length-1].pre.append(ans);
+        return ans.val;
+    }
+    static class Node{
+        Node pre = this, nxt = this;
         int val;
-        Node next;
-        Node prev;
-        
-        public Node(int v) {
+        Node(int v){
             val = v;
         }
-    }
-    
-    private static int step = 50; // alternatively it could be Math.sqrt(n)
-    Node[] skipNodes;
-    Node head;
-    int MRUQueueLength;
-    
-    public MRUQueue(int n) {
-        MRUQueueLength = n;
-        int m = n / step;
-        skipNodes = new Node[m];
-        head = new Node(0);
-        Node cur = head;
-        int idx = 0;
-        int j = 1;
-        for (int i = n; i > 0; i--, j++) {
-            Node next = new Node(i);
-            cur.next = next;
-            next.prev = cur;
-            if (j == step) {
-                skipNodes[idx++] = next;
-                j = 0;
-            }
-            cur = next;
+        void append(Node node){
+            var tmp = nxt;
+            nxt = node;
+            node.pre = this;
+            node.nxt = tmp;
+            tmp.pre = node;
         }
-    }
-    
-    public int fetch(int k) {
-        int index = 0;
-        int nodeIndex = MRUQueueLength - k + 1; // our list has reverse order
-        Node cur = head;
-        while(nodeIndex >= step) {
-            nodeIndex -= step;
-            cur = skipNodes[index];
-            skipNodes[index] = skipNodes[index].prev;
-            index++;
+        Node remove(){
+            pre.nxt = nxt;
+            nxt.pre = pre;
+            return nxt = pre = this;
         }
-        
-        while(nodeIndex > 0) {
-            cur = cur.next;
-            nodeIndex--;
-        }
-        
-        // delete cur from Linked List
-        if (cur.next != null) cur.next.prev = cur.prev;
-        cur.prev.next = cur.next;
-		// insert cur after the head
-        cur.next = head.next;
-        if (head.next != null) head.next.prev = cur;
-        cur.prev = head;
-        head.next = cur;
-        
-        return cur.val;
     }
 }
