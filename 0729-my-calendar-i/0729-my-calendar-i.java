@@ -1,19 +1,59 @@
-class MyCalendar {
-    TreeMap<Integer, Integer> calendar;
-
-    MyCalendar() {
-        calendar = new TreeMap();
+class Node{
+    int start,end;
+    Node left;
+    Node right;
+    public Node(int start , int end){
+        this.start=start;
+        this.end=end;
+        left=null;
+        right=null;
     }
+}
 
+class MyCalendar {
+    
+    Node root ;
+    
+
+    public MyCalendar() {
+        this.root = null;
+        
+    }
+    
+    public boolean insert(Node parent , int s , int e){
+        if (parent.start>=e){
+            if(parent.left==null){
+                parent.left=new Node(s,e);
+                return true;
+            }
+            else{
+                return insert(parent.left,s,e);
+            }
+        }
+        else if (parent.end<=s){
+            if(parent.right==null){
+                parent.right=new Node(s,e);
+                return true;
+            }
+            else{
+                return insert(parent.right,s,e);
+            }
+        }
+        
+            return false;
+    }
+    
     public boolean book(int start, int end) {
-        Integer prev = calendar.floorKey(start),
-                next = calendar.ceilingKey(start);
-        if ((prev == null || calendar.get(prev) <= start) &&
-                (next == null || end <= next)) {
-            calendar.put(start, end);
+        if(root == null){
+            root= new Node(start,end);
             return true;
         }
-        return false;
+        else{
+            return insert(root,start,end);
+        }
+        
+        
+        
     }
 }
 
