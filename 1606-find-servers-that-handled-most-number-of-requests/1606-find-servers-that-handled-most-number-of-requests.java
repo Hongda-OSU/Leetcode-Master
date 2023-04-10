@@ -1,48 +1,47 @@
 class Solution {
     public List<Integer> busiestServers(int k, int[] arrival, int[] load) {
-        int[] count = new int[k];
-        TreeSet<Integer> free = new TreeSet<Integer>();
-        PriorityQueue<Pair<Integer, Integer>> busy = new PriorityQueue<>((a, b) -> a.getKey() - b.getKey());
+        int[] counter = new int[k];
+        // use a tree to track available servers
+        TreeSet<Integer> available = new TreeSet<Integer>();
+        for (int num = 0; num < k; num++) {
+            available.add(num);
+        }
+        // use a PQ to maintain the availability at current arrival time
+        Queue<int[]> busyServers = new PriorityQueue<>((a, b)->(a[0] - b[0]));
         
-        // All servers are free at the beginning.
-
-        for (int i = 0; i < k; ++i) {
-            free.add(i);
+        for (int idx = 0; idx < arrival.length; idx++) {
+            int curTime = arrival[idx];
+            int endTime = curTime + load[idx];
+            while (!busyServers.isEmpty() && busyServers.peek()[0] <= curTime) {
+                int freedServer = busyServers.poll()[1];
+                available.add(freedServer);
+            }
+            if (available.size() == 0) continue; // all busy
+            Integer assignNum = available.ceiling(idx % k);
+            if (assignNum == null) {
+                assignNum = available.first();
+            }
+            counter[assignNum]++;
+            available.remove(assignNum);
+            busyServers.offer(new int[] {endTime, assignNum});
         }
         
-        for (int i = 0; i < arrival.length; ++i) {
-            int start = arrival[i];
-
-            // Move free servers from 'busy' to 'free'.
-            while (!busy.isEmpty() && busy.peek().getKey() <= start) {
-                Pair<Integer, Integer> curr = busy.remove();
-                int serverId = curr.getValue();
-                free.add(serverId);
-            }
-
-            // If we have free servers, use binary search to find the 
-            // target server.
-            if (!free.isEmpty()) {
-                Integer busyId = free.ceiling(i % k);
-                if (busyId == null) {
-                    busyId = free.first();
-                }
- 
-                free.remove(busyId);
-                busy.add(new Pair<>(start + load[i], busyId));
-                count[busyId]++;
+        return findMaxesInCounter(counter);
+    }
+    
+    
+    
+    private List<Integer> findMaxesInCounter(int[] counter) {
+        int max = 0;
+        for (int i = 0; i < counter.length; i++) {
+            max = Math.max(max, counter[i]);
+        }
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < counter.length; i++) {
+            if (counter[i] == max) {
+                result.add(i);
             }
         }
-        
-        // Find the servers that have the maximum workload.
-        int maxJob = Collections.max(Arrays.stream(count).boxed().collect(Collectors.toList()));
-        List<Integer> answer = new ArrayList<>();
-        for (int i = 0; i < k; ++i) {
-            if (count[i] == maxJob) {
-                answer.add(i);
-            }
-        }
-        
-        return answer;
+        return result;
     }
 }
