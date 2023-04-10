@@ -1,56 +1,46 @@
-/*
-Partition numbers into bucket = sqrt(n) long doubly linked lists (dll).
+class ListNode {
+    int val;
+    ListNode next;
 
-Access directly the target/bucket-th bucket and seek
-to the anwser: target%bucket
+    ListNode() {
 
-When removing the target from the dll, rebalance by appending
-each subsequent head to the end of the previous bucket.
+    }
 
-Append target to the last bucket dll.
+    ListNode(int val) { 
+        this.val = val; 
+    }
+}
 
-Use sentinel nodes to ease coding.
-*/
 class MRUQueue {
-    Node[] nodes;
-    int bucket;
+    ListNode head, tail;
     public MRUQueue(int n) {
-        bucket = (int)Math.sqrt(n);
-        nodes = new Node[(n+bucket-1)/bucket];
-        Arrays.asList(nodes).replaceAll(i->new Node(-1));
-        for(int i = 1; i <= n;++i){
-            nodes[(i-1)/bucket].pre.append(new Node(i));
+        head = new ListNode();
+        
+        ListNode node = head;
+        for(int i = 0; i <= n; i++) {
+            node.next = new ListNode(i);
+            node = node.next;
         }
+        
+        tail = node;
     }
+    
     public int fetch(int k) {
-        var ans = nodes[--k/bucket].nxt;
-        for(int i = k%bucket; i > 0; --i){//seek to target inside bucket
-            ans = ans.nxt;
+        ListNode node = head;
+        for(int i = 0; i <= k-1; i++) {
+            node = node.next;
         }
-        ans.remove();
-        for(int i = 1+k/bucket; i < nodes.length; ++i){//rebalance
-            nodes[i-1].pre.append(nodes[i].nxt.remove());
-        }
-        nodes[nodes.length-1].pre.append(ans);
-        return ans.val;
-    }
-    static class Node{
-        Node pre = this, nxt = this;
-        int val;
-        Node(int v){
-            val = v;
-        }
-        void append(Node node){
-            var tmp = nxt;
-            nxt = node;
-            node.pre = this;
-            node.nxt = tmp;
-            tmp.pre = node;
-        }
-        Node remove(){
-            pre.nxt = nxt;
-            nxt.pre = pre;
-            return nxt = pre = this;
-        }
+        
+        int val = node.next.val;
+        
+        tail.next = node.next;
+        
+        tail = tail.next;
+        
+        node.next = tail.next;
+        
+        tail.next = null;
+        
+        return val;
     }
 }
