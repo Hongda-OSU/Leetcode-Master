@@ -1,59 +1,48 @@
-class Node{
-    int start,end;
-    Node left;
-    Node right;
-    public Node(int start , int end){
-        this.start=start;
-        this.end=end;
-        left=null;
-        right=null;
-    }
-}
-
 class MyCalendar {
-    
-    Node root ;
-    
+    public Node root;
 
     public MyCalendar() {
         this.root = null;
-        
-    }
-    
-    public boolean insert(Node parent , int s , int e){
-        if (parent.start>=e){
-            if(parent.left==null){
-                parent.left=new Node(s,e);
-                return true;
-            }
-            else{
-                return insert(parent.left,s,e);
-            }
-        }
-        else if (parent.end<=s){
-            if(parent.right==null){
-                parent.right=new Node(s,e);
-                return true;
-            }
-            else{
-                return insert(parent.right,s,e);
-            }
-        }
-        
-            return false;
     }
     
     public boolean book(int start, int end) {
-        if(root == null){
-            root= new Node(start,end);
+        if (root == null) {
+            root = new Node(start, end);
             return true;
+        } else {
+            return insert(root, start, end);
         }
-        else{
-            return insert(root,start,end);
+    }
+    
+    public boolean insert(Node node, int start, int end) {
+        if (node.start >= end) {
+            if (node.left == null) {
+                node.left = new Node(start, end);
+                return true;
+            } else {
+                return insert(node.left, start, end);
+            }
+        } else if (node.end <= start) {
+            if (node.right == null) {
+                node.right = new Node(start, end);
+                return true;
+            } else {
+                return insert(node.right, start, end);
+            }
         }
-        
-        
-        
+        return false;
+    }
+}
+
+class Node {
+    public int start, end;
+    public Node left, right;
+    
+    public Node(int start, int end) {
+        this.start = start;
+        this.end = end;
+        left = null;
+        right = null;
     }
 }
 
