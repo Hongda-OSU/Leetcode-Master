@@ -1,7 +1,7 @@
 class Solution {
     public List<Integer> busiestServers(int k, int[] arrival, int[] load) {
         int[] count = new int[k];
-        PriorityQueue<Integer> free = new PriorityQueue<>((a, b) -> a - b);
+        TreeSet<Integer> free = new TreeSet<Integer>();
         PriorityQueue<Pair<Integer, Integer>> busy = new PriorityQueue<>((a, b) -> a.getKey() - b.getKey());
         
         // All servers are free at the beginning.
@@ -13,20 +13,22 @@ class Solution {
         for (int i = 0; i < arrival.length; ++i) {
             int start = arrival[i];
 
-            // Remove free servers from 'busy', modify their IDs and
-            // add them to 'free'
+            // Move free servers from 'busy' to 'free'.
             while (!busy.isEmpty() && busy.peek().getKey() <= start) {
                 Pair<Integer, Integer> curr = busy.remove();
                 int serverId = curr.getValue();
-                int modifiedId = ((serverId - i) % k + k) % k + i;
-                free.add(modifiedId);
+                free.add(serverId);
             }
 
-            // Get the original server ID by taking the remainder of
-            // the modified ID to k.
+            // If we have free servers, use binary search to find the 
+            // target server.
             if (!free.isEmpty()) {
-                int busyId = free.peek() % k;
-                free.remove();
+                Integer busyId = free.ceiling(i % k);
+                if (busyId == null) {
+                    busyId = free.first();
+                }
+ 
+                free.remove(busyId);
                 busy.add(new Pair<>(start + load[i], busyId));
                 count[busyId]++;
             }
