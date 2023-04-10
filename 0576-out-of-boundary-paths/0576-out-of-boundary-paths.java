@@ -1,6 +1,6 @@
 class Solution {
     private Integer[][][] memo;
-    private int rows, cols;
+    private int rows, cols, mod = 1_000_000_007;
     private int[] dirs = new int[]{0, 1, 0, -1, 0};
     
     public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
@@ -18,7 +18,7 @@ class Solution {
             return 0;
         int result = 0;
         for (int i = 0; i < 4; i++)
-            result = (result + findPathsHelper(row + dirs[i], col + dirs[i + 1], maxMove - 1)) % 1_000_000_007;
+            result = (result + findPathsHelper(row + dirs[i], col + dirs[i + 1], maxMove - 1)) % mod;
         return memo[row][col][maxMove] = result;
     }
 }
