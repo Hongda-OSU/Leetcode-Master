@@ -1,63 +1,87 @@
 class Solution {
-   int[][] dirs = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    
+    private int[] xd = new int[]{0, 0, 1, -1};
+    private int[] yd = new int[]{1, -1, 0, 0};
+    
+    private class Node {
+        int x;
+        int y;
+        int ks;
+        public Node(int x, int y, int ks) {
+            this.x = x;
+            this.y = y;
+            this.ks = ks;
+        }
+    }
+    
     public int shortestPathAllKeys(String[] grid) {
-        int m = grid.length, n = grid[0].length();
-        int si = -1, sj = -1, k = 0;
+        int m = grid.length;
+        int n = grid[0].length();
+        char[][] chars = new char[m][n];
+        int x = -1, y = -1;
+        int k = 0;
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 char c = grid[i].charAt(j);
+                chars[i][j] = c;
                 if (c == '@') {
-                    si = i;
-                    sj = j;
+                    x = i;
+                    y = j;
                 }
-                if (isKey(c)) k++;
+                else if (c >= 'a' && c <= 'f') {
+                    k++;
+                }
             }
         }
-        Node start = new Node(si, sj, 0);
-        Queue<Node> q = new LinkedList<>();
-        q.offer(start);
-        Set<String> visited = new HashSet<>();
-        visited.add(si + " " +  sj + " " + 0);
-        int level = 0;
-        while (!q.isEmpty()) {
-            int size = q.size();
+        int keys = 0;
+        for (int i = 0; i < k; i++) {
+            keys = addKey(keys, 'a' + i);
+        }
+        Queue<Node> queue = new LinkedList();
+        boolean[][][] visited = new boolean[m][n][keys + 1];
+        queue.offer(new Node(x, y, 0));
+        visited[x][y][0] = true;
+        int cnt = 0;
+        while (!queue.isEmpty()) {
+            int size = queue.size();
             for (int i = 0; i < size; i++) {
-                Node cur = q.poll();
-                if (cur.key == (1 << k) - 1) return level;
-                for (int[] d : dirs) {
-                    int x = cur.i + d[0];
-                    int y = cur.j + d[1];
-                    int key = cur.key;
-                    if (!isValid(grid, x, y, m, n)) continue;
-                    char c = grid[x].charAt(y);
-                    if (isKey(c)) key |= (1 << (c - 'a'));
-                    if (isLock(c) && (key >> (c - 'A') & 1) == 0) continue;
-                    if (visited.add(x + " " + y + " " + key)) q.offer(new Node(x, y, key));
+                Node curr = queue.poll();
+                if (curr.ks == keys) {
+                    return cnt;
+                }
+                for (int j = 0; j < 4; j++) {
+                    x = curr.x + xd[j];
+                    y = curr.y + yd[j];
+                    if (x < 0 || x >= m || y < 0 || y >= n || chars[x][y] == '#') {
+                        continue;
+                    }
+                    char c = chars[x][y];
+                    int ks = addKey(curr.ks, c);
+                    if (visited[x][y][ks]) {
+                        continue;
+                    }
+                    if (c >= 'A' && c <= 'F' && !unlock(curr.ks, c)) {
+                        continue;
+                    }
+                    visited[x][y][ks] = true;
+                    queue.offer(new Node(x, y, ks));
                 }
             }
-            level++;
+            cnt++;
         }
         return -1;
     }
-
-    private boolean isLock(char c) {
-        return c >= 'A' && c <= 'F';
-    }
-
-    private boolean isKey(char c) {
-        return c >= 'a' && c <= 'f';
-    }
-
-    private boolean isValid(String[] grid, int i, int j, int m, int n) {
-        return i >= 0 && i < m && j >= 0 && j < n && grid[i].charAt(j) != '#';
-    }
-
-    class Node {
-        int i, j, key;
-        public Node(int i, int j, int key) {
-            this.i = i;
-            this.j = j;
-            this.key = key;
+    
+    public int addKey(int keys, int c) {
+        if (c >= 'a' && c <= 'f') {
+            int index = c - 'a';
+            return keys | (1 << index);
         }
+        return keys;
+    }
+    
+    public boolean unlock(int keys, int c) {
+        int index = c - 'A';
+        return (keys & (1 << index)) > 0;
     }
 }
