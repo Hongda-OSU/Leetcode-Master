@@ -1,62 +1,47 @@
 class Trie {
-    
-    class Node {
-        Node [] childs;
-        boolean isEnd;
-        
-        Node(){
-            childs = new Node[26];
-            isEnd = false;
-        }
-    }
-    
-    final private Node root;
+    private TrieNode root;
     
     public Trie() {
-        root = new Node();
+        root = new TrieNode();
     }
     
- 
     public void insert(String word) {
-        Node curr = root;
-        
-        for(int i = 0;i<word.length();i++){
-            char ch = word.charAt(i);
-            
-            if(curr.childs[ch - 'a'] == null){
-                curr.childs[ch - 'a'] = new Node();
-            }
-            curr = curr.childs[ch - 'a'];
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            int id = word.charAt(i) - 'a';
+            if (curr.children[id] == null) 
+                curr.children[id] = new TrieNode();
+            curr = curr.children[id];
         }
-        
         curr.isEnd = true;
     }
     
- 
     public boolean search(String word) {
-        Node curr = root;
-        
-        for(int i = 0;i<word.length();i++){
-            char ch = word.charAt(i);
-            
-            if(curr.childs[ch - 'a'] == null) return false;
-            curr = curr.childs[ch - 'a'];
-        }
-        return curr.isEnd;
+        return searchHelper(word, true);
     }
     
-  
     public boolean startsWith(String prefix) {
-          Node curr = root;
-        
-        for(int i = 0;i<prefix.length();i++){
-            char ch = prefix.charAt(i);
-            
-            if(curr.childs[ch - 'a'] == null) return false;
-            curr = curr.childs[ch - 'a'];
+        return searchHelper(prefix, false);
+    }
+    
+    private boolean searchHelper(String str, boolean search) {
+        TrieNode curr = root;
+        int i = -1, len = str.length();
+        while (++i < len) {
+            int id = str.charAt(i) - 'a';
+            if ((curr = curr.children[id]) == null)
+                return false;
         }
-        
-        return true;
+        return search ? curr.isEnd : true;
+    }
+}
+
+class TrieNode {
+    public boolean isEnd;
+    public TrieNode[] children;
+    
+    public TrieNode() {
+        children = new TrieNode[26];
     }
 }
 
