@@ -1,53 +1,48 @@
 class TrieNode {
-    public char val;
-    public boolean isWord;
-    public TrieNode() {};
-    public TrieNode[] children = new TrieNode[26];
-    
-    TrieNode(char ch) {
-        TrieNode node = new TrieNode();
-        node.val = ch;
-    }
+boolean isEnd;
+TrieNode[] children;
+
+public TrieNode() {
+    isEnd = true;
+    children = new TrieNode[26];
+}
 }
 
-class Trie {
-    private TrieNode root;
-    
-    public Trie() {
-        root = new TrieNode();
-        root.val = ' ';
+public class Trie {
+private TrieNode root;
+
+public Trie() {
+    root = new TrieNode();
+}
+
+public void insert(String word) {
+	TrieNode current = root;
+	for(int i=0, L=word.length(); i<L; i++) {
+    	int id = word.charAt(i) - 'a';
+    	if(current.children[id]==null) {
+    		current.children[id] = new TrieNode();
+    		current.children[id].isEnd = false;
+    	}
+    	current = current.children[id];
     }
-    
-    public void insert(String word) {
-        TrieNode node = root;
-        for (int i = 0; i < word.length(); i++) {
-            char ch = word.charAt(i);
-            if (node.children[ch - 'a'] == null)
-                node.children[ch - 'a'] = new TrieNode(ch);
-            node = node.children[ch - 'a'];
-        }
-        node.isWord = true;
-    } 
-    
-    public boolean search(String word) {
-        TrieNode node = root;
-        for (int i = 0; i < word.length(); i++) {
-            char ch = word.charAt(i);
-            if (node.children[ch - 'a'] == null) return false;
-            node = node.children[ch - 'a'];
-        }
-        return node.isWord;
+    current.isEnd = true;
+}
+
+public boolean search(String word) {
+    return search(word, 1);
+}
+public boolean startsWith(String prefix) {
+    return search(prefix, 2);
+}
+private boolean search(String str, int type) {
+    TrieNode current = root;
+    int i=-1, L=str.length();
+    while(++i<L) {
+        int id = str.charAt(i) - 'a';
+        if((current=current.children[id]) == null) return false;
     }
-    
-    public boolean startsWith(String prefix) {
-        TrieNode node = root;
-        for (int i = 0; i < prefix.length(); i++) {
-            char ch = prefix.charAt(i);
-            if (node.children[ch - 'a'] == null) return false;
-            node = node.children[ch - 'a'];
-        }
-        return true;
-    }
+    return type==1 ? current.isEnd : true;
+}
 }
 
 /**
