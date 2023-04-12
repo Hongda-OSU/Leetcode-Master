@@ -1,59 +1,87 @@
 class LRUCache {
-  
-  Node head = new Node(0, 0), tail = new Node(0, 0);
-  Map<Integer, Node> map = new HashMap();
-  int capacity;
-  
-  public LRUCache(int _capacity) {
-    capacity = _capacity;
-    head.next = tail;
-    tail.prev = head;
-  }
+    LinkedNodeList list;
+    Map<Integer, Node> map;
+    Integer cap;
+    public LRUCache(int capacity) {
+        list = new LinkedNodeList();
+        map = new HashMap(capacity);
+        cap = capacity;
+    }
+    
+    public int get(int key) {
+        Node node = map.get(key);
+        if(node == null){
+            return -1;
+        }
+        list.moveToHead(node);
+        return node.val;
+    }
+    
+    public void put(int key, int value) {
+        Node node = map.get(key);
+        if(node != null){
+            list.moveToHead(node);
+            node.val = value;
 
-  public int get(int key) {
-    if(map.containsKey(key)) {
-      Node node = map.get(key);
-      remove(node);
-      insert(node);
-      return node.value;
-    } else {
-      return -1;
+        }else{
+             Node newNode = new Node(key, value);
+            if(map.size() == cap){
+                Node tail = list.getTail();
+                map.remove(tail.key);
+                list.removeTail();
+            }
+            map.put(key, newNode);
+            list.addToHead(newNode);
+        }
     }
-  }
+}
 
-  public void put(int key, int value) {
-    if(map.containsKey(key)) {
-      remove(map.get(key));
+class LinkedNodeList{
+    Node dummyHead;
+    Node dummyTail;
+    
+    LinkedNodeList(){
+        dummyHead = new Node(0,0);
+        dummyTail = new Node(0,0);
+        dummyHead.next = dummyTail;
+        dummyTail.prev = dummyHead;
     }
-    if(map.size() == capacity) {
-      remove(tail.prev);
+    
+    void moveToHead(Node node){
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+        addToHead(node);
     }
-    insert(new Node(key, value));
-  }
-  
-  private void remove(Node node) {
-    map.remove(node.key);
-    node.prev.next = node.next;
-    node.next.prev = node.prev;
-  }
-  
-  private void insert(Node node){
-    map.put(node.key, node);
-    Node headNext = head.next;
-    head.next = node;
-    node.prev = head;
-    headNext.prev = node;
-    node.next = headNext;
-  }
-  
-  class Node{
-    Node prev, next;
-    int key, value;
-    Node(int _key, int _value) {
-      key = _key;
-      value = _value;
+    
+    void addToHead(Node node){
+        Node tmp = dummyHead.next ;
+        dummyHead.next = node;
+        node.next = tmp;
+        node.prev = dummyHead;
+        tmp.prev = node;
     }
-  }
+    
+    void removeTail(){
+        Node newTail = dummyTail.prev.prev;
+        newTail.next = dummyTail;
+        dummyTail.prev = newTail;
+    }
+    
+    Node getTail(){
+        return dummyTail.prev;
+    }
+    
+}
+
+ class Node{
+        int key;
+        int val;
+        Node next;
+        Node prev;
+        Node(int key, int value){
+            this.key = key;
+            this.val =value;
+        }
 }
 
 /**
