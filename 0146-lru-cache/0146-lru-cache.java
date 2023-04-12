@@ -1,67 +1,51 @@
 class LRUCache {
-    
-    final Node head = new Node(0, 0);
-    final Node tail = new Node(0, 0);
-    final Map<Integer, Node> map;
-    final int capacity;
+    private final Map<Integer, Node> map = new HashMap<>();
+    private final int capacity;
+    private final Node head = new Node(), tail = new Node();
     
     public LRUCache(int capacity) {
         this.capacity = capacity;
-        map = new HashMap(capacity);
         head.next = tail;
         tail.prev = head;
     }
     
     public int get(int key) {
-      int res = -1;
-      if(map.containsKey(key)){
-        Node n = map.get(key);
-        remove(n);
-        insertToHead(n);
-        res = n.value;
-      }
-      return res;   
+        if (!map.containsKey(key)) return -1;
+        Node node = map.get(key);
+        remove(node);
+        insert(node);
+        return node.val;
     }
     
     public void put(int key, int value) {
-      if(map.containsKey(key)){
-        Node n = map.get(key);
-        remove(n);
-        n.value = value;
-        insertToHead(n);
-      } else {
-        
-        if(map.size() == capacity){
-           map.remove(tail.prev.key); 
-           remove(tail.prev);
-        } 
-        
-        Node n = new Node(key, value);
-        insertToHead(n);
-        map.put(key, n);
-      }  
+        if (map.containsKey(key)) remove(map.get(key));
+        if (map.size() == capacity) remove(tail.prev);
+        insert(new Node(key, value));
     }
     
-    private void remove(Node n){
-      n.prev.next = n.next;
-      n.next.prev = n.prev;
+    private void remove(Node node) {
+        map.remove(node.key);
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
     }
     
-    private void insertToHead(Node n){
-      Node headNext = head.next;
-      head.next = n;
-      headNext.prev = n;
-      n.prev = head;
-      n.next = headNext;
+    private void insert(Node node) {
+        map.put(node.key, node);
+        Node next = head.next;
+        head.next = node;
+        node.next = next;
+        node.prev = head;
+        next.prev = node;
     }
     
-    class Node{
-      Node prev, next;
-      int key, value;
-      Node(int k, int v){
-        key = k;
-        value = v;
-      }
+    private class Node {
+        int key, val;
+        Node next, prev;
+        Node() {}
+        Node(int key, int val) {
+            this.key = key;
+            this.val = val;
+        }
     }
 }
 
