@@ -1,27 +1,24 @@
 class Solution {
-    
-     void findAllways(int[] candidates,List<List<Integer>> finalList,ArrayList<Integer> list,int i,int target){
-        if(target == 0)
-            finalList.add(new ArrayList<Integer>(list));
-        else{
-            for(int j=i;j<candidates.length;j++)
-            {
-                if(candidates[j]<=target){
-                list.add(candidates[j]);
-                findAllways(candidates,finalList,list,j,target-candidates[j]);
-                list.remove(list.size()-1);
-                }
-            }
-        }
-    }
-    
-    public List<List<Integer>> combinationSum(int[] candidates, int target) {
-    
-        List<List<Integer>> finalList = new ArrayList<>();
-        ArrayList<Integer> list = new ArrayList<>();
-        findAllways(candidates,finalList,list,0,target);
-        
-        return finalList;
-    }
-    
+   public List<List<Integer>> combinationSum(int[] candidates, int target) {
+	List<List<Integer>> list = new ArrayList<>();
+	combinationUtil(list, new ArrayList<>(), candidates, 0, target);
+	return list;
+}
+
+public void combinationUtil(List<List<Integer>> list, List<Integer> temp, int[] candidates, int start, int target) {
+	// base case
+	if(target == 0) {
+		list.add(new ArrayList<>(temp));
+		return;
+	}
+
+	// recursion step
+	for(int i = start; i < candidates.length; i++) {
+		if(target < candidates[i]) continue;
+
+		temp.add(candidates[i]);
+		combinationUtil(list, temp, candidates, i, target - candidates[i]);
+		temp.remove(temp.size() - 1);
+	}
+}
 }
