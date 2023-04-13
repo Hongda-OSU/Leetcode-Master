@@ -1,122 +1,46 @@
 class Solution {
-    private Node root;
-    
     public List<List<Integer>> palindromePairs(String[] words) {
-        
-        if (words == null || words.length == 0)
-            return new ArrayList<>();
-        
-        root = new Node();
-        int n = words.length;
-        List<List<Integer>> finalResult = new ArrayList<>();
-        
-        for (int i = 0; i < n; i++) {
-            if (words[i].isEmpty()) {
-                // Pair with all self-palindrome.
-                List<Integer> selfPalindromeWordIndices = getSelfPalindrome(words);
-                for (int pairId : selfPalindromeWordIndices) {
-                    finalResult.add(new ArrayList<>(Arrays.asList(i, pairId)));
-                    finalResult.add(new ArrayList<>(Arrays.asList(pairId, i)));
+    List<List<Integer>> ret = new ArrayList<>(); 
+    if (words == null || words.length < 2) return ret;
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    for (int i=0; i<words.length; i++) map.put(words[i], i);
+    for (int i=0; i<words.length; i++) {
+        // System.out.println(words[i]);
+        for (int j=0; j<=words[i].length(); j++) { // notice it should be "j <= words[i].length()"
+            String str1 = words[i].substring(0, j);
+            String str2 = words[i].substring(j);
+            if (isPalindrome(str1)) {
+                String str2rvs = new StringBuilder(str2).reverse().toString();
+                if (map.containsKey(str2rvs) && map.get(str2rvs) != i) {
+                    List<Integer> list = new ArrayList<Integer>();
+                    list.add(map.get(str2rvs));
+                    list.add(i);
+                    ret.add(list);
+                    // System.out.printf("isPal(str1): %s\n", list.toString());
                 }
             }
-            else {
-                insert(reverse(words[i]), i);
+            if (isPalindrome(str2)) {
+                String str1rvs = new StringBuilder(str1).reverse().toString();
+                // check "str.length() != 0" to avoid duplicates
+                if (map.containsKey(str1rvs) && map.get(str1rvs) != i && str2.length()!=0) { 
+                    List<Integer> list = new ArrayList<Integer>();
+                    list.add(i);
+                    list.add(map.get(str1rvs));
+                    ret.add(list);
+                    // System.out.printf("isPal(str2): %s\n", list.toString());
+                }
             }
         }
-        for (int i = 0; i < n; i++) {
-            List<Integer> wordIndices = search(words[i], i);
-            for (int pairId : wordIndices) {
-                finalResult.add(new ArrayList<>(Arrays.asList(i, pairId)));
-            }
-        }
-        
-        return finalResult;
     }
-    
-    /****************** Trie-related *******************/
-    
-    private List<Integer> search(String word, int index) {
-        
-        List<Integer> wordIndices = new ArrayList<>();
-        Node ptr = root;
-        int n = word.length();
-        for (int i = 0; i < n; i++) {
-            int label = word.charAt(i) - 'a';
-            if (ptr.endWordId > -1 && isPalindrome(word, i, n - 1)) {
-                wordIndices.add(ptr.endWordId);                
-            }
-            if (ptr.children[label] == null) {
-                return wordIndices;
-            } 
-            ptr = ptr.children[label];
-        }
-        if (ptr.endWordId > -1 && ptr.endWordId != index)
-            wordIndices.add(ptr.endWordId);
-        if (!ptr.belowPalindromeWordIds.isEmpty())
-            wordIndices.addAll(ptr.belowPalindromeWordIds);
-        
-        return wordIndices;
+    return ret;
+}
+
+private boolean isPalindrome(String str) {
+    int left = 0;
+    int right = str.length() - 1;
+    while (left <= right) {
+        if (str.charAt(left++) !=  str.charAt(right--)) return false;
     }
-    
-    private void insert(String word, int index) {
-        
-        Node ptr = root;
-        int n = word.length();
-        for (int i = 0; i < n; i++) {
-            int label = word.charAt(i) - 'a';               
-            if (ptr.children[label] == null)
-                ptr.children[label] = new Node();
-            ptr = ptr.children[label];
-            if (isPalindrome(word, i + 1, n - 1))
-                ptr.belowPalindromeWordIds.add(index);
-        }
-        
-        ptr.endWordId = index;
-    }
-    
-    class Node {
-        
-        Node[] children;
-        int endWordId; // Equals to -1 in default. If it is a word's end, it is the index of the word.
-        List<Integer> belowPalindromeWordIds; // List of word indices such that nodes below can construct a palindrome.
-        
-        public Node() {
-            children = new Node[26];
-            endWordId = -1;
-            belowPalindromeWordIds = new ArrayList<>();
-        }
-        
-    }
-    
-    /****************** Utility *******************/
-    
-    private String reverse(String str) {
-        return new StringBuilder(str).reverse().toString();
-    }
-    
-    private boolean isPalindrome(String str, int start, int end) {
-        
-        if (start > end) {
-            return false;
-        }
-        
-        while (start < end) {
-            if (str.charAt(start) != str.charAt(end))
-                return false;
-            start++;
-            end--;
-        }
-        
-        return true;
-    }
-    
-    private List<Integer> getSelfPalindrome(String[] words) {
-        List<Integer> wordIndices = new ArrayList<>();
-        for (int i = 0; i < words.length; i++) {
-            if (isPalindrome(words[i], 0, words[i].length() - 1)) {
-                wordIndices.add(i);
-            }
-        }
-        return wordIndices;
-    }
+    return true;
+}
 }
