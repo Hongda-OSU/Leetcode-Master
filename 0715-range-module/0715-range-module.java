@@ -1,47 +1,32 @@
 class RangeModule {
-    TreeMap<Integer, Integer> map;
-    public RangeModule() {
-        map = new TreeMap<>();
+    TreeMap<Integer, Integer> m = new TreeMap<>();
+    public RangeModule() {}
+    
+    public void addRange(int s, int e) { // s: start, e: end
+        // find overlap ranges, calc merged range, clear overlapped ranges, insert merged range
+        var L = m.floorEntry(s); // left possible overlap entry
+        var R = m.floorEntry(e); // right possible overlap entry
+
+        if (L != null && L.getValue() >= s) s = L.getKey(); // update overlap start
+        if (R != null && R.getValue() > e) e = R.getValue(); // update overlap end
+
+        m.subMap(s, e).clear(); // clear all overlapped entries
+        m.put(s, e); // save final merged entry
     }
     
-    public void addRange(int left, int right) {
-        if (right <= left) return;
-        Integer start = map.floorKey(left);
-        Integer end = map.floorKey(right);
-        if (start == null && end == null) {
-            map.put(left, right);
-        } else if (start != null && map.get(start) >= left) {
-            map.put(start, Math.max(map.get(end), Math.max(map.get(start), right)));
-    	} else {
-    	    map.put(left, Math.max(map.get(end), right));
-    	}
-        // clean up intermediate intervals
-        Map<Integer, Integer> subMap = map.subMap(left, false, right, true);
-        Set<Integer> set = new HashSet(subMap.keySet());
-        map.keySet().removeAll(set);
+    public boolean queryRange(int s, int e) {
+        var L = m.floorEntry(s);
+        return L != null && L.getValue() >= e; // if there exist a range: start <+ s, end >= e
     }
     
-    public boolean queryRange(int left, int right) {
-        Integer start = map.floorKey(left);
-        if (start == null) return false;
-        return map.get(start) >= right;
-    }
-    
-    public void removeRange(int left, int right) {
-        if (right <= left) return;
-        Integer start = map.floorKey(left);
-        Integer end = map.floorKey(right);
-    	if (end != null && map.get(end) > right) {
-            map.put(right, map.get(end));
-    	}
-    	if (start != null && map.get(start) > left) {
-            map.put(start, left);
-    	}
-        // clean up intermediate intervals
-        Map<Integer, Integer> subMap = map.subMap(left, true, right, false);
-        Set<Integer> set = new HashSet(subMap.keySet());
-        map.keySet().removeAll(set);
-        
+    public void removeRange(int s, int e) {
+        var L = m.floorEntry(s); // left possible overlap entry
+        var R = m.floorEntry(e); // right possible overlap entry
+
+        if (L != null && L.getValue() > s) m.put(L.getKey(), s); // after removal, if anything left
+        if (R != null && R.getValue() > e) m.put(e, R.getValue()); // after removal, if anything left
+
+        m.subMap(s, e).clear(); // removal
     }
 }
 /**
