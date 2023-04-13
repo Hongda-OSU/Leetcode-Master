@@ -1,94 +1,107 @@
 class AutocompleteSystem {
-    class TrieNode implements Comparable<TrieNode> {
-        TrieNode[] children;
-        String s;
-        int times;
-        List<TrieNode> hot;
+    static class TrieNode implements Comparable<TrieNode>{
+        private TrieNode[] children;
+        private int sentHitFreq; // If this is end of sentence, hit freq > 0. Else, 0.
+        private List<TrieNode> hotList; // Holds top 3 sentences that travel via this node.
+        private String sentence; // Last node of sentence also stores the sentence.
         
-        public TrieNode() {
-            children = new TrieNode[128];
-            s = null;
-            times = 0;
-            hot = new ArrayList<>();
+        TrieNode(){
+            sentence = null;
+            sentHitFreq = 0;
+            children = new TrieNode[27]; // Idx 26 is used for ' '.
+            hotList = new ArrayList<>(3);
         }
         
-        public int compareTo(TrieNode o) {
-            if (this.times == o.times) {
-                return this.s.compareTo(o.s);
+        public int compareTo(TrieNode that){
+            if(this.sentHitFreq == that.sentHitFreq){
+                return this.sentence.compareTo(that.sentence);
             }
             
-            return o.times - this.times;
+            return that.sentHitFreq - this.sentHitFreq; // Desc order.
         }
         
-        public void update(TrieNode node) {
-            if (!this.hot.contains(node)) {
-                this.hot.add(node);
+        void updateHotList(TrieNode sentEndNode){
+            if(!hotList.contains(sentEndNode)){ // Adding a sentence node that already exists would be erroneous.
+                hotList.add(sentEndNode);
             }
             
-            Collections.sort(hot);
+            Collections.sort(hotList); // Implemented compareTo will be used.
             
-            if (hot.size() > 3) {
-                hot.remove(hot.size() - 1);
+            if(hotList.size() > 3){
+                hotList.remove(hotList.size() - 1);
             }
         }
     }
     
-    TrieNode root;
-    TrieNode cur;
-    StringBuilder sb;
+    private TrieNode root;
+    private TrieNode iterNodeThatRemembers; // Picks up where left off & doesn't always start from root unless reset.
+    private StringBuilder inpStr;
+    
     public AutocompleteSystem(String[] sentences, int[] times) {
         root = new TrieNode();
-        cur = root;
-        sb = new StringBuilder();
+        iterNodeThatRemembers = root;
+        inpStr = new StringBuilder();
         
-        for (int i = 0; i < times.length; i++) {
-            add(sentences[i], times[i]);
+        for(int idx = 0; idx < sentences.length; ++idx){
+            addSentence(sentences[idx], times[idx]);
         }
     }
     
-    
-    public void add(String sentence, int t) {
-        TrieNode tmp = root;
+    private void addSentence(String sent, int times){
+        TrieNode iterNode = root;
+        List<TrieNode> visitedNodes = new ArrayList<>();
         
-        List<TrieNode> visited = new ArrayList<>();
-        for (char c : sentence.toCharArray()) {
-            if (tmp.children[c] == null) {
-                tmp.children[c] = new TrieNode();
+        for(int idx = 0; idx < sent.length(); ++idx){
+            int idxInChildArr = getArrIdxForChar(sent.charAt(idx));
+            
+            if(iterNode.children[idxInChildArr] == null){
+                iterNode.children[idxInChildArr] = new TrieNode();
             }
             
-            tmp = tmp.children[c];
-            visited.add(tmp);
+            iterNode = iterNode.children[idxInChildArr];        
+            visitedNodes.add(iterNode);
         }
         
-        tmp.s = sentence;
-        tmp.times += t;
+        // Reached the end of setence. The last node holds the hit freq and the sentence itelf.
+        iterNode.sentHitFreq += times;
+        iterNode.sentence = sent;
         
-        for (TrieNode node : visited) {
-            node.update(tmp);
+        for(TrieNode nodeInPath: visitedNodes){
+            nodeInPath.updateHotList(iterNode); // As new sentence went via this node, hotList needs updating.
         }
     }
     
     public List<String> input(char c) {
-        List<String> res = new ArrayList<>();
-        if (c == '#') {
-            add(sb.toString(), 1);
-            sb = new StringBuilder();
-            cur = root;
-            return res;
+        List<String> retHotList = new ArrayList<>();
+        
+        if(c == '#'){
+            addSentence(inpStr.toString(), 1); // 1 might get summed with hitFreq if sentence already in history.
+            iterNodeThatRemembers = root; // Reset.
+            inpStr = new StringBuilder(); // Reset.
+            return retHotList;
         }
         
-        sb.append(c);
-        if (cur != null) {
-            cur = cur.children[c];
+        inpStr.append(c);        
+        
+        int idxInChildArr = getArrIdxForChar(c);
+        if(iterNodeThatRemembers != null){
+            iterNodeThatRemembers = iterNodeThatRemembers.children[idxInChildArr];
         }
         
-        if (cur == null) return res;
-        for (TrieNode node : cur.hot) {
-            res.add(node.s);
+        if(iterNodeThatRemembers == null){
+            return retHotList; // If input char doesn't exist in any prefix path, return empty list.
         }
         
-        return res;
+        for(TrieNode sentEndNode: iterNodeThatRemembers.hotList){
+            retHotList.add(sentEndNode.sentence); // Input char exists in prefix path. Populate retList with hotList.
+        }
+        
+        return retHotList;
     }
+    
+    private int getArrIdxForChar(char c){
+            return c == ' ' ? 26 : c - 'a';
+        }
 }
 
 /**
