@@ -1,32 +1,15 @@
-class Solution {
-  public int numSquares(int n) {
-
-    ArrayList<Integer> square_nums = new ArrayList<Integer>();
-    for (int i = 1; i * i <= n; ++i) {
-      square_nums.add(i * i);
-    }
-
-    Set<Integer> queue = new HashSet<Integer>();
-    queue.add(n);
-
-    int level = 0;
-    while (queue.size() > 0) {
-      level += 1;
-      Set<Integer> next_queue = new HashSet<Integer>();
-
-      for (Integer remainder : queue) {
-        for (Integer square : square_nums) {
-          if (remainder.equals(square)) {
-            return level;
-          } else if (remainder < square) {
-            break;
-          } else {
-            next_queue.add(remainder - square);
-          }
+public class Solution {
+    public int numSquares(int n) {
+        int[] memo = new int[n + 1];
+        Arrays.fill(memo, Integer.MAX_VALUE);
+        memo[0] = 0;
+        int i = 0;
+        while (++i * i <= n) {
+            for (int j = i * i; j < memo.length; j++) {
+                memo[j] = Math.min(memo[j], memo[j - (i * i)] + 1);
+            }
         }
-      }
-      queue = next_queue;
+        return memo[n];
+        
     }
-    return level;
-  }
 }
