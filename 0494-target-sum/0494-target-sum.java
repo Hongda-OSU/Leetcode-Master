@@ -1,17 +1,26 @@
-class Solution {
-     public int findTargetSumWays(int[] nums, int s) {
-        Map<Integer, Integer> dp = new HashMap();
-        dp.put(0, 1);
-        for (int num : nums) {
-            Map<Integer, Integer> dp2 = new HashMap();
-            for (int tempSum : dp.keySet()) {
-                int key1 = tempSum + num;
-                dp2.put(key1, dp2.getOrDefault(key1, 0) + dp.get(tempSum));
-                int key2 = tempSum - num;
-                dp2.put(key2, dp2.getOrDefault(key2, 0) + dp.get(tempSum));
-            }
-            dp = dp2;
+public class Solution {
+    public int findTargetSumWays(int[] nums, int S) {
+        if (nums == null || nums.length == 0){
+            return 0;
         }
-        return dp.getOrDefault(s, 0);
+        return helper(nums, 0, 0, S, new HashMap<>());
+    }
+    private int helper(int[] nums, int index, int sum, int S, Map<String, Integer> map){
+        String encodeString = index + "->" + sum;
+        if (map.containsKey(encodeString)){
+            return map.get(encodeString);
+        }
+        if (index == nums.length){
+            if (sum == S){
+                return 1;
+            }else {
+                return 0;
+            }
+        }
+        int curNum = nums[index];
+        int add = helper(nums, index + 1, sum - curNum, S, map);
+        int minus = helper(nums, index + 1, sum + curNum, S, map);
+        map.put(encodeString, add + minus);
+        return add + minus;
     }
 }
