@@ -1,34 +1,27 @@
 class Solution {
-    private static Map<String, Integer> memo; // key: serialized curIndex and targetSum, value: its corresponding number of ways
-    
+     int result = 0;
+	
     public int findTargetSumWays(int[] nums, int S) {
-        memo = new HashMap<>();        
-        return findTargetSumWaysRecur(nums, S, 0, S);
-    }
-    
-    private static int findTargetSumWaysRecur(int[] nums, int S, int curIndex, int targetSum) {
+        if(nums == null || nums.length == 0) return result;
         
-        String curSerial= serialize(curIndex, targetSum);
-        if (memo.containsKey(curSerial)) {
-            return memo.get(curSerial);
+        int n = nums.length;
+        int[] sums = new int[n];
+        sums[n - 1] = nums[n - 1];
+        for (int i = n - 2; i >= 0; i--)
+            sums[i] = sums[i + 1] + nums[i];
+        
+        helper(nums, sums, S, 0);
+        return result;
+    }
+    public void helper(int[] nums, int[] sums, int target, int pos){
+        if(pos == nums.length){
+            if(target == 0) result++;
+            return;
         }
         
-        if (curIndex == nums.length) {
-            if (targetSum == 0) {
-                return 1;
-            }
-            return 0;
-        }
+        if (sums[pos] < Math.abs(target)) return;
         
-        int numWaysIfMinus = findTargetSumWaysRecur(nums, S, curIndex + 1, targetSum + nums[curIndex]); // -nums[curIndex]
-        int numWaysIfAdd = findTargetSumWaysRecur(nums, S, curIndex + 1, targetSum - nums[curIndex]); // +nums[curIndex]
-        
-        int numWays =  numWaysIfMinus + numWaysIfAdd; 
-        memo.put(curSerial, numWays);
-        return numWays;
-    }
-    
-    private static String serialize(int curIndex, int targetSum) {
-        return curIndex + "," + targetSum;
+        helper(nums, sums, target + nums[pos], pos + 1);
+        helper(nums, sums, target - nums[pos], pos + 1);
     }
 }
