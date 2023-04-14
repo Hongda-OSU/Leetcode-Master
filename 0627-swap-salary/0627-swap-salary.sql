@@ -1,5 +1,5 @@
 # Write your MySQL query statement below
-UPDATE salary
+UPDATE Salary
 SET sex = (
     CASE sex
         WHEN 'm' 
