@@ -1,27 +1,22 @@
 class Solution {
-     int result = 0;
-	
-    public int findTargetSumWays(int[] nums, int S) {
-        if(nums == null || nums.length == 0) return result;
-        
-        int n = nums.length;
-        int[] sums = new int[n];
-        sums[n - 1] = nums[n - 1];
-        for (int i = n - 2; i >= 0; i--)
-            sums[i] = sums[i + 1] + nums[i];
-        
-        helper(nums, sums, S, 0);
-        return result;
-    }
-    public void helper(int[] nums, int[] sums, int target, int pos){
-        if(pos == nums.length){
-            if(target == 0) result++;
-            return;
+    public int findTargetSumWays(int[] nums, int target) {
+        int sum = 0;
+        for (int num : nums)
+            sum += num;
+        if (target > sum || target < -sum)
+            return 0;
+        int[] dp = new int[2 * sum + 1];
+        dp[0 + sum] = 1;
+        for (int i = 0; i < nums.length; i++) {
+            int[] next = new int[2 * sum + 1];
+            for (int j = 0; j < 2 * sum + 1; j++) {
+                if (dp[j] != 0) {
+                    next[j + nums[i]] += dp[j];
+                    next[j - nums[i]] += dp[j];
+                }
+            }
+            dp = next;
         }
-        
-        if (sums[pos] < Math.abs(target)) return;
-        
-        helper(nums, sums, target + nums[pos], pos + 1);
-        helper(nums, sums, target - nums[pos], pos + 1);
+        return dp[sum + target];
     }
 }
