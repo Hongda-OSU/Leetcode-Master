@@ -1,28 +1,21 @@
-class Solution {
+public class Solution {
     public int findTargetSumWays(int[] nums, int S) {
-    int sum = 0;
-    S = Math.abs(S);
-    for(int i = 0; i < nums.length; i++)
-        sum += nums[i];
-	// Invalid S, just return 0
-    if( S > sum || (sum + S) % 2 != 0 )
-        return 0;
-
-    int dp[][] = new int[(sum + S) / 2 + 1][nums.length + 1];
-    dp[0][0] = 1;
-    for(int i = 0; i < nums.length; i++) { // empty knapsack must be processed specially
-        if( nums[i] == 0 )
-            dp[0][i + 1] = dp[0][i] * 2;
-        else
-            dp[0][i + 1] = dp[0][i];
-    }
-    for(int i = 1; i < dp.length; i++) {
-        for(int j = 0; j < nums.length; j++) {
-            dp[i][j + 1] += dp[i][j];
-            if( nums[j] <= i )
-                dp[i][j + 1] += dp[i - nums[j]][j];
+        int total = Arrays.stream(nums).sum();
+        int[] dp = new int[2 * total + 1];
+        dp[nums[0] + total] = 1;
+        dp[-nums[0] + total] += 1;
+        
+        for (int i = 1; i < nums.length; i++) {
+            int[] next = new int[2 * total + 1];
+            for (int sum = -total; sum <= total; sum++) {
+                if (dp[sum + total] > 0) {
+                    next[sum + nums[i] + total] += dp[sum + total];
+                    next[sum - nums[i] + total] += dp[sum + total];
+                }
+            }
+            dp = next;
         }
+        
+        return Math.abs(S) > total ? 0 : dp[S + total];
     }
-    return dp[(sum + S) / 2][nums.length];
-}
 }
