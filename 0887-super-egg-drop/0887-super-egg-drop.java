@@ -1,30 +1,25 @@
 class Solution {
-    public int superEggDrop(int k, int n) {
-        int[][] memo = new int[k + 1][n + 1];
-        return helper(k, n, memo);
-    } 
-    
-    public int helper(int k, int n, int[][] memo) {
-        if (n <= 1)
-            return n;
-        if (k == 1)
-            return n;
-        if (memo[k][n] > 0)
-            return memo[k][n];
-        int low = 1, high = n, result = n;
-        while (low < high) {
-            int pivot = low + (high - low) / 2;
-            int left = helper(k - 1, pivot - 1, memo);
-            int right = helper(k, n - pivot, memo);
-            result = Math.min(result, Math.max(left, right) + 1);
-            if (left == right)
-                break;
-            else if (left < right)
-                low = pivot + 1;
-            else 
-                high = pivot;
+    public int superEggDrop(int K, int N) {
+        int lo = 1, hi = N;
+        while (lo < hi) {
+            int mi = (lo + hi) / 2;
+            if (f(mi, K, N) < N)
+                lo = mi + 1;
+            else
+                hi = mi;
         }
-        memo[k][n] = result;
-        return result;
-    } 
+
+        return lo;
+    }
+
+    public int f(int x, int K, int N) {
+        int ans = 0, r = 1;
+        for (int i = 1; i <= K; ++i) {
+            r *= x-i+1;
+            r /= i;
+            ans += r;
+            if (ans >= N) break;
+        }
+        return ans;
+    }
 }
