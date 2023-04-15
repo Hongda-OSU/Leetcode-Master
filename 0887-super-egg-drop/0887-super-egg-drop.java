@@ -1,25 +1,25 @@
 class Solution {
-    public int superEggDrop(int K, int N) {
-        int lo = 1, hi = N;
-        while (lo < hi) {
-            int mi = (lo + hi) / 2;
-            if (f(mi, K, N) < N)
-                lo = mi + 1;
-            else
-                hi = mi;
+    public int superEggDrop(int k, int n) {
+        int low = 1, high = n;
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+            if (helper(mid, k, n) < n)
+                low = mid + 1;
+            else 
+                high = mid;
         }
-
-        return lo;
+        return low;
     }
-
-    public int f(int x, int K, int N) {
-        int ans = 0, r = 1;
-        for (int i = 1; i <= K; ++i) {
-            r *= x-i+1;
+    
+    private int helper(int x, int k, int n) {
+        int result = 0, r = 1;
+        for (int i = 1; i <= k; i++) {
+            r *= x - i + 1;
             r /= i;
-            ans += r;
-            if (ans >= N) break;
+            result += r;
+            if (result > n)
+                break;
         }
-        return ans;
+        return result;
     }
 }
