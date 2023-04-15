@@ -1,5 +1,5 @@
 class Solution {
-    private int[] dp = new int[1001];
+    private static int[] dp = new int[1001];
     
     public int twoEggDrop(int n) {
         if (dp[n] == 0) {
