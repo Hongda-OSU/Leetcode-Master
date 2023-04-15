@@ -1,30 +1,30 @@
 class Solution {
     public int evalRPN(String[] tokens) {
- int[] ls = new int[tokens.length/2+1];
-    int index = 0;
-    for (String token : tokens) {
-        switch (token) {
-            case "+":
-                ls[index - 2] = ls[index - 2] + ls[index - 1];
-                index--;
-                break;
-            case "-":
-                ls[index - 2] = ls[index - 2] - ls[index - 1];
-                index--;
-                break;
-            case "*":
-                ls[index - 2] = ls[index - 2] * ls[index - 1];
-                index--;
-                break;
-            case "/":
-                ls[index - 2] = ls[index - 2] / ls[index - 1];
-                index--;
-                break;
-            default:
-                ls[index++] = Integer.parseInt(token);
-                break;
+        int[] arr = new int[tokens.length / 2 + 1];
+        int index = 0;
+        for (String token : tokens) {
+            switch (token) {
+                case "+":
+                    arr[index - 2] += arr[index - 1];
+                    index--;
+                    break;
+                case "-":
+                    arr[index - 2] -= arr[index - 1];
+                    index--;
+                    break;
+                case "*":
+                    arr[index - 2] *= arr[index - 1];
+                    index--;
+                    break;
+                case "/":
+                    arr[index - 2] /= arr[index - 1];
+                    index--;
+                    break;           
+                default:
+                    arr[index++] = Integer.parseInt(token);
+                    break;
+            }
         }
+        return arr[0];
     }
-    return ls[0];
-}
 }
