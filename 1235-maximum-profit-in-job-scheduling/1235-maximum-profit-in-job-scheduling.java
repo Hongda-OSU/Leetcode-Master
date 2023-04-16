@@ -1,50 +1,61 @@
 class Solution {
-    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
-        int n = startTime.length;
-        Job[] jobs = new Job[n];
-        for (int i = 0; i < n; i++)
-            jobs[i] = new Job(startTime[i], endTime[i], profit[i]);
-        return schedule(jobs);
-    }
-    
-    public int schedule(Job[] jobs) {
-        Arrays.sort(jobs, Comparator.comparingInt(a -> a.finish));
-        int n = jobs.length;
-        int[] dp = new int[n];
-        dp[0] = jobs[0].profit;
-        for (int i = 1; i < n; i++) {
-            int profit = jobs[i].profit;
-            int k = search(jobs, i);
-            if (k != -1)
-                profit += dp[k];
-            dp[i] = Math.max(profit, dp[i - 1]);
+    class The_Comparator implements Comparator<ArrayList<Integer>> {
+        public int compare(ArrayList<Integer> list1, ArrayList<Integer> list2) {
+            return list1.get(0) - list2.get(0);
         }
-        return dp[n - 1];
     }
     
-    public int search(Job[] jobs, int idx) {
-        int start = 0, end = idx - 1;
-        while (start <= end) {
-            int pivot = (start + end) >>> 1;
-            if (jobs[pivot].finish <= jobs[idx].start) {
-                if (jobs[pivot + 1].finish <= jobs[idx].start)
-                    start = pivot + 1;
-                else
-                    return pivot;
-            } else {
-                end = pivot - 1;
+    private int findMaxProfit(List<List<Integer>> jobs) {
+        int n = jobs.size(), maxProfit = 0;
+        // min heap having {endTime, profit}
+        PriorityQueue<ArrayList<Integer>> pq = new PriorityQueue<>(new The_Comparator());
+        
+        for (int i = 0; i < n; i++) {
+            int start = jobs.get(i).get(0), end = jobs.get(i).get(1), profit = jobs.get(i).get(2);
+            
+            // keep popping while the heap is not empty and
+            // jobs are not conflicting
+            // update the value of maxProfit
+            while (pq.isEmpty() == false && start >= pq.peek().get(0)) {
+                maxProfit = Math.max(maxProfit, pq.peek().get(1));
+                pq.remove();
             }
+            
+            ArrayList<Integer> combinedJob = new ArrayList<>();
+            combinedJob.add(end);
+            combinedJob.add(profit + maxProfit);
+            
+            // push the job with combined profit
+            // if no non-conflicting job is present maxProfit will be 0
+            pq.add(combinedJob);
         }
-        return -1;
+        
+        // update the value of maxProfit by comparing with
+        // profit of jobs that exits in the heap
+        while (pq.isEmpty() == false) {
+            maxProfit = Math.max(maxProfit, pq.peek().get(1));
+            pq.remove();
+        }
+        
+        return maxProfit;
     }
-}
-
-class Job {
-    public int start, finish, profit;
     
-    public Job(int start, int finish, int profit) {
-        this.start = start;
-        this.finish = finish;
-        this.profit = profit;
+    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        List<List<Integer>> jobs = new ArrayList<>();
+        
+        // storing job's details into one list 
+        // this will help in sorting the jobs while maintaining the other parameters
+        int length = profit.length;
+        for (int i = 0; i < length; i++) {
+            ArrayList<Integer> currJob = new ArrayList<>();
+            currJob.add(startTime[i]);
+            currJob.add(endTime[i]);
+            currJob.add(profit[i]);
+            
+            jobs.add(currJob);
+        }
+        
+        jobs.sort(Comparator.comparingInt(a -> a.get(0)));
+        return findMaxProfit(jobs);
     }
 }
