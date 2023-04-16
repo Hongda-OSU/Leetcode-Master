@@ -1,43 +1,51 @@
 class Solution {
-    class The_Comparator implements Comparator<ArrayList<Integer>> {
-        public int compare(ArrayList<Integer> list1, ArrayList<Integer> list2) {
-            return list1.get(0) - list2.get(0);
+    // maximum number of jobs are 50000
+    int memo[] = new int[50001];
+    
+    private int findNextJob(int[] startTime, int lastEndingTime) {
+        int start = 0, end = startTime.length - 1, nextIndex = startTime.length;
+        
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            
+            if (startTime[mid] >= lastEndingTime) {
+                nextIndex = mid;
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
         }
+        return nextIndex;
     }
     
-    private int findMaxProfit(List<List<Integer>> jobs) {
-        int n = jobs.size(), maxProfit = 0;
-        // min heap having {endTime, profit}
-        PriorityQueue<ArrayList<Integer>> pq = new PriorityQueue<>(new The_Comparator());
+    private int findMaxProfit(List<List<Integer>> jobs, int[] startTime) {
+        int length = startTime.length;
         
-        for (int i = 0; i < n; i++) {
-            int start = jobs.get(i).get(0), end = jobs.get(i).get(1), profit = jobs.get(i).get(2);
+        for (int position = length - 1; position >= 0; position--) {
+            // it is the profit made by scheduling the current job 
+            int currProfit = 0;
             
-            // keep popping while the heap is not empty and
-            // jobs are not conflicting
-            // update the value of maxProfit
-            while (pq.isEmpty() == false && start >= pq.peek().get(0)) {
-                maxProfit = Math.max(maxProfit, pq.peek().get(1));
-                pq.remove();
+            // nextIndex is the index of next non-conflicting job
+            int nextIndex = findNextJob(startTime, jobs.get(position).get(1));
+            
+            // if there is a non-conflicting job possible add it's profit
+            // else just consider the curent job profit
+            if (nextIndex != length) {
+                currProfit = jobs.get(position).get(2) + memo[nextIndex];
+            } else {
+                currProfit = jobs.get(position).get(2);
             }
             
-            ArrayList<Integer> combinedJob = new ArrayList<>();
-            combinedJob.add(end);
-            combinedJob.add(profit + maxProfit);
-            
-            // push the job with combined profit
-            // if no non-conflicting job is present maxProfit will be 0
-            pq.add(combinedJob);
+            // storing the maximum profit we can achieve by scheduling 
+            // non - conflicting jobs from index position to the end of array
+            if (position == length - 1) {
+                memo[position] = currProfit;
+            } else {
+                memo[position] = Math.max(currProfit, memo[position + 1]);
+            }
         }
         
-        // update the value of maxProfit by comparing with
-        // profit of jobs that exits in the heap
-        while (pq.isEmpty() == false) {
-            maxProfit = Math.max(maxProfit, pq.peek().get(1));
-            pq.remove();
-        }
-        
-        return maxProfit;
+        return memo[0];
     }
     
     public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
@@ -56,6 +64,12 @@ class Solution {
         }
         
         jobs.sort(Comparator.comparingInt(a -> a.get(0)));
-        return findMaxProfit(jobs);
+
+        // binary search will be used in startTime so store it as separate list
+        for (int i = 0; i < length; i++) {
+            startTime[i] = jobs.get(i).get(0);
+        }
+        
+        return findMaxProfit(jobs, startTime);
     }
 }
