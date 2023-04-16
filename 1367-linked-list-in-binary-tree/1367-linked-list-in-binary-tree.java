@@ -24,33 +24,47 @@
  * }
  */
 class Solution {
-     int[] needle, lps;
+    private static int[] pattern, lps;
+    
     public boolean isSubPath(ListNode head, TreeNode root) {
-        needle = convertLinkedListToArray(head);
-        lps = computeKMPTable(needle);
+        pattern =  convertLinkedListToArray(head);
+        lps = computeKMPTable(pattern);
         return kmpSearch(root, 0);
     }
-    boolean kmpSearch(TreeNode i, int j) {
-        if (j == needle.length) return true;
-        if (i == null) return false;
-        while (j > 0 && i.val != needle[j]) j = lps[j - 1];
-        if (i.val == needle[j]) j++;
-        return kmpSearch(i.left, j) || kmpSearch(i.right, j);
+    
+    private int[] convertLinkedListToArray(ListNode head) {
+        List<Integer> list = new ArrayList<>();
+        while (head != null) {
+            list.add(head.val);
+            head = head.next;
+        }
+        int[] arr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++)
+            arr[i] = list.get(i);
+        return arr;
     }
-    int[] computeKMPTable(int[] pattern) {
+    
+    private int[] computeKMPTable(int[] pattern) {
         int n = pattern.length;
         int[] lps = new int[n];
         for (int i = 1, j = 0; i < n; i++) {
-            while (j > 0 && pattern[i] != pattern[j]) j = lps[j - 1];
-            if (pattern[i] == pattern[j]) lps[i] = ++j;
+            while (j > 0 && pattern[i] != pattern[j])
+                j = lps[j - 1];
+            if (pattern[i] == pattern[j])
+                lps[i] = ++j;
         }
         return lps;
     }
-    int[] convertLinkedListToArray(ListNode head) {
-        List<Integer> list = new ArrayList<>();
-        while (head != null) { list.add(head.val); head = head.next; }
-        int[] arr = new int[list.size()];
-        for (int i = 0; i < list.size(); i++) arr[i] = list.get(i);
-        return arr;
+    
+    private boolean kmpSearch(TreeNode node, int position) {
+        if (position == pattern.length)
+            return true;
+        if (node == null)
+            return false;
+        while (position > 0 && node.val != pattern[position])
+            position = lps[position - 1];
+        if (node.val == pattern[position])
+            position++;
+        return kmpSearch(node.left, position) || kmpSearch(node.right, position);
     }
-}
+} 
