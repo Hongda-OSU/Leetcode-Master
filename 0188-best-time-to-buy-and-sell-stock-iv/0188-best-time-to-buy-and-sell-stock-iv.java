@@ -1,19 +1,25 @@
 class Solution {
     public int maxProfit(int k, int[] prices) {
-        if (k == 0) return 0;
+        int len = prices.length;
+        if (k >= len / 2) return quickSolve(prices);
         
-        int[] profit = new int[k+1];
-        int[] cost = new int[k+1];
-
-        profit[0] = 0;
-        Arrays.fill(cost, Integer.MAX_VALUE);
-        
-        for (int price: prices) {
-            for (int i = 0; i < k; i++) {
-                cost[i+1] = Math.min(cost[i+1], price - profit[i]);
-                profit[i+1] = Math.max(profit[i+1], price - cost[i+1]);
+        int[][] t = new int[k + 1][len];
+        for (int i = 1; i <= k; i++) {
+            int tmpMax =  -prices[0];
+            for (int j = 1; j < len; j++) {
+                t[i][j] = Math.max(t[i][j - 1], prices[j] + tmpMax);
+                tmpMax =  Math.max(tmpMax, t[i - 1][j - 1] - prices[j]);
             }
         }
-        return profit[k];
+        return t[k][len - 1];
+    }
+    
+
+    private int quickSolve(int[] prices) {
+        int len = prices.length, profit = 0;
+        for (int i = 1; i < len; i++)
+            // as long as there is a price gap, we gain a profit.
+            if (prices[i] > prices[i - 1]) profit += prices[i] - prices[i - 1];
+        return profit;
     }
 }
