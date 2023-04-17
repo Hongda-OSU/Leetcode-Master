@@ -1,20 +1,35 @@
 class Solution {
-    public int minDistance(int[] A, int K) {
-        Arrays.sort(A);
-        int n = A.length, B[] = new int[n+1], dp[] = new int[n];
-        for (int i = 0; i < n; ++i) {
-            B[i + 1] = B[i] + A[i];
-            dp[i] = (int)1e6;
+    private Integer[][] cache;
+    public int minDistance(int[] houses, int k) {
+        Arrays.sort(houses);
+        cache = new Integer[houses.length+1][k+1];
+        int res = dfs(houses, 0, k);
+        return res == Integer.MAX_VALUE ? -1 : res;
+    }
+    private int dfs(int[] houses, int idx, int k){
+        if(k == 0 || idx >= houses.length) return Integer.MAX_VALUE;
+        if(cache[idx][k]!=null) return cache[idx][k];
+        if(k == 1){
+            return getMedianSum(houses, idx, houses.length - 1);
         }
-        for (int k = 1; k <= K; ++k) {
-            for (int j = n - 1; j > k - 2; --j) {
-                for (int i = k - 2; i < j; ++i) {
-                    int m1 =  (i + j + 1) / 2, m2 = (i + j + 2) / 2;
-                    int last = (B[j + 1] - B[m2]) - (B[m1 + 1] - B[i + 1]);
-                    dp[j] = Math.min(dp[j], (i >= 0 ? dp[i] : 0) + last);
-                }
+        int min = Integer.MAX_VALUE;
+        for(int i=idx; i<houses.length-k+1; i++){
+            //next group
+            int m1 = getMedianSum(houses, idx, i);
+            int d1 = dfs(houses, i+1, k - 1);
+            if(m1 != Integer.MAX_VALUE && d1 != Integer.MAX_VALUE){
+                min = Math.min(min, m1 + d1);
             }
         }
-        return dp[n - 1];
+        cache[idx][k] = min;
+        return min;
     }
+    private int getMedianSum(int houses[], int l, int r) { 
+        int m = houses[l + (r-l)/2];
+        int sum = 0;
+        for(int i=l;i<=r;i++){
+            sum += Math.abs(houses[i] - m);
+        }
+        return sum;
+    } 
 }
