@@ -1,15 +1,13 @@
 class Solution {
-    public int numberOfWays(int n) {
-        long[] inv = new long[n / 2 + 2];
-        inv[1] = 1;
-        long mod = (long)1e9 + 7, res = 1;
-        for (int i = 2; i < n / 2 + 2; ++i) {
-            inv[i] = mod - mod / i * inv[(int)mod % i] % mod;
+    public int numberOfWays(int num_people) {
+        long M = 1_000_000_007;
+        long[] cache = new long[num_people+1];
+        cache[0] = 1;
+        for (int i = 2; i <= num_people; i += 2) {
+            for (int j = 2; j <= i; j += 2) {
+                cache[i] = (cache[i] + (cache[j-2]*cache[i-j])) % M;
+            }
         }
-        for (int i = 1; i <= n / 2; ++i) {
-            res = res * (i + n / 2) % mod;
-            res = res * inv[i] % mod;
-        }
-        return (int)(res * inv[n / 2 + 1] % mod);
+        return (int)cache[num_people];
     }
 }
