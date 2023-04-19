@@ -1,24 +1,32 @@
 class Solution {
+    Integer memo[][];
+
     public int minDistance(String word1, String word2) {
-        int w1 = word1.length(), w2 = word2.length();
-        int[][] memo = new int[w1 + 1][w2 + 1];
-        return minDistanceHelper(word1, word2, w1, w2, memo);
+        memo = new Integer[word1.length() + 1][word2.length() + 1];
+        return minDistanceRecur(word1, word2, word1.length(), word2.length());
     }
-    
-    public int minDistanceHelper(String word1, String word2, int w1, int w2, int[][] memo) {
-        if (memo[w1][w2] != 0)
-            return memo[w1][w2];
-        if (w1 == 0)
-            return w2;
-        if (w2 == 0)
-            return w1;
-        if (word1.charAt(w1 - 1) == word2.charAt(w2 - 1)) {
-            return minDistanceHelper(word1, word2, w1 - 1, w2 - 1, memo);
-        } else {
-            int delete = 1 + minDistanceHelper(word1, word2, w1 - 1, w2, memo); // delete operation
-            int replace = 1 + minDistanceHelper(word1, word2, w1 - 1, w2 - 1, memo); // replace operation
-            int insert = 1 + minDistanceHelper(word1, word2, w1, w2 - 1, memo); // insert operation
-            return memo[w1][w2] = Math.min(delete, Math.min(replace, insert));
+
+    int minDistanceRecur(String word1, String word2, int word1Index, int word2Index) {
+        if (word1Index == 0) {
+            return word2Index;
         }
+        if (word2Index == 0) {
+            return word1Index;
+        }
+        if (memo[word1Index][word2Index] != null) {
+            return memo[word1Index][word2Index];
+        }
+        int minEditDistance = 0;
+        if (word1.charAt(word1Index - 1) == word2.charAt(word2Index - 1)) {
+            minEditDistance = minDistanceRecur(word1, word2, word1Index - 1, word2Index - 1);
+        }
+        else {
+            int insertOperation = minDistanceRecur(word1, word2, word1Index, word2Index - 1);
+            int deleteOperation = minDistanceRecur(word1, word2, word1Index - 1, word2Index);
+            int replaceOperation = minDistanceRecur(word1, word2, word1Index - 1, word2Index - 1);
+            minEditDistance = Math.min(insertOperation, Math.min(deleteOperation, replaceOperation)) + 1;
+        }
+        memo[word1Index][word2Index] = minEditDistance;
+        return minEditDistance;
     }
 }
