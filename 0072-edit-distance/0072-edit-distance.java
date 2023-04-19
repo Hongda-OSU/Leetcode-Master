@@ -1,37 +1,28 @@
 class Solution {
+    private Integer memo[][];
+    
     public int minDistance(String word1, String word2) {
-        int word1Length = word1.length();
-        int word2Length = word2.length();
-
-        if (word1Length == 0) {
-            return word2Length;
+        memo = new Integer[word1.length() + 1][word2.length() + 1];
+        return minDistanceHelper(word1, word2, word1.length(), word2.length());
+    }
+    
+    private int minDistanceHelper(String w1, String w2, int l1, int l2) {
+        if (l1 == 0)
+            return l2;
+        if (l2 == 0)
+            return l1;
+        if (memo[l1][l2] != null) 
+            return memo[l1][l2];
+        int minDist = 0;
+        if (w1.charAt(l1 - 1) == w2.charAt(l2 - 1)) {
+            minDist = minDistanceHelper(w1, w2, l1 - 1, l2 - 1);
+        } else {
+            int insert = minDistanceHelper(w1, w2, l1, l2 - 1);
+            int delete = minDistanceHelper(w1, w2, l1 - 1, l2);
+            int replace = minDistanceHelper(w1, w2, l1 - 1, l2 - 1);
+            minDist = Math.min(insert, Math.min(delete, replace)) + 1;
         }
-        if (word2Length == 0) {
-            return word1Length;
-        }
-
-        int dp[][] = new int[word1Length + 1][word2Length + 1];
-
-        for (int word1Index = 1; word1Index <= word1Length; word1Index++) {
-            dp[word1Index][0] = word1Index;
-        }
-
-        for (int word2Index = 1; word2Index <= word2Length; word2Index++) {
-            dp[0][word2Index] = word2Index;
-        }
-
-        for (int word1Index = 1; word1Index <= word1Length; word1Index++) {
-            for (int word2Index = 1; word2Index <= word2Length; word2Index++) {
-                if (word2.charAt(word2Index - 1) == word1.charAt(word1Index - 1)) {
-                    dp[word1Index][word2Index] = dp[word1Index - 1][word2Index - 1];
-                } else {
-                    dp[word1Index][word2Index] = Math.min(dp[word1Index - 1][word2Index],
-                            Math.min(dp[word1Index][word2Index - 1],
-                                    dp[word1Index - 1][word2Index - 1])) + 1;
-                }
-            }
-        }
-
-        return dp[word1Length][word2Length];
+        memo[l1][l2] = minDist;
+        return minDist;
     }
 }
