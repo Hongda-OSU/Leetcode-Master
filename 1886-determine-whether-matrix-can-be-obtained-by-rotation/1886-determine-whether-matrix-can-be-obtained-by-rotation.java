@@ -1,49 +1,44 @@
 class Solution {
     public boolean findRotation(int[][] mat, int[][] target) {
-     
-        for(int i=0; i<4; i++){
-        if(isEqual(mat,target)) return true;
-        mat = rotate(mat);
+        for (int i = 0; i < 4; i++) {
+            if (isEqual(mat, target))
+                return true;
+            mat = rotate(mat);
         }
         return false;
     }
     
-    
-//     Function to rotate matrix by 90 degree using transpose
-    public static int[][] rotate(int[][] mat){
-          int[][] check = mat;   
-          int m = check.length;
-//             First transposing the matrix
-            for(int col=0; col<m; col++){
-                for(int row=1+col; row<m; row++){
-                    int temp = check[row][col];
-                    check[row][col] = check[col][row];
-                    check[col][row] = temp;
-                }
-            }
-        
-//             Now swapping coloumns like said in start
-            for(int col_1 = 0 , col_2=m-1; col_1<m/2; col_1++,col_2--){
-            for(int row= 0; row<m; row++){
-                int temp = check[row][col_1];
-                check[row][col_1] = check[row][col_2];
-                check[row][col_2] = temp;;
-            }
-        }
-        return check;
-    }
-    
-    
-//     Function to check whether two matrix are equal
-    public static boolean isEqual(int[][] m1 , int[][] m2){
-        if(m1.length != m2.length) return false;
-        if(m1[0].length != m2[0].length) return false;
-        for(int row=0; row<m1.length; row++){
-            for(int col = 0; col<m1[0].length; col++){
-                if(m1[row][col] != m2[row][col]) return false;
+    private boolean isEqual(int[][] mat, int[][] target) {
+        if (mat.length != target.length)
+            return false;
+        if (mat[0].length != target[0].length)
+            return false;
+        for (int i = 0; i < mat.length; i++) {
+            for (int j = 0; j < mat[0].length; j++) {
+                if (mat[i][j] != target[i][j])
+                    return false;
             }
         }
         return true;
     }
     
+    private int[][] rotate(int[][] mat) {
+        int[][] tmp = mat;
+        int m = tmp.length;
+        for (int col = 0; col < m; col++) {
+            for (int row = col + 1; row < m; row++) {
+                int val = tmp[row][col];
+                tmp[row][col] = tmp[col][row];
+                tmp[col][row] = val;
+            }
+        }
+        for (int col1 = 0, col2 = m - 1; col1 < m / 2; col1++, col2--) {
+            for (int row = 0; row < m; row++) {
+                int val = tmp[row][col1];
+                tmp[row][col1] = tmp[row][col2];
+                tmp[row][col2] = val;
+            }
+        }
+        return tmp;
+    }
 }
