@@ -1,24 +1,31 @@
 class Solution {
     public int longestPalindromeSubseq(String s) {
-        int n = s.length(), base = 251; //set base 251 because max length of s is 250.
-        int[][] dp = new int[n + 2][n + 2];
-        for (int i = n; i >= 1; i--){
-            for (int j = i + 1; j <= n; j++){
-                int prev = dp[i + 1][j - 1] / base;
-                if (s.charAt(i - 1) == s.charAt(j - 1) && s.charAt(j - 1) != prev){
-                    dp[i][j] = dp[i + 1][j - 1] % base + 2 + s.charAt(j - 1) * base; 
-					//store prev info with *251, so that it won't interfere with our acutal answer.
-                }
-                else{
-                    if (dp[i + 1][j] % base > dp[i][j - 1] % base){ //check the score with %251
+        int n = s.length();
+        int[][] dp = new int[n][n];
+        char[][] dpChar = new char[n][n];
+        char[] arr = s.toCharArray();
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = i + 1; j < n; j++) {
+                if (arr[i] == arr[j]) {
+                    dpChar[i][j] = arr[i];
+                    if (arr[i] == dpChar[i + 1][j - 1])
+                        dp[i][j] = dp[i + 1][j - 1];
+                    else 
+                        dp[i][j] = dp[i + 1][j - 1] + 2;
+                } else {
+                    if (dp[i + 1][j] > dp[i][j - 1]) {
                         dp[i][j] = dp[i + 1][j];
-                    }else{
+                        dpChar[i][j] = dpChar[i + 1][j];
+                    } else if (dp[i + 1][j] < dp[i][j - 1] || dpChar[i + 1][j] == dpChar[i][j - 1]) {
                         dp[i][j] = dp[i][j - 1];
+                        dpChar[i][j] = dpChar[i][j - 1];
+                    } else {
+                        dp[i][j] = dp[i][j - 1];
+                        dpChar[i][j] = 'a' - 1;
                     }
-                } 
+                }
             }
         }
-
-        return dp[1][n] % base; //remember to %251 here
+        return dp[0][n - 1];
     }
 }
