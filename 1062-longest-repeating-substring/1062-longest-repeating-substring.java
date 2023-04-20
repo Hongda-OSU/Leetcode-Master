@@ -5,12 +5,14 @@ class Solution {
     Return start position if the substring exits and -1 otherwise.
     */
   public int search(int L, int n, String S) {
-    HashSet<String> seen = new HashSet();
+    HashSet<Integer> seen = new HashSet();
     String tmp;
+    int h;
     for(int start = 0; start < n - L + 1; ++start) {
       tmp = S.substring(start, start + L);
-      if (seen.contains(tmp)) return start;
-      seen.add(tmp);
+      h = tmp.hashCode();
+      if (seen.contains(h)) return start;
+      seen.add(h);
     }
     return -1;
   }
