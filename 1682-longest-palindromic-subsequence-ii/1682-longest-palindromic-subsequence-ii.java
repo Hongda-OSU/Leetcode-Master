@@ -1,16 +1,24 @@
 class Solution {
     public int longestPalindromeSubseq(String s) {
-	Integer[][][] dp = new Integer[s.length()][s.length()][27];
-	return helper(dp, 0, s.length()-1, 26, s);
-}
+        int n = s.length(), base = 251; //set base 251 because max length of s is 250.
+        int[][] dp = new int[n + 2][n + 2];
+        for (int i = n; i >= 1; i--){
+            for (int j = i + 1; j <= n; j++){
+                int prev = dp[i + 1][j - 1] / base;
+                if (s.charAt(i - 1) == s.charAt(j - 1) && s.charAt(j - 1) != prev){
+                    dp[i][j] = dp[i + 1][j - 1] % base + 2 + s.charAt(j - 1) * base; 
+					//store prev info with *251, so that it won't interfere with our acutal answer.
+                }
+                else{
+                    if (dp[i + 1][j] % base > dp[i][j - 1] % base){ //check the score with %251
+                        dp[i][j] = dp[i + 1][j];
+                    }else{
+                        dp[i][j] = dp[i][j - 1];
+                    }
+                } 
+            }
+        }
 
-private int helper(Integer[][][] dp, int i, int j, int x, String s) {
-	if (dp[i][j][x] != null) return dp[i][j][x];
-	if (i >= j) return 0;
-	dp[i][j][x] = Math.max(helper(dp, i+1, j, x, s), helper(dp, i, j-1, x, s));
-	if (s.charAt(i) == s.charAt(j) && (s.charAt(i) - 'a') != x) {
-		dp[i][j][x] = Math.max(dp[i][j][x], 2 + helper(dp, i+1, j-1, s.charAt(i) - 'a', s));
-	}
-	return dp[i][j][x];
-}
+        return dp[1][n] % base; //remember to %251 here
+    }
 }
