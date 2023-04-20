@@ -1,27 +1,33 @@
 class Solution {
-      public int longestPalindromeSubseq(String s) {
-        int[][][] dp = new int[s.length()][s.length()][26];
-        int max = 0;
-        for(int i=0;i<s.length();i++){
-            for(int j=i-1;j>=0;j--){
-                if(j == i-1){
-                    if(s.charAt(i) == s.charAt(j)){
-                        dp[j][i][s.charAt(i)-'a'] = 2;
-                        max = Math.max(max, 2);
+    public int longestPalindromeSubseq(String s) {
+         int n = s.length();
+        int[][] dp = new int[n][n];
+        char[][] dpChar = new char[n][n];
+        char[] arr = s.toCharArray();
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = i + 1; j < n; j++) {
+                if (arr[i] == arr[j]) {
+                    dpChar[i][j] = arr[i];
+                    if (arr[i] == dpChar[i + 1][j - 1]) {
+                        dp[i][j] = dp[i + 1][j - 1];
+                    } else {
+                        dp[i][j] = dp[i + 1][j - 1] + 2;
                     }
                 } else {
-                    for(int k=0;k<26;k++){
-                        if(s.charAt(i) == s.charAt(j) && s.charAt(i) - 'a' != k){
-                            dp[j][i][s.charAt(i)-'a'] = Math.max(dp[j+1][i-1][k] + 2, dp[j][i][s.charAt(i)-'a']);
-                            max = Math.max(max, dp[j][i][s.charAt(i)-'a']);
-                        }
-                        dp[j][i][k] = Math.max(dp[j][i][k], dp[j][i-1][k]);
-                        dp[j][i][k] = Math.max(dp[j][i][k], dp[j+1][i][k]);
-                        dp[j][i][k] = Math.max(dp[j][i][k], dp[j+1][i-1][k]);
+                    if (dp[i + 1][j] > dp[i][j - 1]) {
+                        dp[i][j] = dp[i + 1][j];
+                        dpChar[i][j] = dpChar[i + 1][j];
+                    } else if (dp[i + 1][j] < dp[i][j - 1] || dpChar[i + 1][j] == dpChar[i][j - 1]){
+                        dp[i][j] = dp[i][j - 1];
+                        dpChar[i][j] = dpChar[i][j - 1];
+                    } else {
+                        dp[i][j] = dp[i][j - 1];
+                        dpChar[i][j] = 'a' - 1; // we can just use an invalid character since we have 2 choices for the boarder character here
                     }
                 }
             }
         }
-        return max;
+        return dp[0][n-1];
+    
     }
 }
