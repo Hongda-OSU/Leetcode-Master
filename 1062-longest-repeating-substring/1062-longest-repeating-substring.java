@@ -1,52 +1,39 @@
 class Solution {
-  /*
-  Rabin-Karp with polynomial rolling hash.
-      Search a substring of given length
-      that occurs at least 2 times.
-      Return start position if the substring exits and -1 otherwise.
-      */
-  public int search(int L, int a, long modulus, int n, int[] nums) {
-    // compute the hash of string S[:L]
-    long h = 0;
-    for(int i = 0; i < L; ++i) h = (h * a + nums[i]) % modulus;
-
-    // already seen hashes of strings of length L
-    HashSet<Long> seen = new HashSet();
-    seen.add(h);
-    // const value to be used often : a**L % modulus
-    long aL = 1;
-    for (int i = 1; i <= L; ++i) aL = (aL * a) % modulus;
-
-    for(int start = 1; start < n - L + 1; ++start) {
-      // compute rolling hash in O(1) time
-      h = (h * a - nums[start - 1] * aL % modulus + modulus) % modulus;
-      h = (h + nums[start + L - 1]) % modulus;
-      if (seen.contains(h)) return start;
-      seen.add(h);
+    private static int a = 26;
+    private static long modulus = (long)Math.pow(2, 24);
+    
+    public int longestRepeatingSubstring(String s) {
+        int n = s.length();
+        int[] nums = new int[n];
+        for (int i = 0; i < n; i++)
+            nums[i] = s.charAt(i) - 'a';
+        int left = 1, right = n;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (search(mid, n, nums) != -1)
+                left = mid + 1;
+            else 
+                right = mid - 1;
+        }
+        return left - 1;
     }
-    return -1;
-  }
-
-  public int longestRepeatingSubstring(String S) {
-    int n = S.length();
-    // convert string to array of integers
-    // to implement constant time slice
-    int[] nums = new int[n];
-    for(int i = 0; i < n; ++i) nums[i] = (int)S.charAt(i) - (int)'a';
-    // base value for the rolling hash function
-    int a = 26;
-    // modulus value for the rolling hash function to avoid overflow
-    long modulus = (long)Math.pow(2, 24);
-
-    // binary search, L = repeating string length
-    int left = 1, right = n;
-    int L;
-    while (left <= right) {
-      L = left + (right - left) / 2;
-      if (search(L, a, modulus, n, nums) != -1) left = L + 1;
-      else right = L - 1;
+    
+    private int search(int l, int n, int[] nums) {
+        long hash = 0;
+        for (int i = 0; i < l; i++)
+            hash = (hash * a + nums[i]) % modulus;
+        HashSet<Long> visited = new HashSet<>();
+        visited.add(hash);
+        long aL = 1;
+        for (int i = 1; i <= l; i++)
+            aL = (aL * a) % modulus;
+        for (int i = 1; i < n - l + 1; i++) {
+            hash = (hash * a - nums[i - 1] * aL % modulus + modulus) % modulus;
+            hash = (hash + nums[i + l - 1]) % modulus;
+            if (visited.contains(hash))
+                return i;
+            visited.add(hash);
+        }
+        return -1;
     }
-
-    return left - 1;
-  }
 }
