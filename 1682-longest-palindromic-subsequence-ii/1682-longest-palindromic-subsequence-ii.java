@@ -1,37 +1,16 @@
 class Solution {
     public int longestPalindromeSubseq(String s) {
-         int n = s.length();
-        int[][][] dp = new int[26][n][n];
-        for (int i = 0; i < n - 1; i++) {
-            if (s.charAt(i) == s.charAt(i + 1)) {
-                dp[s.charAt(i) - 'a'][i][i + 1] = 2;
-            }
-        }
-        
-        for (int len = 3; len <= n; len++) {
-            for (int i = 0; i <= n - len; i++) {
-                int j = i + len - 1;
-                for (int c = 0; c < 26; c++) {
-                    dp[c][i][j] = Math.max(dp[c][i + 1][j], dp[c][i][j - 1]);
-                }
-                
-                if (s.charAt(i) == s.charAt(j)) {
-                    int exclude = s.charAt(i) - 'a';
-                    for (int c = 0; c < 26; c++) {
-                        if (c == exclude) {
-                            continue;
-                        }
-                        
-                        dp[exclude][i][j] = Math.max(dp[exclude][i][j], 2 + dp[c][i + 1][j - 1]);
-                    }
-                }
-            }
-        }
-        
-        int max = 0;
-        for (int c = 0; c < 26; c++) {
-            max = Math.max(dp[c][0][n - 1], max);
-        }
-        return max;
-    }
+	Integer[][][] dp = new Integer[s.length()][s.length()][27];
+	return helper(dp, 0, s.length()-1, 26, s);
+}
+
+private int helper(Integer[][][] dp, int i, int j, int x, String s) {
+	if (dp[i][j][x] != null) return dp[i][j][x];
+	if (i >= j) return 0;
+	dp[i][j][x] = Math.max(helper(dp, i+1, j, x, s), helper(dp, i, j-1, x, s));
+	if (s.charAt(i) == s.charAt(j) && (s.charAt(i) - 'a') != x) {
+		dp[i][j][x] = Math.max(dp[i][j][x], 2 + helper(dp, i+1, j-1, s.charAt(i) - 'a', s));
+	}
+	return dp[i][j][x];
+}
 }
