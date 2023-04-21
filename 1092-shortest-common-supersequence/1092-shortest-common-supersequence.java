@@ -1,43 +1,39 @@
 class Solution {
     public String shortestCommonSupersequence(String str1, String str2) {
-        int n1 = str1.length();
-        int n2 = str2.length();
-        int[][] mem = new int[n1+1][n2+1];
-        int i, j;
-
-        for(i=1; i<=n1; i++) {
-            for(j=1; j<=n2; j++) {
-                char ch1 = str1.charAt(i-1);
-                char ch2 = str2.charAt(j-1);
-                if(ch1 == ch2) {
-                    mem[i][j] = 1 + mem[i-1][j-1];
-                } else {
-                    mem[i][j] = Math.max(mem[i-1][j], mem[i][j-1]);
-                }
-            }
+        String[][] mem = new String[str1.length()][str2.length()];
+        String res = memSol(str1, str2, 0, 0, mem);
+        
+        if(res.length() == 0) return str1+str2;
+        
+        StringBuilder ans = new StringBuilder();
+        int i = 0, j = 0;
+        for(char c: res.toCharArray()){
+            while(str1.charAt(i) != c) ans.append(str1.charAt(i++));
+            while(str2.charAt(j) != c) ans.append(str2.charAt(j++));
+            ans.append(c);
+            i++; j++;
         }
-        i=n1;
-        j=n2;
-        StringBuilder str = new StringBuilder();
-        while(i>0 && j>0) {
-            if(mem[i][j] == mem[i-1][j]) {
-                str.append(str1.charAt(i-1));
-                i--;
-            } else if(mem[i][j] == mem[i][j-1]) {
-                str.append(str2.charAt(j-1));
-                j--;
-            } else {
-                str.append(str1.charAt(i-1));
-                i--;
-                j--;
-            }
+        
+        ans.append(str1.substring(i));
+        ans.append(str2.substring(j));
+        return ans.toString();
+    }
+    
+    public String memSol(String s1, String s2, int i, int j, String[][] mem){
+        if(i >= s1.length() || j >= s2.length()) return "";
+        
+        if(mem[i][j] != null) return mem[i][j];
+        
+        String res = "";
+        if(s1.charAt(i) == s2.charAt(j)){
+            mem[i][j] = s1.charAt(i) + memSol(s1, s2, i+1, j+1, mem);
+        }else{
+            String left = memSol(s1, s2, i+1, j, mem);
+            String right = memSol(s1, s2, i, j+1, mem);
+            
+            mem[i][j] = (left.length() >= right.length()) ? left : right;
         }
-        while(i-- > 0) {
-            str.append(str1.charAt(i));
-        }
-        while(j-- > 0) {
-            str.append(str2.charAt(j));
-        }
-        return str.reverse().toString();
+    
+        return mem[i][j];
     }
 }
