@@ -1,14 +1,14 @@
 class Solution {
-    private boolean[][] memo;
+    private Result[][] memo;
     
     public boolean isMatch(String s, String p) {
-        memo = new boolean[s.length() + 1][p.length() + 1];
+        memo = new Result[s.length() + 1][p.length() + 1];
         return dp(0, 0, s, p);
     }
     
     private boolean dp(int i, int j, String s, String p) {
-        if (memo[i][j] != false)
-            return memo[i][j] == true;
+        if (memo[i][j] != null)
+            return memo[i][j] == Result.TRUE;
         boolean result = false;
         if (j == p.length())
             result = i  == s.length();
@@ -19,7 +19,12 @@ class Solution {
             else 
                 result = firstMatch && dp(i + 1, j + 1, s, p);
         }
-        memo[i][j] = result ? true : false;
+        memo[i][j] = result ? Result.TRUE : Result.FALSE;
         return result;
     }
+}
+
+enum Result {
+    TRUE, 
+    FALSE
 }
