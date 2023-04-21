@@ -1,53 +1,50 @@
 class Solution {
-    public String shortestCommonSupersequence(String str1, String str2) {
-        int m = str1.length();
-        int n = str2.length();
-
-        int[][] dp = new int[m + 1][n + 1];
-
-        for (int i = 0; i <= m; i++)
-        {
-            for (int j = 0; j <= n; j++)
-            {
-                if (i == 0)
-                    dp[i][j] = j;
-                else if (j == 0)
-                    dp[i][j] = i;
-                else if (str1.charAt(i - 1) == str2.charAt(j - 1))
-                    dp[i][j] = 1 + dp[i - 1][j - 1];
-                else
-                    dp[i][j] = 1 + Math.min(dp[i - 1][j],
-                            dp[i][j - 1]);
+    public String shortestCommonSupersequence(String s1, String s2) {
+        int n = s1.length(),m = s2.length();
+        int[][] t = new int[n+1][m+1];
+        for(int i= 0; i< n+1;i++){   //initialized
+            for(int j = 0;j < m+1;j++){
+                if(i == 0||j == 0) t[i][j] = 0;
             }
         }
-
-        int l = dp[m][n]; // Length of the ShortestSuperSequence
-        char[] arr = new char[l];
-        int i=m, j=n;
-        while(i>0 && j>0)
-        {
-            /* If current character in str1 and str2 are same, then
-             current character is part of shortest supersequence */
-            if(str1.charAt(i-1) == str2.charAt(j-1)) {
-                arr[--l] = str1.charAt(i-1);
-                i--;j--;
-            }else if(dp[i-1][j]<dp[i][j-1]) {
-                arr[--l] = str1.charAt(i-1);
-                i--;
+        for (int i = 1; i < n+1; i++) {
+            for (int j = 1; j < m+1; j++) {
+                if(s1.charAt(i-1) == s2.charAt(j-1)){
+                    t[i][j] = t[i-1][j-1]+1;
+                }
+                else{
+                    t[i][j] = Math.max(t[i-1][j],t[i][j-1]);
+                }
+            }
+        }
+        StringBuilder sb =new StringBuilder();
+        while(m > 0 && n >0){
+            if(s1.charAt(n-1) == s2.charAt(m-1)){
+                sb.append(s1.charAt(n-1));
+                m--;
+                n--;
             }
             else {
-                arr[--l] = str2.charAt(j-1);
-                j--;
+                if (t[n-1][m] >t[n][m-1]){
+                    sb.append(s1.charAt(n-1));
+                    n--;
+                }
+                else{
+                    sb.append(s2.charAt(m-1));
+                    m--;
+                }
             }
         }
-        while (i > 0) {
-            arr[--l] = str1.charAt(i-1);
-            i--;
+        while(n>0)
+        {
+            sb.append(s1.charAt(n-1));
+            n--;
         }
-        while (j > 0) {
-            arr[--l] = str2.charAt(j-1);
-            j--;
+        while(m>0)
+        {
+            sb.append(s2.charAt(m-1));
+            m--;
         }
-        return new String(arr);
+        return sb.reverse().toString();
     }
 }
