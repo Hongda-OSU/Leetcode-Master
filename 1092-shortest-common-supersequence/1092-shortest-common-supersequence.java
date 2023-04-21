@@ -1,34 +1,43 @@
 class Solution {
-   public String shortestCommonSupersequence(String s1, String s2) {
+    public String shortestCommonSupersequence(String str1, String str2) {
+        int n1 = str1.length();
+        int n2 = str2.length();
+        int[][] mem = new int[n1+1][n2+1];
+        int i, j;
 
-        // find LCS.
-        int m = s1.length(), n = s2.length();
-        int[][] dp = new int[m + 1][n + 1];
-        for (int i = 0; i < m; ++i) {
-            for (int j = 0; j < n; ++j) {
-                if (s1.charAt(i) == s2.charAt(j)) {
-                    dp[i + 1][j + 1] = 1 + dp[i][j];    
-                }else {
-                    dp[i + 1][j + 1] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+        for(i=1; i<=n1; i++) {
+            for(j=1; j<=n2; j++) {
+                char ch1 = str1.charAt(i-1);
+                char ch2 = str2.charAt(j-1);
+                if(ch1 == ch2) {
+                    mem[i][j] = 1 + mem[i-1][j-1];
+                } else {
+                    mem[i][j] = Math.max(mem[i-1][j], mem[i][j-1]);
                 }
             }
         }
-		
-        // Build result.
-        StringBuilder sb = new StringBuilder();
-        int i = m - 1, j = n - 1;
-        while (i >= 0 || j >= 0) { 
-            if (i < 0 ^ j < 0) { // only one string reaches left end.
-                char c = i < 0 ? s2.charAt(j--) : s1.charAt(i--); // remaining chars in the other string.
-                sb.append(c);
-            }else if (s1.charAt(i) == s2.charAt(j)) { // common char in LCS.
-                sb.append(s1.charAt(i)); // append the char of either s1 or s2.
-                --i; --j;  
-            }else { // the char is not in LCS.
-                char c = dp[i][j + 1] > dp[i + 1][j] ? s1.charAt(i--) : s2.charAt(j--); // the char corresponding to larger dp value.
-                sb.append(c);
+        i=n1;
+        j=n2;
+        StringBuilder str = new StringBuilder();
+        while(i>0 && j>0) {
+            if(mem[i][j] == mem[i-1][j]) {
+                str.append(str1.charAt(i-1));
+                i--;
+            } else if(mem[i][j] == mem[i][j-1]) {
+                str.append(str2.charAt(j-1));
+                j--;
+            } else {
+                str.append(str1.charAt(i-1));
+                i--;
+                j--;
             }
-        } 
-        return sb.reverse().toString();
+        }
+        while(i-- > 0) {
+            str.append(str1.charAt(i));
+        }
+        while(j-- > 0) {
+            str.append(str2.charAt(j));
+        }
+        return str.reverse().toString();
     }
 }
