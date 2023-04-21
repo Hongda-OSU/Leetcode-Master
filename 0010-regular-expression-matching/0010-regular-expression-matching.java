@@ -1,14 +1,25 @@
 class Solution {
-    public boolean isMatch(String text, String pattern) {
-        if (pattern.isEmpty()) return text.isEmpty();
-        boolean first_match = (!text.isEmpty() &&
-                               (pattern.charAt(0) == text.charAt(0) || pattern.charAt(0) == '.'));
-
-        if (pattern.length() >= 2 && pattern.charAt(1) == '*'){
-            return (isMatch(text, pattern.substring(2)) ||
-                    (first_match && isMatch(text.substring(1), pattern)));
-        } else {
-            return first_match && isMatch(text.substring(1), pattern.substring(1));
+    private boolean[][] memo;
+    
+    public boolean isMatch(String s, String p) {
+        memo = new boolean[s.length() + 1][p.length() + 1];
+        return dp(0, 0, s, p);
+    }
+    
+    private boolean dp(int i, int j, String s, String p) {
+        if (memo[i][j] != false)
+            return memo[i][j] == true;
+        boolean result = false;
+        if (j == p.length())
+            result = i  == s.length();
+        else {
+            boolean firstMatch = i < s.length() && (p.charAt(j) == s.charAt(i) || p.charAt(j) == '.');
+            if (j + 1 < p.length() && p.charAt(j + 1) == '*') 
+                result = dp(i, j + 2, s, p) || firstMatch && dp(i + 1, j, s, p);
+            else 
+                result = firstMatch && dp(i + 1, j + 1, s, p);
         }
+        memo[i][j] = result ? true : false;
+        return result;
     }
 }
