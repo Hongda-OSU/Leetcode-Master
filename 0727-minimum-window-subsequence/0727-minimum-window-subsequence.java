@@ -1,35 +1,21 @@
 class Solution {
     public String minWindow(String s1, String s2) {
         int n = s1.length(), m = s2.length();
-        String answer = "";
-        HashMap<Character, ArrayList<Integer>> indices = new HashMap<>();
-        for (int i = 0; i < n; i++) {
-            Character c = s1.charAt(i);
-            if (!indices.containsKey(c)) {
-                indices.put(c, new ArrayList<>());
+        int f[] = new int[m + 1], g[] = new int[m + 1];
+        Arrays.fill(f, 1000000000);
+        int end = 0, length = n + 1;
+        f[0] = 0;
+        for (int i = 1; i <= n; i++) {
+            g[0] = 0;
+            for (int j = 1; j <= m; j++) {
+                g[j] = 1 + (s1.charAt(i - 1) == s2.charAt(j - 1) ? f[j - 1] : f[j]);
             }
-            indices.get(c).add(i);
-        }
-        int ind[] = new int[m];
-        for (int start = 0; start < n; start++) {
-            int prev = start - 1;
-            for (int j = 0; j < m; j++) {
-                if (!indices.containsKey(s2.charAt(j))) {
-                    return "";
-                }
-                ArrayList<Integer> curIndices = indices.get(s2.charAt(j));
-                while (ind[j] < curIndices.size() && curIndices.get(ind[j]) <= prev) {
-                    ind[j]++;
-                }
-                if (ind[j] == curIndices.size()) {
-                    return answer;
-                }
-                prev = curIndices.get(ind[j]);
-            }
-            if (answer.isEmpty() || prev - start + 1 < answer.length()) {
-                answer = s1.substring(start, prev + 1);
+            f = g.clone();
+            if (f[m] < length) {
+                length = f[m];
+                end = i;
             }
         }
-        return answer;
+        return length > n ? "" : s1.substring(end - length, end);
     }
 }
