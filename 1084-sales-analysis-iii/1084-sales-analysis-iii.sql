@@ -5,7 +5,8 @@ FROM Sales
 JOIN Product
 USING(product_id)
 GROUP BY product_id
-HAVING
+HAVING (
     MIN(sale_date) >= '2019-01-01'
     AND
-    MAX(sale_date) <= '2019-03-31';
+    MAX(sale_date) <= '2019-03-31'
+);
