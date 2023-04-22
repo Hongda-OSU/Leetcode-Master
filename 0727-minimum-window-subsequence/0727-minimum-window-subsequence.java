@@ -1,30 +1,29 @@
 class Solution {
-    public String minWindow(String S, String T) {
-        char[] s = S.toCharArray(), t = T.toCharArray();
-        String res = "";
-        int i = 0, tindex = 0, slen = s.length, tlen = t.length, len = Integer.MAX_VALUE;
-        while(i < slen) {
-            if(s[i] == t[tindex]) {
-                tindex++; 
-                if(tindex == tlen) { // all chars in T has been matched
-                    int end = i+1; //i is the last match index in S
-                    tindex--; // now tindex is the last index in T
-                    while(tindex >= 0) {  //both i and tindex move back
-                        if(s[i] == t[tindex]){
-                            tindex--;
-                        }
+    public String minWindow(String s1, String s2) {
+        char[] arr1 = s1.toCharArray(), arr2 = s2.toCharArray();
+        String result = "";
+        int i = 0, idx2 = 0, len1 = s1.length(), len2 = s2.length(), len = Integer.MAX_VALUE;
+        while (i < len1) {
+            if (arr1[i] == arr2[idx2]) {
+                idx2++;
+                if (idx2 == len2) {
+                    int end = i + 1;
+                    idx2--;
+                    while (idx2 >= 0) {
+                        if (arr1[i] == arr2[idx2])
+                            idx2--;
                         i--;
                     }
-                    i++;  //we found the first match index in S
-                    tindex++;  //now tindex == 0, the first match index in T
-                    if(end - i < len) { //optimization ops
+                    i++;
+                    idx2++;
+                    if (end - i < len) {
                         len = end - i;
-                        res = S.substring(i, end); // [i, end) is the matching subsequence
+                        result = s1.substring(i, end);
                     }
                 }
             }
             i++;
         }
-        return len == Integer.MAX_VALUE ? "" : res;
+        return len == Integer.MAX_VALUE ? "" : result;
     }
 }
