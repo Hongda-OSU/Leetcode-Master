@@ -1,36 +1,38 @@
-public class Solution {
+class Solution {
     public int nextGreaterElement(int n) {
-        char[] number = (n + "").toCharArray();
+        char arr[] = (Integer.toString(n)).toCharArray();
         
-        int i, j;
-        // I) Start from the right most digit and 
-        // find the first digit that is
-        // smaller than the digit next to it.
-        for (i = number.length-1; i > 0; i--)
-            if (number[i-1] < number[i])
-               break;
-
-        // If no such digit is found, its the edge case 1.
-        if (i == 0)
+        int i=arr.length-2;
+        StringBuilder ans = new StringBuilder();
+        while(i>=0 && arr[i] >= arr[i+1])
+            i--;
+        
+        if(i == -1)
             return -1;
-            
-         // II) Find the smallest digit on right side of (i-1)'th 
-         // digit that is greater than number[i-1]
-        int x = number[i-1], smallest = i;
-        for (j = i+1; j < number.length; j++)
-            if (number[j] > x && number[j] <= number[smallest])
-                smallest = j;
         
-        // III) Swap the above found smallest digit with 
-        // number[i-1]
-        char temp = number[i-1];
-        number[i-1] = number[smallest];
-        number[smallest] = temp;
+        int k = arr.length-1;
         
-        // IV) Sort the digits after (i-1) in ascending order
-        Arrays.sort(number, i, number.length);
+        while(arr[k] <= arr[i])
+            k--;
         
-        long val = Long.parseLong(new String(number));
-        return (val <= Integer.MAX_VALUE) ? (int) val : -1;
+        swap(arr,i,k);
+        
+        for(int j=0;j<=i;j++)
+            ans.append(arr[j]);
+        
+        for(int j=arr.length-1;j>i;j--)
+            ans.append(arr[j]);
+        
+        long ans_ = Long.parseLong(ans.toString());
+        
+        return (ans_ > Integer.MAX_VALUE) ? -1 : (int)ans_;
+        
+        
+    }
+    void swap(char[] arr,int i,int j)
+    {
+        char temp = arr[j];
+        arr[j] = arr[i];
+        arr[i] = temp;
     }
 }
