@@ -1,22 +1,21 @@
 class Solution {
     public int cherryPickup(int[][] grid) {
-        int m = grid.length, n = grid[0].length;
-        Integer[][][] dp = new Integer[m][n][n];
-        return dfs(grid, m, n, 0, 0, n - 1, dp);
-    }
-    int dfs(int[][] grid, int m, int n, int r, int c1, int c2, Integer[][][] dp) {
-        if (r == m) return 0; // Reach to bottom row
-        if (dp[r][c1][c2] != null) return dp[r][c1][c2];
-        int ans = 0;
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                int nc1 = c1 + i, nc2 = c2 + j;
-                if (nc1 >= 0 && nc1 < n && nc2 >= 0 && nc2 < n) {
-                    ans = Math.max(ans, dfs(grid, m, n, r + 1, nc1, nc2, dp));
+    int C = grid[0].length;
+    int[][] dp = new int[C][C], old = new int[C][C];
+    for(int r = grid.length - 1; r >= 0; r--) {
+        for(int c1 = Math.min(r, C - 1); c1 >= 0; c1--) {
+            for(int c2 = Math.max(c1, C - 1 - r); c2 < C; c2++) {
+                int max = 0;
+                for(int i = c1 - 1; i <= c1 + 1; i++) {
+                    for(int j = c2 - 1; j <= c2 + 1; j++) {
+                        if(i >= 0 && i < C && j >= 0 && j < C && i <= j) max = Math.max(max, old[i][j]);
+                    }
                 }
+                dp[c1][c2] = max + grid[r][c1] + (c1 == c2 ? 0 : grid[r][c2]);
             }
         }
-        int cherries = c1 == c2 ? grid[r][c1] : grid[r][c1] + grid[r][c2];
-        return dp[r][c1][c2] = ans + cherries;
+        int[][] temp = dp; dp = old; old = temp;
     }
+    return old[0][C - 1];
+}
 }
