@@ -1,32 +1,28 @@
 class Solution {
-    int[][][] memo;
-    int[][] grid;
-    int N;
     public int cherryPickup(int[][] grid) {
-        this.grid = grid;
-        N = grid.length;
-        memo = new int[N][N][N];
-        for (int[][] layer: memo)
-            for (int[] row: layer)
-                Arrays.fill(row, Integer.MIN_VALUE);
-        return Math.max(0, dp(0, 0, 0));
+    int N = grid.length, M = (N << 1) - 1;
+    int[][] dp = new int[N][N];
+    dp[0][0] = grid[0][0];
+	    
+    for (int n = 1; n < M; n++) {
+		for (int i = N - 1; i >= 0; i--) {
+			for (int p = N - 1; p >= 0; p--) {
+				int j = n - i, q = n - p;
+                
+				if (j < 0 || j >= N || q < 0 || q >= N || grid[i][j] < 0 || grid[p][q] < 0) {
+                    dp[i][p] = -1;
+                    continue;
+                 }
+		 
+				 if (i > 0) dp[i][p] = Math.max(dp[i][p], dp[i - 1][p]);
+				 if (p > 0) dp[i][p] = Math.max(dp[i][p], dp[i][p - 1]);
+				 if (i > 0 && p > 0) dp[i][p] = Math.max(dp[i][p], dp[i - 1][p - 1]);
+		 
+				 if (dp[i][p] >= 0) dp[i][p] += grid[i][j] + (i != p ? grid[p][q] : 0);
+             }
+		 }
     }
-    public int dp(int r1, int c1, int c2) {
-        int r2 = r1 + c1 - c2;
-        if (N == r1 || N == r2 || N == c1 || N == c2 ||
-                grid[r1][c1] == -1 || grid[r2][c2] == -1) {
-            return -999999;        
-        } else if (r1 == N-1 && c1 == N-1) {
-            return grid[r1][c1];
-        } else if (memo[r1][c1][c2] != Integer.MIN_VALUE) {
-            return memo[r1][c1][c2];
-        } else {
-            int ans = grid[r1][c1];
-            if (c1 != c2) ans += grid[r2][c2];
-            ans += Math.max(Math.max(dp(r1, c1+1, c2+1), dp(r1+1, c1, c2+1)),
-                            Math.max(dp(r1, c1+1, c2), dp(r1+1, c1, c2)));
-            memo[r1][c1][c2] = ans;
-            return ans;
-        }
-    }
+    
+    return Math.max(dp[N - 1][N - 1], 0);
+}
 }
