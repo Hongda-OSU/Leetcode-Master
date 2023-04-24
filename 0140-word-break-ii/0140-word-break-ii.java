@@ -1,9 +1,5 @@
 class Solution {
     protected Set<String> wordSet;
-    protected ArrayList<ArrayList<ArrayList<Integer>>> dp;
-
-    protected String inputString;
-    protected ArrayList<String> result;
 
     private void updateCharSet(String s, HashSet<Character> charSet) {
         for (int i = 0; i < s.length(); ++i)
@@ -25,8 +21,8 @@ class Solution {
         if (!wordCharSet.containsAll(stringCharSet))
             return new ArrayList();
 
-        inputString = s;
-        dp = new ArrayList<ArrayList<ArrayList<Integer>>>(s.length() + 1);
+        ArrayList<ArrayList<ArrayList<Integer>>> dp =
+                new ArrayList<ArrayList<ArrayList<Integer>>>(s.length() + 1);
         for (int i = 0; i < s.length() + 1; ++i) {
             ArrayList<ArrayList<Integer>> emptyList = new ArrayList<ArrayList<Integer>>();
             dp.add(emptyList);
@@ -42,30 +38,26 @@ class Solution {
             for (int startIndex = 0; startIndex < endIndex; ++startIndex) {
                 String word = s.substring(startIndex, endIndex);
                 if (wordSet.contains(word)) {
-                    ArrayList<Integer> newStop = new ArrayList();
-                    newStop.add(startIndex);
-                    newStop.add(endIndex);
-                    stops.add(newStop);
+                    for (List<Integer> subsentence : dp.get(startIndex)) {
+                        ArrayList<Integer> copy = new ArrayList(subsentence);
+                        copy.add(endIndex);
+                        stops.add(copy);
+                    }
                 }
             }
             dp.set(endIndex, stops);
         }
 
-        this.result = new ArrayList<String>();
-        wordDFS("", s.length());
-        return this.result;
-    }
-
-    protected void wordDFS(String sentence, Integer dpIndex) {
-        if (dpIndex == 0) {
-            result.add(sentence.strip());
-            return;
+        // reconstruct the words list from the positions of breaks/stops
+        ArrayList<String> ret = new ArrayList<String>();
+        for (List<Integer> stops : dp.get(s.length())) {
+            StringBuffer sentence = new StringBuffer();
+            for (int i = 0; i < stops.size() - 1; ++i) {
+                sentence.append(s.substring(stops.get(i), stops.get(i + 1)) + " ");
+            }
+            ret.add(sentence.toString().strip());
         }
 
-        for (List<Integer> wordIndex : dp.get(dpIndex)) {
-            Integer start = wordIndex.get(0), end = wordIndex.get(1);
-            String newSentence = inputString.substring(start, end) + " " + sentence;
-            wordDFS(newSentence, start);
-        }
+        return ret;
     }
 }
