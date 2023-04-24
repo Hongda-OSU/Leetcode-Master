@@ -3,11 +3,16 @@ class Solution {
     int ns = s.length(), np = p.length();
     if (ns < np) return new ArrayList();
 
-    int [] pCount = new int[26];
-    int [] sCount = new int[26];
-    // build reference array using string p
+    Map<Character, Integer> pCount = new HashMap();
+    Map<Character, Integer> sCount = new HashMap();
+    // build reference hashmap using string p
     for (char ch : p.toCharArray()) {
-      pCount[(int)(ch - 'a')]++;
+      if (pCount.containsKey(ch)) {
+        pCount.put(ch, pCount.get(ch) + 1);
+      }
+      else {
+        pCount.put(ch, 1);
+      }
     }
 
     List<Integer> output = new ArrayList();
@@ -15,15 +20,27 @@ class Solution {
     for (int i = 0; i < ns; ++i) {
       // add one more letter 
       // on the right side of the window
-      sCount[(int)(s.charAt(i) - 'a')]++;
+      char ch = s.charAt(i);
+      if (sCount.containsKey(ch)) {
+        sCount.put(ch, sCount.get(ch) + 1);
+      }
+      else {
+        sCount.put(ch, 1);
+      }
       // remove one letter 
       // from the left side of the window
       if (i >= np) {
-        sCount[(int)(s.charAt(i - np) - 'a')]--;
+        ch = s.charAt(i - np);
+        if (sCount.get(ch) == 1) {
+          sCount.remove(ch);
+        }
+        else {
+          sCount.put(ch, sCount.get(ch) - 1);
+        }
       }
-      // compare array in the sliding window
-      // with the reference array
-      if (Arrays.equals(pCount, sCount)) {
+      // compare hashmap in the sliding window
+      // with the reference hashmap
+      if (pCount.equals(sCount)) {
         output.add(i - np + 1);
       }
     }
