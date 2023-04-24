@@ -21,43 +21,26 @@ class Solution {
         if (!wordCharSet.containsAll(stringCharSet))
             return new ArrayList();
 
-        ArrayList<ArrayList<ArrayList<Integer>>> dp =
-                new ArrayList<ArrayList<ArrayList<Integer>>>(s.length() + 1);
+        ArrayList<ArrayList<String>> dp = new ArrayList<ArrayList<String>>(s.length() + 1);
         for (int i = 0; i < s.length() + 1; ++i) {
-            ArrayList<ArrayList<Integer>> emptyList = new ArrayList<ArrayList<Integer>>();
+            ArrayList<String> emptyList = new ArrayList<String>();
             dp.add(emptyList);
         }
-        ArrayList<Integer> start = new ArrayList<Integer>();
-        start.add(0);
-        dp.get(0).add(start);
+        dp.get(0).add("");
 
         for (int endIndex = 1; endIndex < s.length() + 1; ++endIndex) {
-            ArrayList<ArrayList<Integer>> stops = new ArrayList<ArrayList<Integer>>();
+            ArrayList<String> sublist = new ArrayList<String>();
 
             // fill up the values in the dp array.
             for (int startIndex = 0; startIndex < endIndex; ++startIndex) {
                 String word = s.substring(startIndex, endIndex);
-                if (wordSet.contains(word)) {
-                    for (List<Integer> subsentence : dp.get(startIndex)) {
-                        ArrayList<Integer> copy = new ArrayList(subsentence);
-                        copy.add(endIndex);
-                        stops.add(copy);
-                    }
-                }
+                if (wordSet.contains(word))
+                    for (String subsentence : dp.get(startIndex))
+                        sublist.add((subsentence + " " + word).strip());
             }
-            dp.set(endIndex, stops);
+            dp.set(endIndex, sublist);
         }
 
-        // reconstruct the words list from the positions of breaks/stops
-        ArrayList<String> ret = new ArrayList<String>();
-        for (List<Integer> stops : dp.get(s.length())) {
-            StringBuffer sentence = new StringBuffer();
-            for (int i = 0; i < stops.size() - 1; ++i) {
-                sentence.append(s.substring(stops.get(i), stops.get(i + 1)) + " ");
-            }
-            ret.add(sentence.toString().strip());
-        }
-
-        return ret;
+        return dp.get(s.length());
     }
 }
