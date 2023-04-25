@@ -1,15 +1,12 @@
 class Solution {
-    public int smallestRangeII(int[] A, int K) {
-        int N = A.length;
+   public int smallestRangeII(int[] A, int K) {
         Arrays.sort(A);
-        int ans = A[N-1] - A[0];
-
-        for (int i = 0; i < A.length - 1; ++i) {
-            int a = A[i], b = A[i+1];
-            int high = Math.max(A[N-1] - K, a + K);
-            int low = Math.min(A[0] + K, b - K);
-            ans = Math.min(ans, high - low);
+        int n = A.length, mx = A[n - 1], mn = A[0], res = mx - mn;
+        for (int i = 0; i < n - 1; ++i) {
+            mx = Math.max(mx, A[i] + 2 * K);
+            mn = Math.min(A[i + 1], A[0] + 2 * K);
+            res = Math.min(res, mx - mn);
         }
-        return ans;
+        return res;
     }
 }
