@@ -1,28 +1,39 @@
 class Solution {
-    int [][] direction =new int[][]{{2,1},{-2,1},{2,-1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
-   
-    public double knightProbability(int N, int K, int r, int c) {
-        double [][][] ways = new double[K+1][N][N];
-        ways[0][r][c]=1;
-        for(int k=1; k<=K;++k){
-            for(int i=0; i<N;++i){
-                for(int j=0; j<N;++j){
-                    for(int [] dir: direction){
-                        int oldR = i-dir[0];
-                        int oldC = j-dir[1];
-                        if(oldR>=0 && oldC>=0 && oldR<N && oldC<N){
-                            ways[k][i][j]+=(ways[k-1][oldR][oldC]/8.0);
-                        }
-                    }
-                }
+    public double knightProbability(int n, int k, int row, int column) {
+        double[][][] dp = new double[n][n][k+1];
+        for(double[][] dprow: dp) {
+            for (double[] newRow : dprow) {
+                Arrays.fill(newRow, -1);
             }
         }
-        double res = 0;
-        for(int i=0; i<N;++i){
-            for(int j=0; j<N;++j){
-                res+=ways[K][i][j];
-            }
+        return util (n,row,column,k,dp);
+    }
+
+    public double util(int n, int row, int col, int k,double[][][] dp) {
+        //basecases 
+        if(row < 0 || col < 0 || row >=n || col >=n ) {
+            return 0;
         }
-        return res;
+
+        if(k == 0) {
+            return 1;
+        }
+
+        if(dp[row][col][k] != -1) {
+            return dp[row][col][k];
+        }
+
+        double prob = 0;
+
+        prob += util(n,row-2,col+1,k-1,dp)/8.0;
+        prob += util(n,row-2,col-1,k-1,dp)/8.0;
+        prob += util(n,row+2,col-1,k-1,dp)/8.0;
+        prob += util(n,row+2,col+1,k-1,dp)/8.0;
+        prob += util(n,row+1,col+2,k-1,dp)/8.0;
+        prob += util(n,row-1,col+2,k-1,dp)/8.0;
+        prob += util(n,row-1,col-2,k-1,dp)/8.0;
+        prob += util(n,row+1,col-2,k-1,dp)/8.0;
+
+        return dp[row][col][k] = prob;
     }
 }
