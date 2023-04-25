@@ -1,9 +1,9 @@
 class Solution {
     public double knightProbability(int n, int k, int row, int column) {
         double[][][] dp = new double[n][n][k + 1];
-        for (double[][] i : dp) {
-            for (double[] j : i) 
-                Arrays.fill(j, -1);
+        for (double[][] level2 : dp) {
+            for (double[] level1 : level2) 
+                Arrays.fill(level1, -1);
         }
         return helper(n, k, row, column, dp);
     }
