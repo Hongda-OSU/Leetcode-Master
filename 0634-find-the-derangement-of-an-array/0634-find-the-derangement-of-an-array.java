@@ -1,10 +1,14 @@
-public class Solution {
+class Solution {
+     final static int mod = (int)1e9 + 7;
     public int findDerangement(int n) {
-        long mul = 1, sum = 0, M = 1000000007;
-        for (int i = n; i >= 0; i--) {
-            sum = (sum + M + mul * (i % 2 == 0 ? 1 : -1)) % M;
-            mul = (mul * i) % M;
+        if (n <= 2) return n - 1;
+        long preDp = 0;
+        long dp = 1;
+        for (int i = 3; i <= n; i++) {
+            long temp = dp;
+            dp = (i - 1) * (dp + preDp) % mod;
+            preDp = temp;
         }
-        return (int) sum;
+        return (int)dp;
     }
 }
