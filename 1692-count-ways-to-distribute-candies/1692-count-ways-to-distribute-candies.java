@@ -1,11 +1,17 @@
 class Solution {
+     static final long MOD=1_000_000_007;
     public int waysToDistribute(int n, int k) {
-        long mod = 1000000007;
-        long[][] dp = new long[k + 1][n + 1];
-        for (int i = 0; i < k + 1; i++) dp[i][i] = 1;
-        for (int i = 1; i < k + 1; i++)
-            for (int j = i + 1; j < n + 1; j++)
-                dp[i][j] = (dp[i - 1][j - 1] + i * dp[i][j - 1]) % mod;
-        return (int)dp[k][n];
+        long mod=1_000_000_007;
+        long[] memo=new long[n];
+        Arrays.fill(memo,1);
+        for(int bags=2;bags<=k;bags++) {
+            long diag=memo[bags-1], last=1;
+            for(int candies=bags;candies<n;candies++) {
+                long tmp=memo[candies];
+                last=memo[candies]=(diag+bags*last)%mod;
+                diag=tmp;
+            }
+        }
+        return (int)memo[n-1];
     }
 }
