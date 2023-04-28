@@ -1,6 +1,21 @@
 /**
  * Definition for a binary tree node.
  * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
  * int val;
  * TreeNode left;
  * TreeNode right;
@@ -9,49 +24,44 @@
  */
 class BSTIterator {
 
-    Stack<TreeNode> stack;
+    ArrayList<Integer> nodesSorted;
+    int index;
 
     public BSTIterator(TreeNode root) {
 
-        // Stack for the recursion simulation
-        this.stack = new Stack<TreeNode>();
+        // Array containing all the nodes in the sorted order
+        this.nodesSorted = new ArrayList<Integer>();
 
-        // Remember that the algorithm starts with a call to the helper function
-        // with the root node as the input
-        this._leftmostInorder(root);
+        // Pointer to the next smallest element in the BST
+        this.index = -1;
+
+        // Call to flatten the input binary search tree
+        this._inorder(root);
     }
 
-    private void _leftmostInorder(TreeNode root) {
+    private void _inorder(TreeNode root) {
 
-        // For a given node, add all the elements in the leftmost branch of the tree
-        // under it to the stack.
-        while (root != null) {
-            this.stack.push(root);
-            root = root.left;
+        if (root == null) {
+            return;
         }
+
+        this._inorder(root.left);
+        this.nodesSorted.add(root.val);
+        this._inorder(root.right);
     }
 
     /**
      * @return the next smallest number
      */
     public int next() {
-        // Node at the top of the stack is the next smallest element
-        TreeNode topmostNode = this.stack.pop();
-
-        // Need to maintain the invariant. If the node has a right child, call the
-        // helper function for the right child
-        if (topmostNode.right != null) {
-            this._leftmostInorder(topmostNode.right);
-        }
-
-        return topmostNode.val;
+        return this.nodesSorted.get(++this.index);
     }
 
     /**
      * @return whether we have a next smallest number
      */
     public boolean hasNext() {
-        return this.stack.size() > 0;
+        return this.index + 1 < this.nodesSorted.size();
     }
 }
 
