@@ -1,19 +1,21 @@
 class SeatManager {
+    private static PriorityQueue<Integer> pq;
+    private int count;
 
-  TreeMap<Integer,Boolean> map;
     public SeatManager(int n) {
-        map = new TreeMap<>();
-        for(int i = 1;i<=n;i++)
-            map.put(i,true);
+        this.count = 1;
+        this.pq = new PriorityQueue<>();
     }
-
+    
     public int reserve() {
-        return map.pollFirstEntry().getKey();
+        if (pq.size() == 0)
+            return count++;
+        return pq.poll();
     }
-
+    
     public void unreserve(int seatNumber) {
-        map.put(seatNumber,true);
-}
+        pq.add(seatNumber);
+    }
 }
 
 /**
