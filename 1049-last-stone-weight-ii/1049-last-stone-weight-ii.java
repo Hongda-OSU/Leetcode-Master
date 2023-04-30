@@ -1,15 +1,17 @@
 class Solution {
-    public int lastStoneWeightII(int[] A) {
-         boolean[] dp = new boolean[1501];
+    public int lastStoneWeightII(int[] stones) {
+        boolean[] dp = new boolean[1501];
         dp[0] = true;
-        int sumA = 0;
-        for (int a : A) {
-            sumA += a;
-            for (int i = Math.min(1500, sumA); i >= a; --i)
-                dp[i] |= dp[i - a];
+        int sum = 0;
+        for (int stone : stones) {
+            sum += stone;
+            for (int i = Math.min(1500, sum); i >= stone; i--) 
+                dp[i] |= dp[i - stone];
         }
-        for (int i = sumA / 2; i >= 0; --i)
-            if (dp[i]) return sumA - i - i;
+        for (int i = sum / 2; i >= 0; i--) {
+            if (dp[i])
+                return sum - 2 * i;
+        }
         return 0;
     }
 }
