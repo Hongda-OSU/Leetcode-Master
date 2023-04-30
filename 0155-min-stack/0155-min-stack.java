@@ -1,29 +1,15 @@
 class MinStack {
+    private static Node head;
 
-    /** initialize your data structure here. */
-    class Node{
-        int val;
-        int min;
-        Node next;
-        
-        public Node(int val , int min , Node next){
-            this.val = val;
-            this.min = min;
-            this.next = next;
-        }
-    }
-    
-    private Node head;
-    
     public MinStack() {
         head = null;
     }
     
     public void push(int val) {
-        if(head == null)
-            head = new Node(val ,val ,null);
+        if (head == null)
+            head = new Node(val, val, null);
         else
-            head = new Node(val , Math.min(val ,head.min), head);
+            head = new Node(val, Math.min(val, head.min), head);
     }
     
     public void pop() {
@@ -36,6 +22,17 @@ class MinStack {
     
     public int getMin() {
         return head.min;
+    }
+}
+
+class Node {
+    public int val, min;
+    public Node next;
+    
+    public Node(int val, int min, Node next) {
+        this.val = val;
+        this.min = min;
+        this.next = next;
     }
 }
 
