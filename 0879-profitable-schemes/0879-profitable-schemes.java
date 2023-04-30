@@ -1,36 +1,15 @@
 class Solution {
-    int mod = 1000000007;
-    int[][][] memo = new int[101][101][101];
-    
-    int find(int pos, int count, int profit, int n, int minProfit, int[] group, int[] profits) {
-        if (pos == group.length) {
-            // If profit exceeds the minimum required; it's a profitable scheme.
-            return profit >= minProfit ? 1 : 0;
+    public int profitableSchemes(int G, int P, int[] group, int[] profit) {
+        int[][] dp = new int[P + 1][G + 1];
+        dp[0][0] = 1;
+        int res = 0, mod = (int)1e9 + 7;
+        for (int k = 0; k < group.length; k++) {
+            int g = group[k], p = profit[k];
+            for (int i = P; i >= 0; i--)
+                for (int j = G - g; j >= 0; j--)
+                    dp[Math.min(i + p, P)][j + g] = (dp[Math.min(i + p, P)][j + g] + dp[i][j]) % mod;
         }
-        
-        if (memo[pos][count][profit] != -1) {
-            // Repeated subproblem, return the stored answer.
-            return memo[pos][count][profit];
-        }
-        
-        // Ways to get a profitable scheme without this crime.
-        int totalWays = find(pos + 1, count, profit, n, minProfit, group, profits);
-        if (count + group[pos] <= n) {
-            // Adding ways to get profitable schemes, including this crime.
-            totalWays += find(pos + 1, count + group[pos], Math.min(minProfit, profit + profits[pos]), n, minProfit, group, profits);
-        }
-        
-        return memo[pos][count][profit] = totalWays % mod;
-    }
-    
-    public int profitableSchemes(int n, int minProfit, int[] group, int[] profit) {
-        // Initializing all states as -1.
-        for (int i = 0; i <= group.length; i++) {
-            for(int j = 0; j <= n; j++) {
-                Arrays.fill(memo[i][j], -1);
-            }
-        }
-        
-        return find(0, 0, 0, n, minProfit, group, profit);
+        for (int x : dp[P]) res = (res + x) % mod;
+        return res;
     }
 }
