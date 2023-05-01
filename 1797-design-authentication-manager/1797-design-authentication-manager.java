@@ -1,11 +1,9 @@
 class AuthenticationManager {
-    private static TreeMap<Integer, String> treeMap;
-    private static Map<String, Integer> expireTime;
+    private  TreeMap<Integer, String> treeMap = new TreeMap<>();
+    private  Map<String, Integer> expireTime = new HashMap<>();
     private static int life;
 
     public AuthenticationManager(int timeToLive) {
-        this.treeMap = new TreeMap<>();
-        this.expireTime = new HashMap<>();
         this.life = timeToLive;
     }
     
