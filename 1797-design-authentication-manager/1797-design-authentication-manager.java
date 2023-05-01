@@ -1,30 +1,54 @@
 class AuthenticationManager {
 
-    private TreeMap<Integer, String> tm = new TreeMap<>();
-    private Map<String, Integer> expireTime = new HashMap<>();
-    private int life;
-    
+     private final Map<String, Pair<Integer,Integer>> slotTimeTokens;
+    private final int timeToLive;
+
     public AuthenticationManager(int timeToLive) {
-        life = timeToLive;
+        this.timeToLive = timeToLive;
+        this.slotTimeTokens = new HashMap<>();
     }
     
     public void generate(String tokenId, int currentTime) {
-        expireTime.put(tokenId, life + currentTime);
-        tm.put(life + currentTime, tokenId);         
+        slotTimeTokens.put(tokenId, new Pair<>(currentTime, currentTime + timeToLive));
     }
     
     public void renew(String tokenId, int currentTime) {
-        int expire = expireTime.getOrDefault(tokenId, -1);
-        var tail = tm.tailMap(currentTime + 1);
-        if (!tail.isEmpty() && expire >= tail.firstKey()) {
-            tm.remove(expire);
-            tm.put(life + currentTime, tokenId);
-            expireTime.put(tokenId, life + currentTime);
+        Pair<Integer,Integer> pair = slotTimeTokens.get(tokenId);
+        if(pair == null){
+            return;
         }
+
+        if(currentTime >= pair.getValue()){
+            return;
+        }
+
+        slotTimeTokens.put(tokenId, new Pair<>(currentTime, currentTime + timeToLive));
     }
     
     public int countUnexpiredTokens(int currentTime) {
-        return tm.tailMap(currentTime + 1).size();
+        int cnt = 0;
+        return (int) slotTimeTokens.values().stream().filter(p -> p.getValue() > currentTime).count();
+    }
+
+
+    class Pair<K,V>{
+
+        private K key;
+        private V value;
+
+        public Pair(K key, V value){
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey(){
+            return this.key;
+        }
+
+        public V getValue(){
+            return this.value;
+        }
+
     }
 }
 
