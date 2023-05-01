@@ -1,54 +1,44 @@
 class AuthenticationManager {
 
-     private final Map<String, Pair<Integer,Integer>> slotTimeTokens;
-    private final int timeToLive;
+     int time=0;
+
+    HashMap<String,Integer>mp=new HashMap<>();
 
     public AuthenticationManager(int timeToLive) {
-        this.timeToLive = timeToLive;
-        this.slotTimeTokens = new HashMap<>();
+        
+    time=timeToLive;
+
     }
     
     public void generate(String tokenId, int currentTime) {
-        slotTimeTokens.put(tokenId, new Pair<>(currentTime, currentTime + timeToLive));
+        
+    mp.put(tokenId,currentTime+time);
+
     }
     
     public void renew(String tokenId, int currentTime) {
-        Pair<Integer,Integer> pair = slotTimeTokens.get(tokenId);
-        if(pair == null){
-            return;
-        }
+        
+    if(!mp.containsKey(tokenId)||mp.get(tokenId)<=currentTime)
+    {
+    return;
+    }
 
-        if(currentTime >= pair.getValue()){
-            return;
-        }
+    mp.put(tokenId,currentTime+time);
 
-        slotTimeTokens.put(tokenId, new Pair<>(currentTime, currentTime + timeToLive));
     }
     
     public int countUnexpiredTokens(int currentTime) {
-        int cnt = 0;
-        return (int) slotTimeTokens.values().stream().filter(p -> p.getValue() > currentTime).count();
+    
+    List<String>lr=new ArrayList<>(mp.keySet());
+    
+    for(int i=0;i<lr.size();i++){
+    
+    if(mp.get(lr.get(i))<=currentTime)mp.remove(lr.get(i));
+
     }
 
-
-    class Pair<K,V>{
-
-        private K key;
-        private V value;
-
-        public Pair(K key, V value){
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey(){
-            return this.key;
-        }
-
-        public V getValue(){
-            return this.value;
-        }
-
+    return mp.size();
+    
     }
 }
 
