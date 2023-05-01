@@ -1,109 +1,118 @@
 class MyLinkedList {
-    
-    class Node {
-        int value;
-        Node next;
-        
-        Node(int value){
-            this.value = value;
-        }
+    private Item head;
+    private Item tail;
+    private int length;
+
+    public int get(int index) {
+        Item result = getItemByIndex(index);
+        if (result != null) return result.val;
+        return -1;
     }
 
-    /** Initialize your data structure here. */
-    private Node head;
-    private Node tail;
-    private int size;
-    public MyLinkedList() {
-        head = null;
-        tail = null;
-        size=0;
-    }
-    
-    /** Get the value of the index-th node in the linked list. If the index is invalid, return -1. */
-    public int get(int index) {
-        if(index >= size){
-            return -1;
-        }
-        Node node = head;
-        while(index > 0){
-            node = node.next;
-            index--;
-        }
-        return node.value;
-    }
-    
-    /** Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list. */
     public void addAtHead(int val) {
-        Node node = new Node(val);
-        node.next = head;
-        head = node;
-        if(null == tail){
+        if (length > 0) {
+            Item temp = head;
+            head = new Item(val);
+            head.next = temp;
+            temp.prev = head;
+        } else {
+            head = new Item(val);
             tail = head;
         }
-        size++;
+        length++;
     }
-    
-    /** Append a node of value val to the last element of the linked list. */
-    public void addAtTail(int val) {        
-        if(head == null){
-            addAtHead(val);
-            return;
+
+    public void addAtTail(int val) {
+        if (length > 0) {
+            Item temp = tail;
+            tail = new Item(val);
+            tail.prev = temp;
+            temp.next = tail;
+        } else {
+            tail = new Item(val);
+            head = tail;
+        }
+        length++;
+    }
+
+    public void addAtIndex(int index, int val) {
+        if (index < 0 || index > length) return; // index validation
+        if (index == 0) addAtHead(val);
+        else if (index == length) addAtTail(val);
+        else {
+            Item result = getItemByIndex(index);
+            if (result != null) {
+                Item temp = new Item(val);
+                temp.prev = result.prev;
+                result.prev.next = temp;
+                temp.next = result;
+                result.prev = temp;
+                length++;
+            }
+        }
+    }
+
+    public void deleteAtIndex(int index) {
+        if (index < 0 || index >= length) return; // index validation
+        if (index == 0) {
+            if (length == 1) {
+                head = null;
+                tail = null;
+            } else {
+                head = head.next;
+                if (length > 2) head.next.prev = head;
+            }
+            length--;
+        } else if (index == (length - 1)) {
+            tail = tail.prev;
+            if (length > 2) tail.prev.next = tail;
+            length--;
+        } else {
+            Item result = getItemByIndex(index);
+            if (result != null) {
+                result.prev.next = result.next;
+                result.next.prev = result.prev;
+                length--;
+            }
+        }
+    }
+
+    private Item getItemByIndex(int index) {
+        if (length > 0 && index < length) {
+            if (index == 0) return head;
+            if (index == length - 1) return tail;
+            Item result;
+            // we choose how to get to the desired element faster. Begin with head or tail
+            if (index > (length / 2)) {
+                result = tail;
+                for (int i = length - 1; i > index; i--) {
+                    result = result.prev;
+                }
+            } else {
+                result = head;
+                for (int i = 1; i <= index; i++) {
+                    result = result.next;
+                }
+
+            }
+            return result;
+        }
+        return null;
+    }
+
+    public int getLength() {
+        return length;
+    }
+    // subclass element of linked-list
+    private static class Item {
+        public Item(int val) {
+            this.val = val;
         }
 
-        tail.next = new Node(val);
-        tail = tail.next; 
-        size++;
-    }
-    
-    /** Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted. */
-    public void addAtIndex(int index, int val) {
-        if(index > size){
-            return;
-        }
-        if(index == 0){
-            addAtHead(val);
-            return;
-        }
-        if(index == size){
-            addAtTail(val);
-            return;
-        }
-        Node node = head;
-        Node newNode = new Node(val);
-        while(null != node && index >1){
-            node = node.next;
-            index--;
-        }
-        newNode.next = node.next;
-        node.next = newNode; 
-        size++;
-    }
-    
-    /** Delete the index-th node in the linked list, if the index is valid. */
-    public void deleteAtIndex(int index) {
-        if(index >= size){
-            return;
-        }
-        if(index == 0){
-            deleteAtHead();
-            return;
-        }
-        Node node = head;
-        while(null != node && index > 1){
-            node = node.next;
-            index--;
-        }
-        
-        node.next = node.next.next;
-        if(node.next == null){
-            tail = node;
-        }
-        size--;
-    }
-    
-    public void deleteAtHead(){
-        head = head.next;
-        size--;
+        int val;
+        Item next;
+        Item prev;
+
     }
 }
 
