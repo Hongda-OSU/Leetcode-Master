@@ -1,22 +1,37 @@
 class Solution {
+    int notComputed = 1000000000;
+    int[] dp;
+
+    private int f(int[] stoneValue, int n, int i) {
+        if (i == n) {
+            return 0;
+        }
+        if (dp[i] != notComputed) {
+            return dp[i];
+        }
+        dp[i] = stoneValue[i] - f(stoneValue, n, i + 1);
+        if (i + 2 <= n) {
+            dp[i] = Math.max(dp[i], stoneValue[i]
+                + stoneValue[i + 1] - f(stoneValue, n, i + 2));
+        }
+        if (i + 3 <= n) {
+            dp[i] = Math.max(dp[i], stoneValue[i] + stoneValue[i + 1]
+                + stoneValue[i + 2] - f(stoneValue, n, i + 3));
+        }
+        return dp[i];
+    }
+
     public String stoneGameIII(int[] stoneValue) {
         int n = stoneValue.length;
-        int[] dp = new int [4];
-        for (int i = n - 1; i >= 0; i--) {
-            dp[i % 4] = stoneValue[i] - dp[(i + 1) % 4];
-            if (i + 2 <= n) {
-                dp[i % 4] = Math.max(dp[i % 4], stoneValue[i] + stoneValue[i + 1]
-                    - dp[(i + 2) % 4]);
-            }
-            if (i + 3 <= n) {
-                dp[i % 4] = Math.max(dp[i % 4], stoneValue[i] + stoneValue[i + 1]
-                    + stoneValue[i + 2] - dp[(i + 3) % 4]);
-            }
+        dp = new int [n + 1];
+        for (int i = 0; i < n; i++) {
+            dp[i] = notComputed;
         }
-        if (dp[0] > 0) {
+        int dif = f(stoneValue, stoneValue.length, 0);
+        if (dif > 0) {
             return "Alice";
         }
-        if (dp[0] < 0) {
+        if (dif < 0) {
             return "Bob";
         }
         return "Tie";
