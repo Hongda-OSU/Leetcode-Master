@@ -24,7 +24,7 @@ class Solution {
                 }   
             }
         }
-            dp[mask] = -1;
-            return false;
+        dp[mask] = -1;
+        return false;
     }
 } 
