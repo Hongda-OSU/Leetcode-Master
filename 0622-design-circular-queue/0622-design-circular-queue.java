@@ -1,39 +1,80 @@
 class MyCircularQueue {
-    static int arr[]=new int[1000],k,front,end;
 
-    public MyCircularQueue(int k) {
-        this.k=k;
-        front=end=0;
+    int[] arr;
+int front; //front
+int rear; //rear
+int size; //size
+
+public MyCircularQueue(int k) {
+    arr = new int[k];
+    front = 0; 
+    rear = -1;
+    size = k;
+}
+
+public boolean enQueue(int value) {
+    if(isFull()) return false;
+    
+	//when rear is last element
+	if(rear == size - 1){
+        rear = -1;
+    } 
+    
+    arr[++rear] = value;
+    return true;
+}
+
+public boolean deQueue() {
+    if(isEmpty()) return false;
+    
+    //when only one element
+    if(front == rear){
+        //reset 
+        front = 0;
+        rear = -1;
+    }else{
+        //if front is last pos, then reset to first position
+        //otherwise increment
+        if(front == size - 1){
+            front = 0;
+        }else{
+            front++;
+        }
     }
     
-    public boolean enQueue(int value) {
-        if(end-front==k) return false;
-        arr[end%k]=value;
-        end++;
-        return true;
-    }
+    return true;
+}
+
+public int Front() {
+    if(isEmpty()) return -1;
     
-    public boolean deQueue() {
-        if(front==end) return false;
-        front++;
-        return true;
-    }
+    return arr[front];
+}
+
+public int Rear() {
+    if(isEmpty()) return -1;
     
-    public int Front() {
-        return (isEmpty())?-1:arr[front%k];
-    }
+    return arr[rear];
+}
+
+public boolean isEmpty() {
+    //front is default value
+    //rear is default value
+    return (front == 0 && rear == -1);
+}
+
+public boolean isFull() {
+    //when front is at first pos,
+    //rear is last elemnt
+    if(front == 0 && rear == size - 1) return true;
     
-    public int Rear() {
-        return (isEmpty())?-1:arr[(end-1)%k];
-    }
     
-    public boolean isEmpty() {
-        return end==front;
-    }
+    //when fron is not at first pos 
+    //previous all pos is also occupied
+    if(front != 0 && rear == front - 1) return true;
     
-    public boolean isFull() {
-        return end-front==k;
-    }
+    return false;
+}
 }
 
 /**
