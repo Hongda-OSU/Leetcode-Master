@@ -1,80 +1,61 @@
 class MyCircularQueue {
+    private int[] arr;
+    private int front, rear, size;
 
-    int[] arr;
-int front; //front
-int rear; //rear
-int size; //size
-
-public MyCircularQueue(int k) {
-    arr = new int[k];
-    front = 0; 
-    rear = -1;
-    size = k;
-}
-
-public boolean enQueue(int value) {
-    if(isFull()) return false;
-    
-	//when rear is last element
-	if(rear == size - 1){
-        rear = -1;
-    } 
-    
-    arr[++rear] = value;
-    return true;
-}
-
-public boolean deQueue() {
-    if(isEmpty()) return false;
-    
-    //when only one element
-    if(front == rear){
-        //reset 
+    public MyCircularQueue(int k) {
+        arr = new int[k];
         front = 0;
         rear = -1;
-    }else{
-        //if front is last pos, then reset to first position
-        //otherwise increment
-        if(front == size - 1){
-            front = 0;
-        }else{
-            front++;
-        }
+        size = k;
     }
     
-    return true;
-}
-
-public int Front() {
-    if(isEmpty()) return -1;
+    public boolean enQueue(int value) {
+        if (isFull())
+            return false;
+        if (rear == size - 1)
+            rear = -1;
+        arr[++rear] = value;
+        return true;
+    }
     
-    return arr[front];
-}
-
-public int Rear() {
-    if(isEmpty()) return -1;
+    public boolean deQueue() {
+        if (isEmpty())
+            return false;
+        if (front == rear) {
+            front = 0;
+            rear = -1;
+        } else {
+            if (front == size - 1)
+                front = 0;
+            else
+                front++;
+        }
+        return true;
+    }
     
-    return arr[rear];
-}
-
-public boolean isEmpty() {
-    //front is default value
-    //rear is default value
-    return (front == 0 && rear == -1);
-}
-
-public boolean isFull() {
-    //when front is at first pos,
-    //rear is last elemnt
-    if(front == 0 && rear == size - 1) return true;
+    public int Front() {
+        if (isEmpty())
+            return -1;
+        return arr[front];
+    }
     
+    public int Rear() {
+        if (isEmpty())
+            return -1;
+        return arr[rear];
+    }
     
-    //when fron is not at first pos 
-    //previous all pos is also occupied
-    if(front != 0 && rear == front - 1) return true;
+    public boolean isEmpty() {
+        return front == 0 && rear == -1;
+    }
     
-    return false;
-}
+    public boolean isFull() {
+        if (front == 0 && rear == size - 1)
+            return true;
+        if (front != 0 && rear == front - 1)
+            return true;
+        return false;
+    }
 }
 
 /**
