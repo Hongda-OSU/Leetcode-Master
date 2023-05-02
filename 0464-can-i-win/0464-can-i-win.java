@@ -18,7 +18,7 @@ class Solution {
             return dp[mask] == 1;
         for (int i = 0; i < numLimit; i++) {
             if ((mask & (1 << i)) == 0) {
-                if (lstSum + i + 1 >= targetTotal || !solve((mask | (1 << i)), lstSum + i + 1, player + 1, dp)) {
+                if (lstSum + i + 1 >= targetTotal || !solve(mask | (1 << i), lstSum + i + 1, player + 1, dp)) {
                     dp[mask] = 1;
                     return true;
                 }   
