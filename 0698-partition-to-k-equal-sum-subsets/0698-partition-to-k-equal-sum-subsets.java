@@ -1,85 +1,55 @@
 class Solution {
-    private boolean backtrack(int[] arr, int index, int count, int currSum, int k, 
-                              int targetSum, Integer mask, HashMap<Integer, Boolean> memo) {
-                                  
-        int n = arr.length;
-      
-        // We made k - 1 subsets with target sum and last subset will also have target sum.
-        if (count == k - 1) { 
-            return true;
+    public boolean canPartitionKSubsets(int[] nums, int k) {
+        int sum=0;
+        for(int i:nums){
+            sum+=i;
         }
         
-        // No need to proceed further.
-        if (currSum > targetSum) { 
-            return false;
-        }
+        //sum%k must equal to 0 if not just return false
+        //if we have to to divide the array greater than array size retun false(we can't)
+        if(sum%k!=0 || nums.length<k) return false;
         
-        // If we have already computed the current combination.
-        if (memo.containsKey(mask)) {
-            return memo.get(mask);
-        }
-      
-        // When curr sum reaches target then one subset is made.
-        // Increment count and reset current sum.
-        if (currSum == targetSum) {
-            boolean ans = backtrack(arr, 0, count + 1, 0, k, targetSum, mask, memo);
-            memo.put(mask, ans);
-            return ans;
-        }
+        //sort so we can take last element and start filling our bucket
+        Arrays.sort(nums);
         
-        // Try not picked elements to make some combinations.
-        for (int j = index; j < n; ++j) {
-            if (((mask >> j) & 1) == 0) {
-                // Include this element in current subset.
-                mask = (mask | (1 << j));
-                
-                // If using current jth element in this subset leads to make all valid subsets.
-                if (backtrack(arr, j + 1, count, currSum + arr[j], k, targetSum, mask, memo)) {
-                    return true;
-                }
-                
-                // Backtrack step.
-                mask = (mask ^ (1 << j));
-            }
-        } 
-      
-        // We were not able to make a valid combination after picking each element from the array,
-        // hence we can't make k subsets.
-        memo.put(mask, false);
-        return false;
-    }
+        //our target is sum/k and we have to find this in nums, k times then it is valid
+        return canPartitionKSubsets(nums,sum/k,nums.length-1,new int[k]);
     
-    void reverse(int[] arr) {
-        for (int i = 0, j = arr.length - 1; i < j; i++, j--) { 
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-        }
     }
-  
-    public boolean canPartitionKSubsets(int[] arr, int k) {
-        int totalArraySum = 0;
-        int n = arr.length;
+    public boolean canPartitionKSubsets(int a[],int target,int i,int bucket[]){
         
-        for (int i = 0; i < n; ++i) {
-             totalArraySum += arr[i];
+        //we have taken all the elements
+        if(i==-1)
+            return true;
+        
+        //start filling the buckets
+        for(int j=0;j<bucket.length;j++){
+            
+            //can we take this ith element
+            if(bucket[j]+a[i]<=target){
+            
+                //if we take this element
+                bucket[j]+=a[i];
+                
+                //go to next element (in our case go to smallest ele bcz we sorted)
+                //if we can fill all buckets then return true
+                if(canPartitionKSubsets(a,target,i-1,bucket))
+                    return true;
+                
+                //means we can't fill other buckets if we take ith element so leave this element
+                bucket[j]-=a[i];
+            
+            }
+            
+            //if our bucket is empty means we have not taken any elements in the buckets
+            if(bucket[j]==0)
+                break;
+        
         }
-      
-        // If total sum not divisible by k, we can't make subsets.
-        if (totalArraySum % k != 0) { 
-            return false;
-        }
-      
-        // Sort in decreasing order.
-        Arrays.sort(arr);
-        reverse(arr);
         
-        int targetSum = totalArraySum / k;
-        Integer mask = 0;
-        
-        // Memoize the ans using taken element's string as key.
-        HashMap<Integer, Boolean> memo = new HashMap<>();
-      
-        return backtrack(arr, 0, 0, 0, k, targetSum, mask, memo);
+        //all buckets are full but i is pointing to some element (elements still left)
+        //or our bucket is empty means we haven't take any element (not valid)
+        return false;
+    
     }
 }
