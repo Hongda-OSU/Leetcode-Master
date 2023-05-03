@@ -11,29 +11,45 @@
  */
 
 class Solution {
-    public PolyNode addPoly(PolyNode p1, PolyNode p2) {
-        PolyNode dummy = new PolyNode();
-        PolyNode curr = dummy;
-        while(p1!=null || p2!=null){
-            int e1 = p1==null? -1: p1.power;
-            int e2 = p2==null? -1: p2.power;
-            if(e1 > e2){
-                curr.next = new PolyNode(p1.coefficient, p1.power);
-                p1 = p1.next;
-                curr = curr.next;
-            }else if(e1 < e2){
-                curr.next = new PolyNode(p2.coefficient, p2.power);
-                p2 = p2.next;
-                curr = curr.next;
-            }else{
-                if(p1.coefficient+p2.coefficient != 0){
-                    curr.next = new PolyNode(p1.coefficient+p2.coefficient, p1.power);
-                    curr = curr.next;
+    public PolyNode addPoly(PolyNode poly1, PolyNode poly2) {
+        if (poly1 == null)
+            return poly2;
+        if (poly2 == null)
+            return poly1;
+        PolyNode high = new PolyNode(), low = new PolyNode(), prev = null, start = new PolyNode();
+        if (poly1.power < poly2.power) {
+            high = poly2;
+            low = poly1;
+        } else {
+            high = poly1;
+            low = poly2;
+        }
+        start.next = high;
+        prev = start;
+        while (high != null && low != null) {
+            if (high.power > low.power) {
+                high = high.next;
+                prev = prev.next;
+            } else if (high.power == low.power) {
+                high.coefficient += low.coefficient;
+                if (high.coefficient == 0) {
+                    high = high.next;
+                    prev.next = high;
+                } else {
+                    high = high.next;
+                    prev = prev.next;
                 }
-                p1 = p1.next;
-                p2 = p2.next;
+                low = low.next;
+            } else {
+                PolyNode tmp = low;
+                low = low.next;
+                prev.next = tmp;
+                tmp.next = high;
+                prev = prev.next;
             }
         }
-        return dummy.next;
+        if (low != null)
+            prev.next = low;
+        return start.next;
     }
 }
