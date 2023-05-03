@@ -10,20 +10,26 @@
  */
 class Solution {
     public ListNode deleteDuplicatesUnsorted(ListNode head) {
-         Map<Integer, Integer> nodeCounts = new HashMap<>();
-        for (ListNode curr = head; curr != null; curr = curr.next) {
-            nodeCounts.put(curr.val, nodeCounts.getOrDefault(curr.val, 0) + 1);
+        // Key: val  Value: its frequency
+        Map<Integer, Integer> map = new HashMap<>();
+        ListNode curr = head;
+        while (curr != null) {
+            map.put(curr.val, map.getOrDefault(curr.val, 0) + 1);
+            curr = curr.next;
         }
-        // create dummy node pointing to head
-        ListNode temp = new ListNode(0, head); // ListNode(int val, ListNode next)
-        for (ListNode prev = temp, curr = head; curr != null; curr = curr.next) {
-            if (nodeCounts.get(curr.val) == 1) { // not a duplicate
-                prev = curr; // keep moving 1 step forward
+        
+        ListNode dummy = new ListNode(0);
+        curr = dummy;
+        while (head != null) {
+            if (map.get(head.val) == 1) {
+                curr.next = head;
+                curr = curr.next;
             }
-            else { // duplicate
-                prev.next = curr.next; // skip the current node
-            }
+            
+            head = head.next;
         }
-        return temp.next;
+        
+        curr.next = null;
+        return dummy.next;
     }
 }
