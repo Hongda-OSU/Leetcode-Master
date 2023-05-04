@@ -3,10 +3,10 @@ BEGIN
   SET N = N - 1;
   RETURN (
       # Write your MySQL query statement below.
-      SELECT Salary
+      SELECT salary
       FROM Employee
-      GROUP BY Salary
-      ORDER BY Salary DESC
+      GROUP BY salary
+      ORDER BY salary DESC
       LIMIT 1 OFFSET N
   );
 END
