@@ -1,32 +1,30 @@
 class Solution {
-    
-    private static int MOD = 1000000007;
-
+    int mod = (int) Math.pow(10, 9) + 7, mask = 0;
+    List<List<Integer>> ps;
+    Integer[][] dp;
     public int numberWays(List<List<Integer>> hats) {
-        int n = hats.size();
-        List<Integer>[] h = new List[40];
-        for (int i = 0; i < 40; i++) h[i] = new ArrayList<>();
+        ps = new ArrayList<>();
+        mask = (1 << hats.size()) - 1;
+        for (int i = 0; i < 41; i++) ps.add(new ArrayList<>());
         for (int i = 0; i < hats.size(); i++) {
-            for (int hat : hats.get(i)) {
-                h[hat - 1].add(i); // convert to 0-indexed
+            for(int h : hats.get(i)) {
+                ps.get(h).add(i);
             }
         }
-
-        int[][] dp = new int[41][1 << n];
-        dp[0][0] = 1;
-
-        for (int i = 0; i < 40; i++) {
-            for (int j = 0; j < 1 << n; j++) {
-                dp[i+1][j] = dp[i][j];
-                for (int people: h[i]) {
-                    int index = 1 << people; 
-                    if ((j & index) > 0) {
-                        dp[i+1][j] = (dp[i+1][j] + dp[i][j^index]) % MOD;
-                    }
-                }
-            }
+        dp = new Integer[41][1 << hats.size()];
+        return dfs(0, 0);
+    }
+    
+    private int dfs(int h, int pa) {  // pa for people assigned mask;
+        if (pa == mask) return 1;
+        if (h > 40) return 0;
+        if (dp[h][pa] != null) return dp[h][pa];
+        int res = dfs(h + 1, pa);
+        for (int p : ps.get(h)) {
+            if ((pa & (1 << p)) > 0) continue; // p is assigned with a hat;
+            res = (res + dfs(h + 1, pa | (1 << p))) % mod;
         }
-        
-        return dp[40][(1 << n) - 1];        
+        dp[h][pa] = res;
+        return res;
     }
 }
