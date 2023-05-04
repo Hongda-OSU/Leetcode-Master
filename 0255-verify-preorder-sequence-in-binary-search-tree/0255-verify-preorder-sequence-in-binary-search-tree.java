@@ -1,12 +1,13 @@
 class Solution {
-    int i = 1;
-    public boolean verifyPreorder(int[] A) {
-        return A.length == 0 || check(A, Integer.MIN_VALUE, A[0]) && check(A, A[0], Integer.MAX_VALUE);
+   public boolean verifyPreorder(int[] preorder) {
+    int low = Integer.MIN_VALUE, i = -1;
+    for (int p : preorder) {
+        if (p < low)
+            return false;
+        while (i >= 0 && p > preorder[i])
+            low = preorder[i--];
+        preorder[++i] = p;
     }
-
-    public boolean check(int[] A, int left, int right) {
-        if (i == A.length || A[i] > right) return true;
-        int mid = A[i++];
-        return (mid > left) && check(A, left, mid) && check(A, mid, right);
-    }
+    return true;
+}
 }
