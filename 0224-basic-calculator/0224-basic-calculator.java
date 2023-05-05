@@ -1,78 +1,23 @@
 class Solution {
-
-    public int evaluateExpr(Stack<Object> stack) {
-        
-        // If stack is empty or the expression starts with
-        // a symbol, then append 0 to the stack.
-        // i.e. [1, '-', 2, '-'] becomes [1, '-', 2, '-', 0]
-        if (stack.empty() || !(stack.peek() instanceof Integer)) {
-            stack.push(0);
-        }
-
-        int res = (int) stack.pop();
-
-        // Evaluate the expression till we get corresponding ')'
-        while (!stack.empty() && !((char) stack.peek() == ')')) {
-
-            char sign = (char) stack.pop();
-
-            if (sign == '+') {
-                res += (int) stack.pop();
-            } else {
-                res -= (int) stack.pop();
-            }
-        }
-        return res;
-    }
-
+    int idx; // this index traverse the string in one pass, between different level of recursion
     public int calculate(String s) {
-
-        int operand = 0;
-        int n = 0;
-        Stack<Object> stack = new Stack<Object>();
-
-        for (int i = s.length() - 1; i >= 0; i--) {
-
-            char ch = s.charAt(i);
-
-            if (Character.isDigit(ch)) {
-
-                // Forming the operand - in reverse order.
-                operand = (int) Math.pow(10, n) * (int) (ch - '0') + operand;
-                n += 1;
-
-            } else if (ch != ' ') {
-                if (n != 0) {
-
-                    // Save the operand on the stack
-                    // As we encounter some non-digit.
-                    stack.push(operand);
-                    n = 0;
-                    operand = 0;
-
-                }
-                if (ch == '(') {
-
-                    int res = evaluateExpr(stack);
-                    stack.pop();
-
-                    // Append the evaluated result to the stack.
-                    // This result could be of a sub-expression within the parenthesis.
-                    stack.push(res);
-
-                } else {
-                    // For other non-digits just push onto the stack.
-                    stack.push(ch);
-                }
+        idx = 0; // Initialization should be here
+        return calc(s);
+    }
+    
+    private int calc(String s) {
+        int res = 0, num = 0, sign = 1;
+        while (idx < s.length()) {
+            char c = s.charAt(idx++);
+            if (c >= '0' && c <= '9') num = num * 10 + c - '0';
+            else if (c == '(') num = calc(s); // ( is start of a new sub-problem, Let recursion solve the sub-problem
+            else if (c == ')') return res + sign * num;
+            else if (c == '+' || c == '-') { // only when we meet a new sign, we know a while number has been read
+                res += sign * num;
+                num = 0;
+                sign = c == '-' ? -1 : 1;
             }
         }
-
-        //Push the last operand to stack, if any.
-        if (n != 0) {
-            stack.push(operand);
-        }
-
-        // Evaluate any left overs in the stack.
-        return evaluateExpr(stack);
+        return res + sign * num; // last number is not processed yet
     }
 }
