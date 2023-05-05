@@ -1,27 +1,24 @@
 class StockSpanner {
-
-List<Integer> list; int i;
-
+//    Initialize a stack with int array.
+//      First Index would be price, and
+//      Second Index Will be span at that price.
+    Stack<int[]> stack;
     public StockSpanner() {
-        list = new ArrayList<Integer>();
-        i = 0;
+        stack = new Stack<>();
     }
-    
+
     public int next(int price) {
-        list.add(i, price); 
-        int j=i; int count = 0;
-        while(list.get(j) <= price){
-            if(j==0) {
-                count++;
-                break;
-            }
-            else{
-                count++; 
-                j--;
-            }
+//        At each level initialize the span to 1.
+        int span = 1;
+//        If The top element of stack price is below or equal to the current price:
+//          Then, the previous element will be span of current.
+        while(!stack.isEmpty() && stack.peek()[0] <= price){
+            span += stack.pop()[1];
         }
-        i++;
-        return count;
+//        At each level add the price and the span. 
+//        So that Next time when visited for consecutive days, you have the value of current that will avoid traversal till the current days span. 
+        stack.add(new int[]{price, span});
+        return span;
     }
 }
 
