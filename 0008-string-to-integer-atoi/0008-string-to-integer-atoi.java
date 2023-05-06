@@ -1,42 +1,24 @@
 class Solution {
-   public int myAtoi(String s) {
+    public int myAtoi(String s) {
+        if (s.equals(""))
+            return 0;
+        s = s.trim();
+        if (s.length() == 0)
+            return 0;
+        int sign = s.charAt(0) == '-' ? -1 : 1;
         long result = 0;
-        boolean isNegative = false;
-        int i = 0;
-        int len = s.length();
-        
-		// remove the blank space
-        while(i < len && s.charAt(i) == ' ') {
-            i++;
-        }
-        
-		// check the first operator
-        while((i < len) && (s.charAt(i) == '+'  || s.charAt(i) == '-')) {
-            if(s.charAt(i) == '-') {
-              isNegative = true; 
-            } 
-            i++;
-            break;
-        }
-        
-        int prev = 0;
-        int base = 10;
-		
-		// add the digit else break loop + if overflow then return the high value
-        while(i < s.length()) {
-            if(Character.isDigit(s.charAt(i))) {
-                int add = s.charAt(i) - '0';
-                result = (result * base) + add;
-                
-                if (result > Integer.MAX_VALUE) {
-    				return isNegative ? -Integer.MAX_VALUE-1 : Integer.MAX_VALUE;
-    			}
-            } else {
+        int max = Integer.MAX_VALUE, min = Integer.MIN_VALUE;
+        int i = (s.charAt(0) == '+' || s.charAt(0) == '-') ? 1 : 0;
+        while (i < s.length()) {
+            if (s.charAt(i) == ' ' || !Character.isDigit(s.charAt(i)))
                 break;
-            }
+            result = result * 10 + s.charAt(i) - '0';
+            if (sign == -1 && -1 * result < min)
+                return min;
+            if (sign == 1 && result > max)
+                return max;
             i++;
         }
-		
-        return isNegative ? (int)-result : (int)result;
+        return (int)(sign * result);
     }
 }
