@@ -14,7 +14,6 @@ public class Solution {
             }
             dp = temp;
         }
-
         return dp[0];
     }
 }
