@@ -1,21 +1,22 @@
 class Solution {
-    public int deleteTreeNodes(int nodes, int[] parent, int[] value) {
-        Map<Integer, Set<Integer>> tree = new HashMap<>();
-        for (int i = 0; i < nodes; i++) {
-            tree.computeIfAbsent(parent[i], s -> new HashSet<>()).add(i);
-        }
-        return dfs(0, tree, value)[1];
+    public int deleteTreeNodes(int n, int[] parent, int[] value) {
+        List<List<Integer>> graph = new ArrayList<>(n); // Create graph for the tree
+        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());
+        for (int i = 0; i < n; i++)
+            if (parent[i] != -1)
+                graph.get(parent[i]).add(i);
+
+        return dfs(graph, value, 0)[1];
     }
-    
-    private int[] dfs(int x, Map<Integer, Set<Integer>> tree, int[] value) {
-        int total = value[x], count = 1;
-        if (tree.containsKey(x)) {
-            for (int child : tree.get(x)) {
-                int[] next = dfs(child, tree, value);
-                total += next[0];
-                count += next[1];
-            }
+    private int[] dfs(List<List<Integer>> graph, int[] value, int root) { // return [sum, cnt of remain nodes after deleted]
+        int totalSum = value[root];
+        int totalNodes = 1;
+        for (int child : graph.get(root)) {
+            int[] temp = dfs(graph, value, child);
+            totalSum += temp[0];
+            totalNodes += temp[1];
         }
-        return new int[]{total, total == 0 ? 0 : count};
+        if (totalSum == 0) totalNodes = 0; // This subtree should be removed, so don't count nodes of this subtree
+        return new int[]{totalSum, totalNodes};
     }
 }
