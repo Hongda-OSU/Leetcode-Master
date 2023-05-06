@@ -1,17 +1,43 @@
-public class Solution {
+class Solution {
+    
+    Map<Integer, List<Integer>> flightMap = new HashMap<>();
+    int k;
+    Integer[][] dp;
+    
     public int maxVacationDays(int[][] flights, int[][] days) {
-        if (days.length == 0 || flights.length == 0) return 0;
-        int[][] dp = new int[days.length][days[0].length + 1];
-        for (int week = days[0].length - 1; week >= 0; week--) {
-            for (int cur_city = 0; cur_city < days.length; cur_city++) {
-                dp[cur_city][week] = days[cur_city][week] + dp[cur_city][week + 1];
-                for (int dest_city = 0; dest_city < days.length; dest_city++) {
-                    if (flights[cur_city][dest_city] == 1) {
-                        dp[cur_city][week] = Math.max(days[dest_city][week] + dp[dest_city][week + 1], dp[cur_city][week]);
-                    }
-                }
+        if(flights.length == 0 || flights[0].length == 0)
+            return 0;
+        
+        
+        k = days[0].length;
+        int n = flights.length;
+        dp = new Integer[k][n];
+            
+        for(int i = 0; i < n; i++){
+            flightMap.put(i, new ArrayList<>());
+            flightMap.get(i).add(i);
+            for(int j = 0; j < n; j++){
+                if(flights[i][j] == 1)
+                    flightMap.get(i).add(j);
             }
         }
-        return dp[0][0];
+        
+        return dfs(0, 0, days);    
+    }
+    
+    int dfs(int loc, int week, int[][] days){
+        if(week == k)
+            return 0;
+        
+        if(dp[week][loc] != null)
+            return dp[week][loc];
+        
+        int local = 0;
+        for(Integer to : flightMap.get(loc)){
+            local = Math.max(local, days[to][week] + dfs(to, week+1, days));
+        }
+        
+        dp[week][loc] = local;
+        return local;
     }
 }
