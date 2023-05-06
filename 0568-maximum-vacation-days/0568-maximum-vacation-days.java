@@ -1,23 +1,20 @@
-class Solution {
+public class Solution {
     public int maxVacationDays(int[][] flights, int[][] days) {
-        int[] memo=new int[days.length];
-        Arrays.fill(memo,-1);
-        memo[0]=0;
-        for(int i=0;i<days[0].length;i++) {
-            int[] tmp=new int[days.length];
-            Arrays.fill(tmp,-1);
-            for(int j=0;j<memo.length;j++) {
-                int m=memo[j];
-                for(int k=0;k<memo.length&&m>=0;k++) {
-                    if((j==k||flights[j][k]==1)) {
-                        tmp[k]=Math.max(tmp[k],m+days[k][i]);
+        if (days.length == 0 || flights.length == 0) return 0;
+        int[] dp = new int[days.length];
+        for (int week = days[0].length - 1; week >= 0; week--) {
+            int[] temp = new int[days.length];
+            for (int cur_city = 0; cur_city < days.length; cur_city++) {
+                temp[cur_city] = days[cur_city][week] + dp[cur_city];
+                for (int dest_city = 0; dest_city < days.length; dest_city++) {
+                    if (flights[cur_city][dest_city] == 1) {
+                        temp[cur_city] = Math.max(days[dest_city][week] + dp[dest_city], temp[cur_city]);
                     }
                 }
             }
-            memo=tmp;
+            dp = temp;
         }
-        int max=0;
-        for(int g: memo) max=Math.max(max,g);
-        return max;
+
+        return dp[0];
     }
 }
