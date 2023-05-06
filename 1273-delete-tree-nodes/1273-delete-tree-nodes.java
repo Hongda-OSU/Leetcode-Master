@@ -1,37 +1,33 @@
 class Solution {
-  public int deleteTreeNodes(int nodes, int[] parent, int[] value) {
-        int[] d = new int[nodes]; // degree array
-        int[] s = new int[nodes]; // size array
-        for(int i=1;i<nodes;++i){ // init
-            ++d[parent[i]];
-            s[i] = 1;
+    public int deleteTreeNodes(int nodes, int[] parent, int[] value) {
+        int[] degree = new int[nodes], size = new int[nodes];
+        for (int i = 1; i < nodes; i++) {
+            ++degree[parent[i]];
+            size[i] = 1;
         }
-        s[0] = 1;
-        
-        int cnt = 0; // delted nodes number
-        Queue<Integer> q = new LinkedList<>();
-        for(int i=0;i<nodes;++i)  // added all the leaves into que
-            if(d[i]==0)
-                q.offer(i);
-        
-        while(!q.isEmpty()){
-            int i = q.poll();
-            if(i==0){  // if it is root, break
-                if(value[0]==0)
-                    cnt+=s[0];
+        size[0] = 1;
+        int count = 0;
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < nodes; i++) {
+            if (degree[i] == 0)
+                queue.offer(i);
+        }
+        while (!queue.isEmpty()) {
+            int i = queue.poll();
+            if (i == 0) {
+                if (value[0] == 0) 
+                    count += size[0];
                 break;
             }
-            if(value[i]==0) // delete node
-                cnt+=s[i];
-            else
-                s[parent[i]]+=s[i];
-            value[parent[i]]+=value[i];
-            --d[parent[i]];
-            if(d[parent[i]]==0)
-                q.offer(parent[i]);
-            
-        }
-        
-        return nodes-cnt; // the number of nodes remaining 
+            if (value[i] == 0)
+                count += size[i];
+            else 
+                size[parent[i]] += size[i];
+            value[parent[i]] += value[i];
+            --degree[parent[i]];
+            if (degree[parent[i]] == 0)
+                queue.offer(parent[i]);
+        } 
+        return nodes - count;
     }
 }
