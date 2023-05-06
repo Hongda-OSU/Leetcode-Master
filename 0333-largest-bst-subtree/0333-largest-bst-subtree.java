@@ -13,41 +13,28 @@
  *     }
  * }
  */
-// Each node will return min node value, max node value, max size
-class NodeValue {
-    public int maxNode, minNode, maxSize;
-    
-    NodeValue(int minNode, int maxNode, int maxSize) {
-        this.maxNode = maxNode;
-        this.minNode = minNode;
-        this.maxSize = maxSize;
-    }
-};
-
 class Solution {
-    public NodeValue largestBSTSubtreeHelper(TreeNode root) {
-        // An empty tree is a BST of size 0.
-        if (root == null) {
-            return new NodeValue(Integer.MAX_VALUE, Integer.MIN_VALUE, 0);
-        }
-        
-        // Get values from left and right subtree of current tree.
-        NodeValue left = largestBSTSubtreeHelper(root.left);
-        NodeValue right = largestBSTSubtreeHelper(root.right);
-        
-        // Current node is greater than max in left AND smaller than min in right, it is a BST.
-        if (left.maxNode < root.val && root.val < right.minNode) {
-            // It is a BST.
-            return new NodeValue(Math.min(root.val, left.minNode), Math.max(root.val, right.maxNode), 
-                                left.maxSize + right.maxSize + 1);
-        }
-        
-        // Otherwise, return [-inf, inf] so that parent can't be valid BST
-        return new NodeValue(Integer.MIN_VALUE, Integer.MAX_VALUE, 
-                            Math.max(left.maxSize, right.maxSize));
+    public int largestBSTSubtree(TreeNode root) {
+        return helper(root).size;
     }
     
-    public int largestBSTSubtree(TreeNode root) {
-        return largestBSTSubtreeHelper(root).maxSize;
+    private Node helper(TreeNode root) {
+        if (root == null)
+            return new Node(Integer.MAX_VALUE, Integer.MIN_VALUE, 0);
+        Node left = helper(root.left);
+        Node right = helper(root.right);
+        if (left.max < root.val && root.val < right.min)
+            return new Node(Math.min(root.val, left.min), Math.max(root.val, right.max), left.size + right.size + 1);
+        return new Node(Integer.MIN_VALUE, Integer.MAX_VALUE, Math.max(left.size, right.size));
+    }
+}
+
+class Node {
+    public int min, max, size;
+    
+    public Node(int min, int max, int size) {
+        this.min = min;
+        this.max = max;
+        this.size = size;
     }
 }
