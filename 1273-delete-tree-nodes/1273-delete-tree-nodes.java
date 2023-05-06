@@ -1,22 +1,37 @@
 class Solution {
-    public int deleteTreeNodes(int n, int[] parent, int[] value) {
-        List<List<Integer>> graph = new ArrayList<>(n); // Create graph for the tree
-        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());
-        for (int i = 0; i < n; i++)
-            if (parent[i] != -1)
-                graph.get(parent[i]).add(i);
-
-        return dfs(graph, value, 0)[1];
-    }
-    private int[] dfs(List<List<Integer>> graph, int[] value, int root) { // return [sum, cnt of remain nodes after deleted]
-        int totalSum = value[root];
-        int totalNodes = 1;
-        for (int child : graph.get(root)) {
-            int[] temp = dfs(graph, value, child);
-            totalSum += temp[0];
-            totalNodes += temp[1];
+  public int deleteTreeNodes(int nodes, int[] parent, int[] value) {
+        int[] d = new int[nodes]; // degree array
+        int[] s = new int[nodes]; // size array
+        for(int i=1;i<nodes;++i){ // init
+            ++d[parent[i]];
+            s[i] = 1;
         }
-        if (totalSum == 0) totalNodes = 0; // This subtree should be removed, so don't count nodes of this subtree
-        return new int[]{totalSum, totalNodes};
+        s[0] = 1;
+        
+        int cnt = 0; // delted nodes number
+        Queue<Integer> q = new LinkedList<>();
+        for(int i=0;i<nodes;++i)  // added all the leaves into que
+            if(d[i]==0)
+                q.offer(i);
+        
+        while(!q.isEmpty()){
+            int i = q.poll();
+            if(i==0){  // if it is root, break
+                if(value[0]==0)
+                    cnt+=s[0];
+                break;
+            }
+            if(value[i]==0) // delete node
+                cnt+=s[i];
+            else
+                s[parent[i]]+=s[i];
+            value[parent[i]]+=value[i];
+            --d[parent[i]];
+            if(d[parent[i]]==0)
+                q.offer(parent[i]);
+            
+        }
+        
+        return nodes-cnt; // the number of nodes remaining 
     }
 }
