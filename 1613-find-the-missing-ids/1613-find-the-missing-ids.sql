@@ -9,4 +9,8 @@ WITH RECURSIVE id_seq AS (
 
 SELECT continued_id AS ids
 FROM id_seq
-WHERE continued_id NOT IN (SELECT customer_id FROM Customers) 
+WHERE continued_id NOT IN 
+(
+    SELECT customer_id 
+    FROM Customers
+);
