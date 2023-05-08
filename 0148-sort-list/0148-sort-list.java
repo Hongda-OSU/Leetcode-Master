@@ -8,7 +8,6 @@
  *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
  * }
  */
-
 class Solution {
     public ListNode sortList(ListNode head) {
         if (head == null || head.next == null)
@@ -18,33 +17,33 @@ class Solution {
         ListNode right = sortList(mid);
         return merge(left, right);
     }
-
-    ListNode merge(ListNode list1, ListNode list2) {
-        ListNode dummyHead = new ListNode();
-        ListNode tail = dummyHead;
-        while (list1 != null && list2 != null) {
-            if (list1.val < list2.val) {
-                tail.next = list1;
-                list1 = list1.next;
-                tail = tail.next;
-            } else {
-                tail.next = list2;
-                list2 = list2.next;
-                tail = tail.next;
-            }
-        }
-        tail.next = (list1 != null) ? list1 : list2;
-        return dummyHead.next;
-    }
-
-    ListNode getMid(ListNode head) {
+    
+    private ListNode getMid(ListNode node) {
         ListNode midPrev = null;
-        while (head != null && head.next != null) {
-            midPrev = (midPrev == null) ? head : midPrev.next;
-            head = head.next.next;
+        while (node != null && node.next != null) {
+            midPrev = (midPrev == null) ? node : midPrev.next;
+            node = node.next.next;
         }
         ListNode mid = midPrev.next;
         midPrev.next = null;
         return mid;
+    }
+    
+    private ListNode merge(ListNode left, ListNode right) {
+        ListNode dummy = new ListNode();
+        ListNode tail = dummy;
+        while (left != null && right != null) {
+            if (left.val < right.val) {
+                tail.next = left;
+                left = left.next;
+                tail = tail.next;
+            } else {
+                tail.next = right;
+                right = right.next;
+                tail = tail.next;
+            }
+        }
+        tail.next = (left != null) ? left : right;
+        return dummy.next;
     }
 }
