@@ -1,28 +1,35 @@
 class Solution {
-    List<String> ans = new ArrayList<>();
-    String s;
-    int target;
-    public List<String> addOperators(String s, int target) {
-        this.s = s;
-        this.target = target;
-        backtrack( 0, "", 0, 0);
-        return ans;
+    void dfs(List<String> ret, char[] path, int len, long left, long cur, char[] digits, int pos, int target) {
+    if (pos == digits.length) {
+        if (left + cur == target) ret.add(new String(path, 0, len));
+        return;
     }
-    void backtrack(int i, String path, long resSoFar, long prevNum) {
-        if (i == s.length()) {
-            if (resSoFar == target) ans.add(path);
-            return;
-        }
-        for (int j = i; j < s.length(); j++) {
-            if (j > i && s.charAt(i) == '0') break; // Skip leading zero number
-            long num = Long.parseLong(s.substring(i, j + 1));
-            if (i == 0) {
-                backtrack(j + 1, path + num, num, num); // First num, pick it without adding any operator!
-            } else {
-                backtrack(j + 1, path + "+" + num, resSoFar + num, num);
-                backtrack(j + 1, path + "-" + num, resSoFar - num, -num);
-                backtrack(j + 1, path + "*" + num, resSoFar - prevNum + prevNum * num, prevNum * num); // Can imagine with example: 1-2*3
-            }
-        }
+    long n = 0;
+    int j = len + 1;
+    for (int i = pos; i < digits.length; i++) {
+        n = n * 10 + digits[i] - '0';
+        path[j++] = digits[i];
+        path[len] = '+';
+        dfs(ret, path, j, left + cur, n, digits, i + 1, target);
+        path[len] = '-';
+        dfs(ret, path, j, left + cur, -n, digits, i + 1, target);
+        path[len] = '*';
+        dfs(ret, path, j, left, cur * n, digits, i + 1, target);
+        if (digits[pos] == '0') break; 
     }
+}
+public List<String> addOperators(String num, int target) {
+    List<String> ret = new LinkedList<>();
+    if (num.length() == 0) return ret;
+    char[] path = new char[num.length() * 2 - 1];
+    char[] digits = num.toCharArray();
+    long n = 0;
+    for (int i = 0; i < digits.length; i++) {
+        n = n * 10 + digits[i] - '0';
+        path[i] = digits[i];
+        dfs(ret, path, i + 1, 0, n, digits, i + 1, target);
+        if (n == 0) break;
+    }
+    return ret;
+}
 }
