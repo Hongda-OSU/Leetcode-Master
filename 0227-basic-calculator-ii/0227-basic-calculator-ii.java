@@ -1,36 +1,38 @@
-public class Solution {
-public int calculate(String s) {
-    int len;
-    if(s==null || (len = s.length())==0) return 0;
-    Stack<Integer> stack = new Stack<Integer>();
-    int num = 0;
-    char sign = '+';
-    for(int i=0;i<len;i++){
-        if(Character.isDigit(s.charAt(i))){
-            num = num*10+s.charAt(i)-'0';
+class Solution {
+
+    public int calculate(String s) {
+        var stack = new ArrayDeque<Integer>();
+        var n = 0;
+        var op = '+';
+        
+        for (var c : s.toCharArray()) {
+            switch (c) {
+                case '+', '-', '*', '/' -> {
+                    eval(stack, n, op);
+                    op = c;
+                    n = 0;
+                }
+                case ' ' -> {}
+                default -> n = n * 10 + (c - '0');
+            }
         }
-        if((!Character.isDigit(s.charAt(i)) &&' '!=s.charAt(i)) || i==len-1){
-            if(sign=='-'){
-                stack.push(-num);
-            }
-            if(sign=='+'){
-                stack.push(num);
-            }
-            if(sign=='*'){
-                stack.push(stack.pop()*num);
-            }
-            if(sign=='/'){
-                stack.push(stack.pop()/num);
-            }
-            sign = s.charAt(i);
-            num = 0;
-        }
+
+        // add last number
+        eval(stack, n, op);
+
+        var rez = 0;
+        while (!stack.isEmpty())
+            rez += stack.pop();
+
+        return rez;
     }
 
-    int re = 0;
-    for(int i:stack){
-        re += i;
+    private void eval(Deque<Integer> stack, int n, char op) {
+        switch (op) {
+            case '-' -> stack.push(-n);
+            case '*' -> stack.push(stack.pop() * n);
+            case '/' -> stack.push(stack.pop() / n);
+            default -> stack.push(n);
+        }
     }
-    return re;
-}
 }
