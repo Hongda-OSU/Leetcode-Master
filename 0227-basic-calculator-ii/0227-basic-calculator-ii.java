@@ -1,33 +1,27 @@
 class Solution {
-
     public int calculate(String s) {
-        var stack = new ArrayDeque<Integer>();
-        var n = 0;
-        var op = '+';
-        
-        for (var c : s.toCharArray()) {
-            switch (c) {
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        int n = 0;
+        char op = '+';
+        for (char ch : s.toCharArray()) {
+            switch (ch) {
                 case '+', '-', '*', '/' -> {
                     eval(stack, n, op);
-                    op = c;
+                    op = ch;
                     n = 0;
                 }
                 case ' ' -> {}
-                default -> n = n * 10 + (c - '0');
+                default -> n = n * 10 + (ch - '0');
             }
         }
-
-        // add last number
         eval(stack, n, op);
-
-        var rez = 0;
+        int result = 0;
         while (!stack.isEmpty())
-            rez += stack.pop();
-
-        return rez;
+            result += stack.pop();
+        return result;
     }
-
-    private void eval(Deque<Integer> stack, int n, char op) {
+    
+    private void eval(ArrayDeque<Integer> stack, int n, char op) {
         switch (op) {
             case '-' -> stack.push(-n);
             case '*' -> stack.push(stack.pop() * n);
