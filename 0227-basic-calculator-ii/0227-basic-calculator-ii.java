@@ -1,26 +1,36 @@
-class Solution {
-    public int calculate(String s) {
-        if (s == null || s.isEmpty()) return 0;
-        int currentNumber = 0, lastNumber = 0, result = 0;
-        char operation = '+';
-        for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-            if (Character.isDigit(ch))
-                currentNumber = (currentNumber * 10) + (ch - '0');
-            if (!Character.isDigit(ch) && !Character.isWhitespace(ch) || i == s.length() - 1) {
-                if (operation == '+' || operation == '-') {
-                    result += lastNumber;
-                    lastNumber = operation == '+' ? currentNumber : -currentNumber;
-                } else if (operation == '*') {
-                    lastNumber = lastNumber * currentNumber;
-                } else if (operation == '/') {
-                    lastNumber = lastNumber / currentNumber;
-                }
-                operation = ch;
-                currentNumber = 0;
-            }
+public class Solution {
+public int calculate(String s) {
+    int len;
+    if(s==null || (len = s.length())==0) return 0;
+    Stack<Integer> stack = new Stack<Integer>();
+    int num = 0;
+    char sign = '+';
+    for(int i=0;i<len;i++){
+        if(Character.isDigit(s.charAt(i))){
+            num = num*10+s.charAt(i)-'0';
         }
-        result += lastNumber;
-        return result;
+        if((!Character.isDigit(s.charAt(i)) &&' '!=s.charAt(i)) || i==len-1){
+            if(sign=='-'){
+                stack.push(-num);
+            }
+            if(sign=='+'){
+                stack.push(num);
+            }
+            if(sign=='*'){
+                stack.push(stack.pop()*num);
+            }
+            if(sign=='/'){
+                stack.push(stack.pop()/num);
+            }
+            sign = s.charAt(i);
+            num = 0;
+        }
     }
+
+    int re = 0;
+    for(int i:stack){
+        re += i;
+    }
+    return re;
+}
 }
