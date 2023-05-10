@@ -12,7 +12,7 @@ class ProductOfNumbers {
             list = new ArrayList<>();
             lastProduct = 1;
         } else {
-            lastProduct = lastProduct * num;
+            lastProduct *= num;
             list.add(lastProduct);
         }
     }
