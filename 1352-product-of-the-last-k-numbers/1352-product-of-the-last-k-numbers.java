@@ -9,7 +9,7 @@ class ProductOfNumbers {
     
     public void add(int num) {
         if (num == 0) {
-            list = new ArrayList<>();
+            list.clear();
             lastProduct = 1;
         } else {
             lastProduct *= num;
