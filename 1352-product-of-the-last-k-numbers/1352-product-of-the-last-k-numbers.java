@@ -1,20 +1,27 @@
 class ProductOfNumbers {
-    ArrayList<Integer> pList;
-    
+    private final List<Integer> list;
+    private int lastProduct = 1;
+
     public ProductOfNumbers() {
-        pList = new ArrayList<Integer>();
+        this.list = new ArrayList<>();
     }
-    
+
     public void add(int num) {
-        if (num == 0) pList.clear();
-        else 
-            pList.add(pList.size() == 0 ? num : pList.get(pList.size() - 1)*num);
+        if (num == 0) {
+            list.clear();
+            lastProduct = 1;
+        } else {
+            lastProduct *= num;
+            list.add(lastProduct);
+        }
     }
-    
+
     public int getProduct(int k) {
-        if (k > pList.size()) return 0;
-        if (k == pList.size()) return pList.get(pList.size()-1);
-        return pList.get(pList.size()-1)/pList.get(pList.size()-1-k);
+        final int index = list.size() - k;
+        if (index > 0) return lastProduct / list.get(index - 1);
+        if (index == 0) return lastProduct;
+
+        return 0;
     }
 }
 
