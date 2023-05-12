@@ -1,49 +1,58 @@
+class TrieNode {
+    boolean isWord;
+    TrieNode[] children;
+    
+    public TrieNode() {
+        isWord = false;
+        children = new TrieNode[26]; // 26 English lowercase letters
+    }
+}
+
 class Trie {
-    private TrieNode root;
+    TrieNode root;
     
     public Trie() {
         root = new TrieNode();
     }
     
     public void insert(String word) {
-        TrieNode curr = root;
-        for (int i = 0; i < word.length(); i++) {
-            int id = word.charAt(i) - 'a';
-            if (curr.children[id] == null) 
-                curr.children[id] = new TrieNode();
-            curr = curr.children[id];
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            int index = c - 'a';
+            if (node.children[index] == null) {
+                node.children[index] = new TrieNode();
+            }
+            node = node.children[index];
         }
-        curr.isEnd = true;
+        node.isWord = true;
     }
     
     public boolean search(String word) {
-        return searchHelper(word, true);
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            int index = c - 'a';
+            if (node.children[index] == null) {
+                return false;
+            }
+            node = node.children[index];
+        }
+        return node.isWord;
     }
     
     public boolean startsWith(String prefix) {
-        return searchHelper(prefix, false);
-    }
-    
-    private boolean searchHelper(String str, boolean search) {
-        TrieNode curr = root;
-        int i = -1, len = str.length();
-        while (++i < len) {
-            int id = str.charAt(i) - 'a';
-            if ((curr = curr.children[id]) == null)
+        TrieNode node = root;
+        for (char c : prefix.toCharArray()) {
+            int index = c - 'a';
+            if (node.children[index] == null) {
                 return false;
+            }
+            node = node.children[index];
         }
-        return search ? curr.isEnd : true;
+        return true;
     }
 }
 
-class TrieNode {
-    public boolean isEnd;
-    public TrieNode[] children;
-    
-    public TrieNode() {
-        children = new TrieNode[26];
-    }
-}
+
 
 /**
  * Your Trie object will be instantiated and called as such:
