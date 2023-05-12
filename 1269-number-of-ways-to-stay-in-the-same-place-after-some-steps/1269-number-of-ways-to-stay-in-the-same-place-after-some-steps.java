@@ -1,30 +1,40 @@
 class Solution {
     
-    HashMap<String,Long> map = new HashMap();
-    
     public int numWays(int steps, int arrLen) {
-        
-        return (int) (ways(steps,arrLen,0) % ((Math.pow(10,9)) +7));
+        int[][] memo = new int[steps + 1][steps + 1];
+        return helper(steps , arrLen , 0 , memo );
     }
     
-    public long ways(int steps,int arrLen,int index){
-        String curr = index + "->" + steps;
+    private int helper(int moves , int N , int i , int[][]memo){
         
-        if(index == 0 && steps == 0){
+        if(i  > moves){
+            return 0 ;
+         }
+        
+        if(moves == 0 && i == 0){
             return 1;
-        }else if(index < 0 || (index >= arrLen) || steps == 0){
-            return 0;
         }
         
-        if(map.containsKey(curr)){
-            return map.get(curr);
+        if(memo[moves][i] != 0){
+            return memo[moves][i];
         }
-        long stay = ways(steps-1,arrLen,index);
-        long right = ways(steps-1,arrLen,index+1);
-        long left = ways(steps-1,arrLen,index-1);
         
-        map.put(curr , (stay+right+left) % 1000000007);
+        int res = 0 , MOD = 1_000_000_007;
         
-        return (right + left + stay) % 1000000007;
+        res = helper(moves - 1  , N , i , memo) % MOD; 
+        
+        if(i > 0){
+            res = ( res % MOD + helper(moves - 1 , N , i - 1 , memo) % MOD ) % MOD;
+        }
+        if( i < N - 1){
+            res = ( res % MOD +  helper(moves - 1 , N ,  i + 1 , memo) % MOD ) % MOD;
+        }
+        
+        memo[moves][i] = res;
+        
+      return res;  
+        
     }
+    
+    
 }
