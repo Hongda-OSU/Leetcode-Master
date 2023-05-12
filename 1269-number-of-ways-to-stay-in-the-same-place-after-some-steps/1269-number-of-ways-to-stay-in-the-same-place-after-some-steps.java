@@ -1,40 +1,20 @@
 class Solution {
-    
+    final int max = 1000000007;
+    Long[][] mem = null;
     public int numWays(int steps, int arrLen) {
-        int[][] memo = new int[steps + 1][steps + 1];
-        return helper(steps , arrLen , 0 , memo );
+        mem = new Long[steps+1][2*steps+1];
+        return (int)dfs(steps, 0, arrLen)%max;
     }
     
-    private int helper(int moves , int N , int i , int[][]memo){
+    long dfs(int steps, int arrLen, int farrLen) {
+        if (arrLen >= farrLen || arrLen < 0 || steps < 0) return 0;
+        if (steps == 0 && arrLen == 0) { return 1;}
+        if (mem[steps][arrLen] != null) return mem[steps][arrLen];
         
-        if(i  > moves){
-            return 0 ;
-         }
-        
-        if(moves == 0 && i == 0){
-            return 1;
-        }
-        
-        if(memo[moves][i] != 0){
-            return memo[moves][i];
-        }
-        
-        int res = 0 , MOD = 1_000_000_007;
-        
-        res = helper(moves - 1  , N , i , memo) % MOD; 
-        
-        if(i > 0){
-            res = ( res % MOD + helper(moves - 1 , N , i - 1 , memo) % MOD ) % MOD;
-        }
-        if( i < N - 1){
-            res = ( res % MOD +  helper(moves - 1 , N ,  i + 1 , memo) % MOD ) % MOD;
-        }
-        
-        memo[moves][i] = res;
-        
-      return res;  
+        long c = dfs(steps-1, arrLen+1, farrLen)%max + dfs(steps-1, arrLen, farrLen)%max + dfs(steps-1, arrLen-1, farrLen)%max;
+        c = c%max;
+        mem[steps][arrLen] = c;
+        return c;
         
     }
-    
-    
 }
