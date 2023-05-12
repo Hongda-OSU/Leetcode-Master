@@ -1,25 +1,16 @@
 class Solution {
     public int numWays(String[] words, String target) {
-        int n = words[0].length();
-        int m = target.length();
-        int mod = 1000000007;
-        int[] dp = new int[m+1];
-        dp[0] = 1;
-        
-        int[][] count = new int[n][26];
-        for (String word : words) {
-            for (int i = 0; i < n; i++) {
-                count[i][word.charAt(i) - 'a']++;
-            }
+        int n = target.length();
+        long mod = (long)1e9 + 7;
+        long[] result = new long[n + 1];
+        result[0] = 1;
+        for (int i = 0; i < words[0].length(); i++) {
+            int[] count = new int[26];
+            for (String word : words)
+                count[word.charAt(i) - 'a']++;
+            for (int j = n - 1; j >= 0; j--) 
+                result[j + 1] += result[j] * count[target.charAt(j) - 'a'] % mod;
         }
-        
-        for (int i = 0; i < n; i++) {
-            for (int j = m-1; j >= 0; j--) {
-                dp[j+1] += (int)((long)dp[j] * count[i][target.charAt(j) - 'a'] % mod);
-                dp[j+1] %= mod;
-            }
-        }
-        
-        return dp[m];
+        return (int)(result[n] % mod);
     }
 }
