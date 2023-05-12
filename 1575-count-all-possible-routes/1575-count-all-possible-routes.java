@@ -1,31 +1,19 @@
 class Solution {
-    public int solve(int[] locations, int currCity, int finish, int remainingFuel, int memo[][]) {
-        if (remainingFuel < 0) {
-            return 0;
-        }
-        if (memo[currCity][remainingFuel] != -1) {
-            return memo[currCity][remainingFuel];
-        }
-
-        int ans = currCity == finish ? 1 : 0;
-        for (int nextCity = 0; nextCity < locations.length; nextCity++) {
-            if (nextCity != currCity) {
-                ans = (ans + solve(locations, nextCity, finish,
-                remainingFuel - Math.abs(locations[currCity] - locations[nextCity]),
-                                   memo)) % 1000000007;
+    public int countRoutes(int[] locations, int start, int finish, int fuel) {
+        long[][] dp = new long[locations.length][fuel+1];
+        long MOD = (long)(1e9 + 7);
+        Arrays.fill(dp[finish],1);
+        long ans = 0;
+        for(int j = 0; j <= fuel; j++) {
+            for(int i = 0; i < locations.length; i++) {
+                for(int k = 0; k < locations.length; k++) {
+                    if(k == i) continue;
+                    if(Math.abs(locations[i] - locations[k]) <= j) {
+                        dp[i][j] = (dp[i][j] + dp[k][j - Math.abs(locations[i] - locations[k])]) % MOD; 
+                    }
+                }
             }
         }
-
-        return memo[currCity][remainingFuel] = ans;
-    }
-
-    public int countRoutes(int[] locations, int start, int finish, int fuel) {
-        int n = locations.length;
-        int memo[][] = new int[n][fuel + 1];
-        for (int i = 0; i < n; ++i) {
-            Arrays.fill(memo[i], -1);
-        }
-
-        return solve(locations, start, finish, fuel, memo);
+        return (int)dp[start][fuel];
     }
 }
