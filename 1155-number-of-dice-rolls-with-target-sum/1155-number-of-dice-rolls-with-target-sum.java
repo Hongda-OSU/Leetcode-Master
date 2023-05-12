@@ -1,27 +1,33 @@
 class Solution {
-    final int MOD = 1000000007;
-    
-    int waysToTarget(Integer[][] memo, int diceIndex, int n, int currSum, int target, int k) {
-        // All the n dice are traversed, the sum must be equal to target for valid combination
-        if (diceIndex == n) {
-            return currSum == target ? 1 : 0;
+    private int[][] dp;
+
+    public int numRollsToTarget(int dices, int faces, int target) {
+        dp = new int[dices + 1][target + 1];
+        for (int[] arr : dp) {
+            Arrays.fill(arr, -1);
         }
-        
-        // We have already calculated the answer so no need to go into recursion
-        if (memo[diceIndex][currSum] != null) {
-            return memo[diceIndex][currSum];
-        }
-        
-        int ways = 0;
-        // Iterate over the possible face value for current dice
-        for (int i = 1; i <= Math.min(k, target - currSum); i++) {
-            ways = (ways + waysToTarget(memo, diceIndex + 1, n, currSum + i, target, k)) % MOD;
-        }
-        return memo[diceIndex][currSum] = ways;
+        return recursion(dices, faces, target);
     }
-    
-    public int numRollsToTarget(int n, int k, int target) {
-        Integer[][] memo = new Integer[n + 1][target + 1];
-        return waysToTarget(memo, 0, n, 0, target, k);
+
+    private int recursion(int dices, int faces, int target) {
+        int result = 0;
+        if (dices == 0 && target == 0) {
+            return 1;
+        }
+        if (target < 0 || dices<=0) {
+            return 0;
+        }
+        if (dp[dices][target] != -1) {
+            return dp[dices][target];
+        }
+        for (int i = 1; i <= faces; i++) {
+            result += recursion(dices - 1, faces, target - i);
+
+            if (result >= 1000000007) {
+                result %= 1000000007;
+            }
+        }
+        dp[dices][target] = result;
+        return result;
     }
 }
