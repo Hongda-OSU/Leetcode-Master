@@ -14,40 +14,35 @@
  * }
  */
 class Solution {
-     public Node expTree(String s) {
+    public Node expTree(String s) {
         Deque<Character> deque = new LinkedList<>();
-        for (char c : s.toCharArray()) deque.offerLast(c);
+        for (char ch : s.toCharArray())
+            deque.offerLast(ch);
         return helper(deque);
     }
-
+    
     private Node helper(Deque<Character> deque) {
         Deque<Node> operands = new LinkedList<>();
         Deque<Node> operators = new LinkedList<>();
         while (!deque.isEmpty()) {
-            char c = deque.pollFirst();
-            if (Character.isDigit(c)) {
-                // directly push into operands
-                operands.offerLast(new Node(c));
-            } else if (c == '(') {
-                // recursively push into operands
+            char ch = deque.pollFirst();
+            if (Character.isDigit(ch))
+                operands.offerLast(new Node(ch));
+            else if (ch == '(')
                 operands.offerLast(helper(deque));
-            } else if (c == ')') {
-                // clear all operands and operators
+            else if (ch == ')') {
                 eliminate(operands, operators);
                 return operands.pollLast();
             } else {
-                // c is operator, + - * /
-                // only case cannot use eliminate: c is * or /, previous operator is + or -.
-                if (!operators.isEmpty() && !(((operators.peekLast().val == '+' || operators.peekLast().val == '-') && (c == '*' || c == '/')))) {
+                if (!operators.isEmpty() && !(((operators.peekLast().val == '+' || operators.peekLast().val == '-') && (ch == '*' || ch == '/'))))
                     eliminate(operands, operators);
-                }
-                operators.offerLast(new Node(c));
+                operators.offerLast(new Node(ch));
             }
         }
         eliminate(operands, operators);
         return operands.pollLast();
     }
-
+    
     private void eliminate(Deque<Node> operands, Deque<Node> operators) {
         while (operands.size() != 1) {
             Node right = operands.pollLast();
