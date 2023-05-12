@@ -1,26 +1,16 @@
 class Solution {
     public int numWays(String[] words, String target) {
-        int alphabet = 26;
-        int mod = 1000000007;
-        int m = target.length(), k = words[0].length();
-        int cnt[][] = new int[alphabet][k];
-        for (int j = 0; j < k; j++) {
-            for (String word : words) {
-                cnt[word.charAt(j) - 'a'][j]++;
+        int n = target.length();
+        long mod = (long)1e9 + 7, res[] = new long[n + 1];
+        res[0] = 1;
+        for (int i = 0; i < words[0].length(); ++i) {
+            int[] count = new int[26];
+            for (String w : words)
+                count[w.charAt(i) - 'a']++;
+            for (int j = n - 1; j >= 0; --j) {
+                res[j + 1] += res[j] * count[target.charAt(j) - 'a'] % mod;
             }
         }
-        long dp[][] = new long[m + 1][k + 1];
-        dp[0][0] = 1;
-        for (int i = 0; i <= m; i++) {
-            for (int j = 0; j < k; j++) {
-                if (i < m) {
-                    dp[i + 1][j + 1] += cnt[target.charAt(i) - 'a'][j] * dp[i][j];
-                    dp[i + 1][j + 1] %= mod;
-                }
-                dp[i][j + 1] += dp[i][j];
-                dp[i][j + 1] %= mod;
-            }
-        }
-        return (int)dp[m][k];
+        return (int)(res[n] % mod);
     }
 }
