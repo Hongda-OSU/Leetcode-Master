@@ -1,79 +1,68 @@
 class Trie {
-    Trie[] child;
-    int wordCount = 0;
 
-    public Trie() {
-        child = new Trie[26];
-    }
-    
-    public void insert(String word) {
-        Trie temp = this;
-        for(int i = 0; i < word.length(); i++) {
-            if(temp.child[word.charAt(i) - 'a'] == null) {    // If its null means, we need to create a new brach from that point.
-                temp.child[word.charAt(i) - 'a'] = new Trie();
-            }
-            temp = temp.child[word.charAt(i) - 'a'];
-            if(i == word.length()-1) {  // Change boolean to int to record the number of words
-                temp.wordCount++;
-            }
-        }
-    }
-    
-    public int countWordsEqualTo(String word) {
-        boolean isFound = false;
-        Trie temp = this;
-        int wordCount = 0;
-        for(int i = 0; i < word.length(); i++) {
-            if(temp.child[word.charAt(i) - 'a'] == null) {
-                return 0;
-            } else {
-                if(i == word.length()-1 && temp.child[word.charAt(i) - 'a'].wordCount != 0) {
-                    isFound = true;
-                    wordCount = temp.child[word.charAt(i) - 'a'].wordCount;
-                }
-            }
-            temp = temp.child[word.charAt(i) - 'a'];
-        }
-        return wordCount;//Find the end point of the word in the Trie and output wordCount of that Node
-    }
-    
-    public int countWordsStartingWith(String prefix) {
-        Trie temp = this;
-        for(int i = 0; i < prefix.length(); i++) {
-            if(temp.child[prefix.charAt(i) - 'a'] == null) { // If the path doesn't exist, just end the search and break at this point.
-                return 0;
-            }
-            temp = temp.child[prefix.charAt(i) - 'a'];
-        }
-        //The code above helps us to find the endpoint of 'Prefix", after that we could count from this as root
-        return count(temp);
-    }
-    
-    private int count(Trie root) {
-        int res = 0;
-        res += root.wordCount;
-        for (Trie trie: root.child) {
-            if (trie != null) {
-                res += count(trie);
-            }
-        }
-        return res;
-    }// Recursively get the cumulative sum
-    
-    public void erase(String word) {
-        Trie temp = this;
-        if (countWordsEqualTo(word) == 0) {
-            return;
-        }
-        for(int i = 0; i < word.length(); i++) {
-            if(i == word.length()-1 && temp.child[word.charAt(i) - 'a'].wordCount != 0) {
-                temp.child[word.charAt(i) - 'a'].wordCount--;// Find the endpoint, decrease the count by 1
-            }
-            temp = temp.child[word.charAt(i) - 'a'];
-        }
-        return;
-        
-    }
+	private static class TrieNode {
+		char val;
+		int wordCount;
+		int prefixCount;
+		Map<Character, TrieNode> children = new HashMap<>(26);
+
+		TrieNode(char val) {
+			this.val = val;
+		}
+	}
+
+	private final TrieNode root;
+
+	public Trie() {
+		root = new TrieNode('#');
+	}
+
+	public void insert(String word) {
+		var node = root;
+
+		for (var i = 0; i < word.length(); i++) {
+			var key = word.charAt(i);
+			node = node.children.computeIfAbsent(word.charAt(i), k -> new TrieNode(key));
+			node.prefixCount++;
+		}
+
+		node.wordCount++;
+	}
+
+	public int countWordsEqualTo(String word) {
+		return countWords(word, false);
+	}
+
+	public int countWordsStartingWith(String prefix) {
+		return countWords(prefix, true);
+	}
+
+	private int countWords(String word, boolean isPrefix) {
+		var node = root;
+		for (var i = 0; i < word.length(); i++) {
+			var key = word.charAt(i);
+			if (!node.children.containsKey(key))
+				return 0;
+			node = node.children.get(key);
+		}
+		return isPrefix ? node.prefixCount : node.wordCount;
+	}
+
+	public void erase(String word) {
+		var parent = root;
+
+		for (var i = 0; i < word.length(); i++) {
+			var key = word.charAt(i);
+			var node = parent.children.get(key);
+
+			if (--node.prefixCount == 0) {
+				parent.children.remove(key);
+				return;
+			}
+			parent = node;
+		}
+		parent.wordCount--;
+	}
 }
 
 /**
