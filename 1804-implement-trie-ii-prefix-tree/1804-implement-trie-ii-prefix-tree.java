@@ -1,88 +1,67 @@
 class Trie {
-    TrieNode root;
+    private Node root;
+
     public Trie() {
-        root = new TrieNode();
+        root = new Node();
     }
     
     public void insert(String word) {
-        int n = word.length();
-        TrieNode cur = root;
-        for (int i = 0; i < n; i++) {
-            char ch = word.charAt(i);
-            Map<Character, TrieNode> children = cur.children;
-            TrieNode child = children.get(ch);
-            if (child == null) {
-                child = new TrieNode();
-                children.put(ch, child);
-            }
-            child.prefixCnt++;
-            cur = child;
+        Node curr = root;
+        int pos;
+        for (char ch : word.toCharArray()) {
+            pos = ch - 'a';
+            if (curr.children[pos] == null)
+                curr.children[pos] = new Node();
+            curr = curr.children[pos];
+            curr.count++;
         }
-        cur.wordCnt++;
+        curr.end++;
     }
     
     public int countWordsEqualTo(String word) {
-        TrieNode cur = root;
-        int n = word.length();
-        for (int i = 0; i < n; i++) {
-            char ch = word.charAt(i);
-            Map<Character, TrieNode> children = cur.children;
-            TrieNode child = children.get(ch);
-            if (child == null) {
+        Node curr = root;
+        int pos;
+        for (char ch : word.toCharArray()) {
+            pos = ch - 'a';
+            if (curr.children[pos] == null)
                 return 0;
-            }
-            cur = child;
+            curr = curr.children[pos];
         }
-        return cur.wordCnt;
+        return curr.end;
     }
     
     public int countWordsStartingWith(String prefix) {
-        TrieNode cur = root;
-        int n = prefix.length();
-        for (int i = 0; i < n; i++) {
-            char ch = prefix.charAt(i);
-            Map<Character, TrieNode> children = cur.children;
-            TrieNode child = children.get(ch);
-            if (child == null) {
+        Node curr = root;
+        int pos;
+        for (char ch : prefix.toCharArray()) {
+            pos = ch - 'a';
+            if (curr.children[pos] == null)
                 return 0;
-            }
-            cur = child;
+            curr = curr.children[pos];
         }
-        return cur.prefixCnt;
+        return curr.count;
     }
     
     public void erase(String word) {
-        Deque<TrieNode> stack = new ArrayDeque<>();
-        TrieNode cur = root;
-        int n = word.length();
-        for (int i = 0; i < n; i++) {
-            stack.offerFirst(cur);
-            char ch = word.charAt(i);
-            Map<Character, TrieNode> children = cur.children;
-            TrieNode child = children.get(ch);
-            cur = child;
+        Node curr = root;
+        int pos;
+        for (char ch : word.toCharArray()) {
+            pos = ch - 'a';
+            curr = curr.children[pos];
+            curr.count--;
         }
-        cur.wordCnt--;
-        for (int i = n - 1; i >= 0; i--) {
-            char ch = word.charAt(i);
-            //System.out.println(ch);
-            TrieNode parent = stack.pollFirst();
-            Map<Character, TrieNode> children = parent.children;
-            TrieNode child = children.get(ch);
-            child.prefixCnt--;
-            if (child.prefixCnt == 0) {
-                children.remove(ch);
-            }
-        }
+        curr.end--;
     }
+}
+
+class Node {
+    public Node[] children;
+    public int count, end;
     
-    static class TrieNode {
-        Map<Character, TrieNode> children;
-        int prefixCnt;
-        int wordCnt;
-        TrieNode() {
-            children = new HashMap<>();
-        }
+    public Node() {
+        this.count = 0;
+        this.end = 0;
+        this.children = new Node[26];
     }
 }
 
