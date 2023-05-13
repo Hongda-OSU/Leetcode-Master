@@ -1,25 +1,23 @@
 public class Solution {
     public int candy(int[] ratings) {
-        int[] candies = new int[ratings.length];
-        Arrays.fill(candies, 1);
-        boolean hasChanged = true;
-        while (hasChanged) {
-            hasChanged = false;
-            for (int i = 0; i < ratings.length; i++) {
-                if (i != ratings.length - 1 && ratings[i] > ratings[i + 1] && candies[i] <= candies[i + 1]) {
-                    candies[i] = candies[i + 1] + 1;
-                    hasChanged = true;
+        if (ratings == null || ratings.length == 0) return 0;
+        int total = 1, prev = 1, countDown = 0;
+        for (int i = 1; i < ratings.length; i++) {
+            if (ratings[i] >= ratings[i-1]) {
+                if (countDown > 0) {
+                    total += countDown*(countDown+1)/2; // arithmetic progression
+                    if (countDown >= prev) total += countDown - prev + 1;
+                    countDown = 0;
+                    prev = 1;
                 }
-                if (i > 0 && ratings[i] > ratings[i - 1] && candies[i] <= candies[i - 1]) {
-                    candies[i] = candies[i - 1] + 1;
-                    hasChanged = true;
-                }
-            }
+                prev = ratings[i] == ratings[i-1] ? 1 : prev+1;
+                total += prev;
+            } else countDown++;
         }
-        int sum = 0;
-        for (int candy : candies) {
-            sum += candy;
+        if (countDown > 0) { // if we were descending at the end
+            total += countDown*(countDown+1)/2;
+            if (countDown >= prev) total += countDown - prev + 1;
         }
-        return sum;
+        return total;
     }
 }
