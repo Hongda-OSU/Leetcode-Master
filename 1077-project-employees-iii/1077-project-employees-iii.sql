@@ -4,7 +4,8 @@ SELECT p.project_id,
 FROM Project p
 JOIN Employee e
 ON p.employee_id = e.employee_id
-WHERE (p.project_id, e.experience_years) IN (
+WHERE (p.project_id, e.experience_years) IN 
+(
     SELECT a.project_id,
         MAX(b.experience_years)
     FROM Project a 
