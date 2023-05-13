@@ -1,13 +1,13 @@
 class Solution {
     public int rearrangeSticks(int n, int k) {
-        final int MOD = 1_000_000_007;
-        long[][] M = new long[k + 1][n + 1];
-        M[0][0] = 1;
-        for (int i = 1; i <= k; i++) {
-            for (int j = 1; j <= n; j++) {
-                M[i][j] = ((j - 1) * M[i][j - 1] % MOD + M[i - 1][j - 1]) % MOD;
+        long [][] dp = new long [n + 1][k + 1];
+        int mod = (int) 1e9 + 7;
+        dp[0][0] = 1L;
+        for (int i=1; i<=n; i++) {
+            for (int j=1; j<=Math.min(i, k); j++) {
+                dp[i][j] = (dp[i - 1][j] * (long)(i - 1) + dp[i - 1][j - 1]) % mod;
             }
         }
-        return (int) M[k][n];
+        return (int)(dp[n][k] % mod);
     }
 }
