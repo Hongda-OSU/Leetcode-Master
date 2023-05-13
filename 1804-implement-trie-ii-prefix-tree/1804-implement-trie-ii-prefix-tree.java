@@ -1,97 +1,81 @@
-	class Trie
-	{
-		private Node root;
+class Trie {
+    Trie[] child;
+    int wordCount = 0;
 
-		public Trie()
-		{
-			root = new Node();
-		}
+    public Trie() {
+        child = new Trie[26];
+    }
+    
+    public void insert(String word) {
+        Trie temp = this;
+        for(int i = 0; i < word.length(); i++) {
+            if(temp.child[word.charAt(i) - 'a'] == null) {    // If its null means, we need to create a new brach from that point.
+                temp.child[word.charAt(i) - 'a'] = new Trie();
+            }
+            temp = temp.child[word.charAt(i) - 'a'];
+            if(i == word.length()-1) {  // Change boolean to int to record the number of words
+                temp.wordCount++;
+            }
+        }
+    }
+    
+    public int countWordsEqualTo(String word) {
+        boolean isFound = false;
+        Trie temp = this;
+        int wordCount = 0;
+        for(int i = 0; i < word.length(); i++) {
+            if(temp.child[word.charAt(i) - 'a'] == null) {
+                return 0;
+            } else {
+                if(i == word.length()-1 && temp.child[word.charAt(i) - 'a'].wordCount != 0) {
+                    isFound = true;
+                    wordCount = temp.child[word.charAt(i) - 'a'].wordCount;
+                }
+            }
+            temp = temp.child[word.charAt(i) - 'a'];
+        }
+        return wordCount;//Find the end point of the word in the Trie and output wordCount of that Node
+    }
+    
+    public int countWordsStartingWith(String prefix) {
+        Trie temp = this;
+        for(int i = 0; i < prefix.length(); i++) {
+            if(temp.child[prefix.charAt(i) - 'a'] == null) { // If the path doesn't exist, just end the search and break at this point.
+                return 0;
+            }
+            temp = temp.child[prefix.charAt(i) - 'a'];
+        }
+        //The code above helps us to find the endpoint of 'Prefix", after that we could count from this as root
+        return count(temp);
+    }
+    
+    private int count(Trie root) {
+        int res = 0;
+        res += root.wordCount;
+        for (Trie trie: root.child) {
+            if (trie != null) {
+                res += count(trie);
+            }
+        }
+        return res;
+    }// Recursively get the cumulative sum
+    
+    public void erase(String word) {
+        Trie temp = this;
+        if (countWordsEqualTo(word) == 0) {
+            return;
+        }
+        for(int i = 0; i < word.length(); i++) {
+            if(i == word.length()-1 && temp.child[word.charAt(i) - 'a'].wordCount != 0) {
+                temp.child[word.charAt(i) - 'a'].wordCount--;// Find the endpoint, decrease the count by 1
+            }
+            temp = temp.child[word.charAt(i) - 'a'];
+        }
+        return;
+        
+    }
+}
 
-        // We are iterating through each word character and if Node doesn't have a child we will add it.
-		// on each step after adding/stepping the node we increment prefix count
-		// after last step we add to words end's counter
-		public void insert(String word)
-		{
-			Node current = root;
-			int pos;
-			for (char ch : word.toCharArray())
-			{
-				pos = ch - 'a';
-				if (current.children[pos] == null)
-				{
-					current.children[pos] = new Node();
-				}
-
-				current = current.children[pos];
-				current.count++;
-			}
-
-			current.end++;
-		}
-
-        // We are iterating through each word character and if Node doesn't have a child we return 0.
-		// In case we iterated entire word, just return end's counter
-		public int countWordsEqualTo(String word)
-		{
-			Node current = root;
-			int pos;
-			for (char ch : word.toCharArray())
-			{
-				pos = ch - 'a';
-				if (current.children[pos] == null)
-				{
-					return 0;
-				}
-
-				current = current.children[pos];
-			}
-
-			return current.end;
-		}
-
-        // We are iterating through each word character and if Node doesn't have a child we return 0.
-		// In case we iterated entire word, just return count counter
-		public int countWordsStartingWith(String prefix)
-		{
-			Node current = root;
-			int pos;
-			for (char ch : prefix.toCharArray())
-			{
-				pos = ch - 'a';
-				if (current.children[pos] == null)
-				{
-					return 0;
-				}
-
-				current = current.children[pos];
-			}
-
-			return current.count;
-		}
-
-        // We are iterating through each word character and if Node doesn't have a child we return
-		// In case we iterated entire word, just decrement end's counter
-		public void erase(String word)
-		{
-			Node current = root;
-			int pos;
-			for (char ch : word.toCharArray())
-			{
-				pos = ch - 'a';
-				current = current.children[pos];
-				current.count--;
-			}
-
-			current.end--;
-		}
-	}
-
-	class Node
-	{
-		Node[] children = new Node[26];
-		int count;
-		int end;
-	}
 /**
  * Your Trie object will be instantiated and called as such:
  * Trie obj = new Trie();
