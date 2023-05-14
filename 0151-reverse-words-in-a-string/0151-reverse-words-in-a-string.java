@@ -1,50 +1,45 @@
-public class Solution {
-  
-  public String reverseWords(String s) {
-    if (s == null) return null;
+class Solution {
+    public String reverseWords(String s) {
+        if (s == null)
+            return null;
+        char[] arr = s.toCharArray();
+        int n = s.length();
+        reverse(arr, 0, n - 1);
+        reverseWord(arr, n);
+        return cleanSpace(arr, n);
+    }
     
-    char[] a = s.toCharArray();
-    int n = a.length;
+    private void reverse(char[] arr, int i, int j) {
+        while (i < j) {
+            char ch = arr[i];
+            arr[i++] = arr[j];
+            arr[j--] = ch;
+        }
+    }
     
-    // step 1. reverse the whole string
-    reverse(a, 0, n - 1);
-    // step 2. reverse each word
-    reverseWords(a, n);
-    // step 3. clean up spaces
-    return cleanSpaces(a, n);
-  }
-  
-  void reverseWords(char[] a, int n) {
-    int i = 0, j = 0;
-      
-    while (i < n) {
-      while (i < j || i < n && a[i] == ' ') i++; // skip spaces
-      while (j < i || j < n && a[j] != ' ') j++; // skip non spaces
-      reverse(a, i, j - 1);                      // reverse the word
+    private void reverseWord(char[] arr, int n) {
+        int i = 0, j = 0;
+        while (i < n) {
+            while (i < j || i < n && arr[i] == ' ')
+                i++;
+            while (j < i || j < n && arr[j] != ' ')
+                j++;
+            reverse(arr, i, j - 1);
+        }
     }
-  }
-  
-  // trim leading, trailing and multiple spaces
-  String cleanSpaces(char[] a, int n) {
-    int i = 0, j = 0;
-      
-    while (j < n) {
-      while (j < n && a[j] == ' ') j++;             // skip spaces
-      while (j < n && a[j] != ' ') a[i++] = a[j++]; // keep non spaces
-      while (j < n && a[j] == ' ') j++;             // skip spaces
-      if (j < n) a[i++] = ' ';                      // keep only one space
+    
+    private String cleanSpace(char[] arr, int n) {
+        int i = 0, j = 0;
+        while (j < n) {
+            while (j < n && arr[j] == ' ')
+                j++;
+            while (j < n && arr[j] != ' ')
+                arr[i++] = arr[j++];
+            while (j < n && arr[j] == ' ')
+                j++;
+            if (j < n)
+                arr[i++] = ' ';
+        }
+        return new String(arr).substring(0, i);
     }
-  
-    return new String(a).substring(0, i);
-  }
-  
-  // reverse a[] from a[i] to a[j]
-  private void reverse(char[] a, int i, int j) {
-    while (i < j) {
-      char t = a[i];
-      a[i++] = a[j];
-      a[j--] = t;
-    }
-  }
-  
 }
