@@ -4,7 +4,7 @@ SELECT user_id,
 FROM 
 (
     SELECT user_id,
-         DATEDIFF(LEAD(visit_date, 1, '2021-01-01') OVER (PARTITION BY user_id ORDER BY visit_date), visit_date) AS diff
+        DATEDIFF(LEAD(visit_date, 1, '2021-01-01') OVER (PARTITION BY user_id ORDER BY visit_date), visit_date) AS diff
     FROM UserVisits
 ) a
 GROUP BY user_id
