@@ -4,7 +4,7 @@ SELECT user1_id,
 FROM (
     SELECT r1.user_id AS user1_id,
         r2.user_id AS user2_id,
-        dense_rank() OVER(ORDER BY COUNT(r1.follower_id) DESC) AS rk
+        DENSE_RANK() OVER(ORDER BY COUNT(r1.follower_id) DESC) AS rk
     FROM Relations r1,
         Relations r2
     WHERE r1.user_id < r2.user_id
