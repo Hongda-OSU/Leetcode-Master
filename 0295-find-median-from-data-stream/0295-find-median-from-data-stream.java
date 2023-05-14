@@ -1,20 +1,25 @@
 class MedianFinder {
-     // max queue is always larger or equal to min queue
-    PriorityQueue<Integer> min = new PriorityQueue();
-    PriorityQueue<Integer> max = new PriorityQueue(1000, Collections.reverseOrder());
-    // Adds a number into the data structure.
+     List<Integer> list; 
+    public MedianFinder() {
+        this.list = new ArrayList<Integer>();
+    }
+    
     public void addNum(int num) {
-        max.offer(num);
-        min.offer(max.poll());
-        if (max.size() < min.size()){
-            max.offer(min.poll());
+        if(list.size() == 0) list.add(0, num);  
+        else{
+            int i=0;
+            while(list.get(i) <= num && i<list.size()-1) i++;
+            //*****The reason why I didn't traversed till the last index was to escape from IndexOutOfBounds Error*****
+            if(list.get(i) <= num) list.add(i+1, num);
+            else list.add(i, num);
         }
     }
-
-    // Returns the median of current data stream
+    
     public double findMedian() {
-        if (max.size() == min.size()) return (max.peek() + min.peek()) /  2.0;
-        else return max.peek();
+        int n = list.size();
+        if(n == 0) return 0;
+        if(n%2 == 1) return list.get(n/2);
+        return (double)((list.get(n/2) + list.get(n/2 - 1)))/2;
     }
 }
 
