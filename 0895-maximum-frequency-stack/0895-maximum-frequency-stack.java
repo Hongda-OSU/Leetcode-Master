@@ -1,7 +1,8 @@
 class FreqStack {
-    Map<Integer, LinkedList<Integer>> st;
-    Map<Integer, Integer> map = new HashMap<>();
-    int maxFreq;
+    private Map<Integer, LinkedList<Integer>> st;
+    private Map<Integer, Integer> map;
+    private int maxFreq;
+
     public FreqStack() {
         st = new HashMap<>();
         map = new HashMap<>();
@@ -12,24 +13,20 @@ class FreqStack {
         int currFreq = map.getOrDefault(val, 0);
         currFreq++;
         map.put(val, currFreq);
-        
-        if(st.containsKey(currFreq) == false){
-            st.put(currFreq, new LinkedList<Integer>());
-        }
+        if (st.containsKey(currFreq) == false) 
+            st.put(currFreq, new LinkedList<>());
         st.get(currFreq).addFirst(val);
         maxFreq = Math.max(maxFreq, currFreq);
     }
     
     public int pop() {
-        int ans = st.get(maxFreq).removeFirst();
-        
-        int currFreq = map.get(ans);
+        int result = st.get(maxFreq).removeFirst();
+        int currFreq = map.get(result);
         currFreq--;
-        map.put(ans, currFreq);
-        if(st.get(maxFreq).size() == 0){
+        map.put(result, currFreq);
+        if (st.get(maxFreq).size() == 0)
             maxFreq--;
-        }
-        return ans;
+        return result;
     }
 }
 
