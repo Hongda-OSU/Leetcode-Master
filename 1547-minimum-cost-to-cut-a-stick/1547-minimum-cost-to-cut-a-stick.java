@@ -1,33 +1,22 @@
 class Solution {
-    int[][] memo;
-    int newCuts[];
-    private int cost(int left, int right) {
-        if (memo[left][right] != -1) {
-            return memo[left][right];
+   public int minCost(int n, int[] cuts) {
+        List<Integer> A = new ArrayList<>();
+        for (int a : cuts) {
+            A.add(a);
         }
-        if (right - left == 1) {
-            return 0;
+        A.add(0);
+        A.add(n);
+        Collections.sort(A);
+        int k = A.size();
+        int[][] dp = new int[k][k];
+        for (int d = 2; d < k; ++d) {
+            for (int i = 0; i < k - d; ++i) {
+                dp[i][i + d] = 1000000000;
+                for (int m = i + 1; m < i + d; ++m) {
+                    dp[i][i + d] = Math.min(dp[i][i + d], dp[i][m] + dp[m][i + d] + A.get(i + d) - A.get(i));
+                }
+            }
         }
-        int ans = Integer.MAX_VALUE;
-        for (int mid = left + 1; mid < right; mid++) {
-            int cost = cost(left, mid) + cost(mid, right) + newCuts[right] - newCuts[left];
-            ans = Math.min(ans, cost);
-        }
-        memo[left][right] = ans;
-        return ans;
+        return dp[0][k - 1];
     }
-    public int minCost(int n, int[] cuts) {
-        int m = cuts.length;
-        newCuts = new int[m + 2];
-        System.arraycopy(cuts, 0, newCuts, 1, m);
-        newCuts[m + 1] = n;
-        Arrays.sort(newCuts);
-        
-        memo = new int[m + 2][m + 2];
-        for (int r = 0; r < m + 2; ++r) {
-            Arrays.fill(memo[r], -1);
-        }
-        
-        return cost(0, newCuts.length - 1);
-    }    
 }
