@@ -1,17 +1,21 @@
 class Solution {
     public int minCost(int n, int[] cuts) {
-    var c = new ArrayList<Integer>();
-    for (int cut : cuts)
-        c.add(cut);
-    c.addAll(Arrays.asList(0, n));
-    Collections.sort(c);
-    int[][] dp = new int[c.size()][c.size()];
-    for (int i = c.size() - 1; i >= 0; --i)
-        for (int j = i + 1; j < c.size(); ++j) {
-            for (int k = i + 1; k < j; ++k)
-                dp[i][j] = Math.min(dp[i][j] == 0 ? Integer.MAX_VALUE : dp[i][j],
-                    c.get(j) - c.get(i) + dp[i][k] + dp[k][j]);
+        int m = cuts.length;
+        int[] newCuts = new int[m + 2];
+        System.arraycopy(cuts, 0, newCuts, 1, m);
+        newCuts[m + 1] = n;
+        Arrays.sort(newCuts);
+        int[][] dp = new int[m + 2][m + 2];
+        for (int diff = 2; diff < m + 2; diff++) {
+            for (int left = 0; left < m + 2 - diff; left++) {
+                int right = left + diff;
+                int result = Integer.MAX_VALUE;
+                for (int mid = left + 1; mid < right; mid++) {
+                    result = Math.min(result, dp[left][mid] + dp[mid][right] + newCuts[right] - newCuts[left]);
+                }
+                dp[left][right] = result;
+            }
         }
-    return dp[0][c.size() - 1];    
-}
+        return dp[0][m + 1];
+    }
 }
