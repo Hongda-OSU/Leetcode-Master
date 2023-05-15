@@ -1,22 +1,17 @@
 class Solution {
-   public int minCost(int n, int[] cuts) {
-        List<Integer> A = new ArrayList<>();
-        for (int a : cuts) {
-            A.add(a);
+    public int minCost(int n, int[] cuts) {
+    var c = new ArrayList<Integer>();
+    for (int cut : cuts)
+        c.add(cut);
+    c.addAll(Arrays.asList(0, n));
+    Collections.sort(c);
+    int[][] dp = new int[c.size()][c.size()];
+    for (int i = c.size() - 1; i >= 0; --i)
+        for (int j = i + 1; j < c.size(); ++j) {
+            for (int k = i + 1; k < j; ++k)
+                dp[i][j] = Math.min(dp[i][j] == 0 ? Integer.MAX_VALUE : dp[i][j],
+                    c.get(j) - c.get(i) + dp[i][k] + dp[k][j]);
         }
-        A.add(0);
-        A.add(n);
-        Collections.sort(A);
-        int k = A.size();
-        int[][] dp = new int[k][k];
-        for (int d = 2; d < k; ++d) {
-            for (int i = 0; i < k - d; ++i) {
-                dp[i][i + d] = 1000000000;
-                for (int m = i + 1; m < i + d; ++m) {
-                    dp[i][i + d] = Math.min(dp[i][i + d], dp[i][m] + dp[m][i + d] + A.get(i + d) - A.get(i));
-                }
-            }
-        }
-        return dp[0][k - 1];
-    }
+    return dp[0][c.size() - 1];    
+}
 }
