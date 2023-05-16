@@ -8,25 +8,41 @@
  * }
  */
 public class Codec {
-
     // Encodes a tree to a single string.
     public String serialize(TreeNode root) {
-        if (root == null) return "#";
-        return root.val + "," + serialize(root.left) + "," + serialize(root.right);
+        StringBuilder sb = new StringBuilder();
+        preOrderTraverse(root, sb);
+        sb.deleteCharAt(sb.length() - 1); // delete the last redundant comma ","
+        return sb.toString();
+    }
+
+    void preOrderTraverse(TreeNode root, StringBuilder sb) {
+        if (root == null) {
+            sb.append("null,");
+            return;
+        }
+        sb.append(root.val);
+        sb.append(",");
+        preOrderTraverse(root.left, sb);
+        preOrderTraverse(root.right, sb);
     }
 
     // Decodes your encoded data to tree.
     public TreeNode deserialize(String data) {
-        Queue<String> queue = new LinkedList<>(Arrays.asList(data.split(",")));
-        return decode(queue);
+        nodes = data.split(",");
+        return dfs();
     }
     
-    public TreeNode decode(Queue<String> queue) {
-        String str = queue.poll();
-        if (str.equals("#")) return null;
-        TreeNode root = new TreeNode(Integer.valueOf(str));
-        root.left = decode(queue);
-        root.right = decode(queue);
+    int i = 0;
+    String[] nodes;
+    TreeNode dfs() {
+        if (i == nodes.length) return null;
+        String val = nodes[i];
+        i += 1;
+        if (val.equals("null")) return null;
+        TreeNode root = new TreeNode(Integer.parseInt(val));
+        root.left = dfs();
+        root.right = dfs();
         return root;
     }
 }
