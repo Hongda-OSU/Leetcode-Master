@@ -1,44 +1,40 @@
 class Solution {
-   public int palindromePartition(String s, int k) {
-        int len = s.length();
-        if (len <= k) return 0;
-
-        int[][] dp = new int[k][len];
-        int[][] cache = new int[len][len]; // caching the cost of s.substring(left, right)
-        char[] chars = s.toCharArray();  // optimization: avoid calling substrings
-
-        // initialize cache
-        for (int i = 0; i < len; ++i) {
-            for (int j = i; j < len; ++j) { // optimization: j is always >= i
-                cache[i][j] = -1;
-            }
-        }
-
-        for (int i = 0; i < k; ++i) {
-            for (int j = i; j < len; ++j) {
-                if (i == 0) {
-                    dp[i][j] = cost(chars, i, j, cache); // k = 1
-                } else {
-                    int min = Integer.MAX_VALUE;
-                    for (int p = i; p <= j; ++p) {
-                        min = Math.min(min, dp[i - 1][p - 1] + cost(chars, p, j, cache));
+    public int palindromePartition(String s, int k) {
+        if(s.length() == k) return 0;
+        int n = s.length();
+        int dp[][] = new int[n][n];
+        
+        //Counting no.of changes to make a substring palindrome for each substring
+        for(int i = n-1; i>=0; i--){
+            for(int j = i; j<n; j++){
+                if(i-j == 0) dp[i][j] = 0;
+                else{
+                    dp[i][j] = dp[i+1][j-1];
+                    if(s.charAt(i) != s.charAt(j)){
+                        dp[i][j] += 1;
                     }
-                    dp[i][j] = min;
                 }
             }
         }
-
-        return dp[k - 1][len - 1];
-    }
-
-    protected int cost(char[] s, int left, int right, int[][] cache) {
-        if (cache[left][right] != -1) return cache[left][right];
-
-        int diff = 0, ll = left, rr = right;
-        while (ll < rr) {
-            if (s[ll++] != s[rr--]) diff++;
+       
+        int countdp[][] = new int [k+1][n];
+        
+        // Count min no. of changes for each substring for k partitions
+        for(int i = 1; i<=k; i++){
+            for(int j = 0; j<n; j++){
+                if(i == 1) countdp[i][j] = dp[i-1][j];
+                else{
+                    if(i - j < 1){
+                        int min = 100000;
+                        for(int l = j; l>=i-1 ; l--){
+                            min = Math.min(countdp[i-1][l-1] + dp[l][j], min);
+                            if(min == 0) break;
+                        }
+                        countdp[i][j] = min;
+                    }
+                }
+            }
         }
-
-        return cache[left][right] = diff;
+        return countdp[k][n-1];
     }
 }
