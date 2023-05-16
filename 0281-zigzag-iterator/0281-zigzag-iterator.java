@@ -1,12 +1,8 @@
 public class ZigzagIterator {
-    int i1 = 0;
-    int i2 = 0;
-    
-    boolean flag = false;
-    
-    List<Integer> l1;
-    List<Integer> l2;
-    
+    private int i1 = 0, i2 = 0;
+    private boolean flag = false;
+    private List<Integer> l1, l2;
+
     public ZigzagIterator(List<Integer> v1, List<Integer> v2) {
         l1 = v1;
         l2 = v2;
@@ -14,13 +10,10 @@ public class ZigzagIterator {
 
     public int next() {
         flag = !flag;
-        
-        if (i1 < l1.size() && (flag  || i2 >= l2.size())) 
+        if (i1 < l1.size() && (flag || i2 >= l2.size()))
             return l1.get(i1++);
-            
-        if (i2 < l2.size() && (!flag || i1 >= l1.size())) 
+        if (i2 < l2.size() && (!flag || i1 >= l1.size()))
             return l2.get(i2++);
-        
         return -1;
     }
 
