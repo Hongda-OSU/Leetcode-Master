@@ -16,7 +16,8 @@ class TicTacToe {
         if (col == (cols.length - row - 1))
             antiDiagonal += curr;
         int n = rows.length;
-        if (Math.abs(rows[row]) == n || Math.abs(cols[col]) == n || Math.abs(diagonal) == n || Math.abs(antiDiagonal) == n)
+        if (Math.abs(rows[row]) == n || Math.abs(cols[col]) == n 
+            || Math.abs(diagonal) == n || Math.abs(antiDiagonal) == n)
             return player;
         return 0;
     }
