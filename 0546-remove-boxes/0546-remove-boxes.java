@@ -1,31 +1,23 @@
 class Solution {
+    int[][][] memo;
     public int removeBoxes(int[] boxes) {
-        int[][][] dp = new int[100][100][100];
-        return calculatePoints(boxes, dp, 0, boxes.length - 1, 0);
+        int n = boxes.length;
+        memo = new int[n][n][n];
+        return dp(boxes, 0, n - 1, 0);
     }
-    
-    public int calculatePoints(int[] boxes, int[][][] dp, int l, int r, int k) {
-        if (l > r) {
-            return 0;
+    int dp(int[] boxes, int l, int r, int k) {
+        if (l > r) return 0;
+        if (memo[l][r][k] > 0) return memo[l][r][k];
+        int lOrg = l, kOrg = k;
+
+        while (l+1 <= r && boxes[l] == boxes[l+1]) { // Increase both `l` and `k` if they have consecutive colors with `boxes[l]`
+            l += 1;
+            k += 1;
         }
-        
-        while (r > l && boxes[r] == boxes[r - 1]) {
-            r--;
-            k++;
-        }
-        
-        if (dp[l][r][k] != 0) {
-            return dp[l][r][k];
-        }
-        
-        dp[l][r][k] = calculatePoints(boxes, dp, l, r - 1, 0) + (k + 1) * (k + 1);
-        for (int i = l; i < r; i++) {
-            if (boxes[i] == boxes[r]) {
-                dp[l][r][k] = Math.max(dp[l][r][k], calculatePoints(boxes, dp, l, i, k + 1) 
-                              + calculatePoints(boxes, dp, i + 1, r - 1, 0));
-            }
-        }
-                              
-        return dp[l][r][k];
+        int ans = (k+1) * (k+1) + dp(boxes, l+1, r, 0); // Remove all boxes which has the same with `boxes[l]`
+        for (int m = l+1; m <= r; ++m) // Try to merge non-contiguous boxes of the same color together
+            if (boxes[m] == boxes[l])
+                ans = Math.max(ans, dp(boxes, m, r, k+1) + dp(boxes, l+1, m-1, 0));
+        return memo[lOrg][r][kOrg] = ans;
     }
 }
