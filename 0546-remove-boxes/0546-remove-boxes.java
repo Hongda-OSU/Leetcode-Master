@@ -1,23 +1,25 @@
 class Solution {
-    int[][][] memo;
-    public int removeBoxes(int[] boxes) {
-        int n = boxes.length;
-        memo = new int[n][n][n];
-        return dp(boxes, 0, n - 1, 0);
-    }
-    int dp(int[] boxes, int l, int r, int k) {
-        if (l > r) return 0;
-        if (memo[l][r][k] > 0) return memo[l][r][k];
-        int lOrg = l, kOrg = k;
-
-        while (l+1 <= r && boxes[l] == boxes[l+1]) { // Increase both `l` and `k` if they have consecutive colors with `boxes[l]`
-            l += 1;
-            k += 1;
+   public int removeBoxes(int[] boxes) {
+    int n = boxes.length;
+    int[][][] dp = new int[n][n][n];
+    return removeBoxesSub(boxes, 0, n - 1, 0, dp);
+}
+    
+private int removeBoxesSub(int[] boxes, int i, int j, int k, int[][][] dp) {
+    if (i > j) return 0;
+    if (dp[i][j][k] > 0) return dp[i][j][k];
+    
+	int i0 = i, k0 = k; // Need to record the intial values of i and k in order to apply the following optimization
+    for (; i + 1 <= j && boxes[i + 1] == boxes[i]; i++, k++); // optimization: all boxes of the same color counted continuously from the first box should be grouped together
+    int res = (k + 1) * (k + 1) + removeBoxesSub(boxes, i + 1, j, 0, dp);
+    
+    for (int m = i + 1; m <= j; m++) {
+        if (boxes[i] == boxes[m]) {
+            res = Math.max(res, removeBoxesSub(boxes, i + 1, m - 1, 0, dp) + removeBoxesSub(boxes, m, j, k + 1, dp));
         }
-        int ans = (k+1) * (k+1) + dp(boxes, l+1, r, 0); // Remove all boxes which has the same with `boxes[l]`
-        for (int m = l+1; m <= r; ++m) // Try to merge non-contiguous boxes of the same color together
-            if (boxes[m] == boxes[l])
-                ans = Math.max(ans, dp(boxes, m, r, k+1) + dp(boxes, l+1, m-1, 0));
-        return memo[lOrg][r][kOrg] = ans;
     }
+        
+    dp[i0][j][k0] = res; // When updating the dp matrix, we should use the initial values of i, j and k
+    return res;
+}
 }
