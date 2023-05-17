@@ -1,40 +1,26 @@
-public class TicTacToe {
-    int[] rows;
-    int[] cols;
-    int diagonal;
-    int antiDiagonal;
+class TicTacToe {
+    private int[] rows, cols;
+    private int diagonal, antiDiagonal;
 
     public TicTacToe(int n) {
         rows = new int[n];
         cols = new int[n];
     }
-
+    
     public int move(int row, int col, int player) {
-        int currentPlayer = (player == 1) ? 1 : -1;
-        // update currentPlayer in rows and cols arrays
-        rows[row] += currentPlayer;
-        cols[col] += currentPlayer;
-        // update diagonal
-        if (row == col) {
-            diagonal += currentPlayer;
-        }
-        //update anti diagonal
-        if (col == (cols.length - row - 1)) {
-            antiDiagonal += currentPlayer;
-        }
+        int curr = (player == 1) ? 1 : -1;
+        rows[row] += curr;
+        cols[col] += curr;
+        if (row == col)
+            diagonal += curr;
+        if (col == (cols.length - row - 1))
+            antiDiagonal += curr;
         int n = rows.length;
-        // check if the current player wins
-        if (Math.abs(rows[row]) == n ||
-                Math.abs(cols[col]) == n ||
-                Math.abs(diagonal) == n ||
-                Math.abs(antiDiagonal) == n) {
+        if (Math.abs(rows[row]) == n || Math.abs(cols[col]) == n || Math.abs(diagonal) == n || Math.abs(antiDiagonal) == n)
             return player;
-        }
-        // No one wins
         return 0;
     }
 }
-
 
 /**
  * Your TicTacToe object will be instantiated and called as such:
