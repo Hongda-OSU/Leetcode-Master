@@ -1,20 +1,30 @@
 class Solution {
-  int[][][] memo; 
     public int removeBoxes(int[] boxes) {
-        int size = boxes.length;
-        memo = new int[size][size][size];
-        return dfs(boxes, 0, size - 1, 0); 
+        int[][][] dp = new int[boxes.length][boxes.length][boxes.length];
+        return dfs(boxes, 0, boxes.length - 1, 0, dp);
     }
     
-    int dfs(int[] boxes, int l, int r, int k) {
-        if (l > r) return 0; 
-        if (memo[l][r][k] != 0) return memo[l][r][k]; 
-        memo[l][r][k] = dfs(boxes, l + 1 , r, 0) + (k + 1) * (k + 1); 
-        for (int i = l + 1; i <= r; i++) {
-            if (boxes[l] == boxes[i]) {
-                memo[l][r][k] = Math.max(memo[l][r][k], dfs(boxes, l + 1, i - 1, 0) + dfs(boxes, i, r, k + 1)); 
-            }
+    private int dfs(int[] boxes, int start, int end, int prefix, int[][][] dp) {
+        int result = 0, count = 0;
+        if (start > end)
+            return 0;
+        if (start == end)
+            return (prefix + 1) * (prefix + 1);
+        if (dp[start][end][prefix] != 0)
+            return dp[start][end][prefix];
+        int index = start;
+        while (index <= end && boxes[index] == boxes[start]) {
+            index++;
+            count++;
         }
-        return memo[l][r][k]; 
+        int newStart = index;
+        result = (count + prefix) * (count + prefix) + dfs(boxes, newStart, end, 0, dp);
+        while (index <= end) {
+            if (boxes[index] == boxes[start] && boxes[index - 1] != boxes[start])
+                result = Math.max(result, dfs(boxes, newStart, index - 1, 0, dp) + dfs(boxes, index, end, count + prefix, dp));
+            index++;
+        }
+        dp[start][end][prefix] = result;
+        return result; 
     }
 }
