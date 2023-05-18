@@ -15,39 +15,60 @@
  */
 class BSTIterator {
 
-    List<Integer> arr = new ArrayList();
-    int pointer;
-    int n;
-    
-    public void inorder(TreeNode r, List<Integer> arr) {
-        if (r == null) return;
-        inorder(r.left, arr);
-        arr.add(r.val);
-        inorder(r.right, arr);
-    }
-
+    // stack holds unvisited nodes
+    Stack<TreeNode> stack;
+    // list holds all visited nodes
+    List<TreeNode> popedNodes;
+    // always point to the latest visited node
+    int ptr;
     public BSTIterator(TreeNode root) {
-        inorder(root, arr);
-        n = arr.size();
-        pointer = -1;
+        stack = new Stack();
+        popedNodes = new ArrayList();
+        ptr = -1;
+        
+        while(root != null) {
+            stack.push(root);
+            root = root.left;
+        }
     }
     
     public boolean hasNext() {
-        return pointer < n - 1;
+        // pre() was invoked
+        if (ptr < popedNodes.size()-1 && popedNodes.size() > 0)
+            return true;
+        // prev points to end of list
+        return !stack.isEmpty();
     }
     
     public int next() {
-        ++pointer;
-        return arr.get(pointer);
+        if (ptr < popedNodes.size()-1) {
+            return popedNodes.get(++ptr).val;
+        }
+        
+        if (!stack.isEmpty()) {
+            TreeNode cur = stack.pop();
+            TreeNode curRight = cur.right;
+            while (curRight != null) {
+                stack.push(curRight);
+                curRight = curRight.left;
+            }
+            popedNodes.add(cur);
+            ptr = popedNodes.size()-1;
+            return cur.val;
+        }
+        
+        return popedNodes.get(0).val;
     }
     
     public boolean hasPrev() {
-        return pointer > 0;
+        return ptr > 0;
     }
     
     public int prev() {
-        --pointer;
-        return arr.get(pointer);
+        if (hasPrev()) {
+            return popedNodes.get(--ptr).val;
+        }
+        return -1;
     }
 }
 
