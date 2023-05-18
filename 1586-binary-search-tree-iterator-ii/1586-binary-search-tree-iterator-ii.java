@@ -13,43 +13,57 @@
  *     }
  * }
  */
-class BSTIterator {
-        Stack<TreeNode> nextStack = new Stack<>();
-        Stack<TreeNode> prevStack = new Stack<>();
-        Set<TreeNode> visited = new HashSet<>();
+ class BSTIterator {
+        private Deque<TreeNode> stack = new ArrayDeque<>();
+        private List<TreeNode> list = new ArrayList<>();
+        private int curIndex = -1;
+        // curIndex is the cur element tht we are standing on
+        // curIndex- 1 is the prev value; curIndex+1 is the next value, if exists, in the list
+        // if curIndex+1 is too big we expand the list by adding the top of the stack to it and move nextIndex
+
+        private void pushLeft(TreeNode p) {
+            while (p != null) {
+                stack.push(p);
+                p = p.left;
+            }
+        }
+
+        private boolean inRange(int i) {
+            return i >= 0 && i < list.size();
+        }
 
         public BSTIterator(TreeNode root) {
-            fillInNextStack(root);
+            pushLeft(root);
         }
 
         public boolean hasNext() {
-            return !nextStack.isEmpty();
+            if (inRange(curIndex + 1)) {
+                return true;
+            }
+            return !stack.isEmpty();
         }
 
         public int next() {
-            TreeNode node = nextStack.pop();
-            if(!visited.contains(node) && node.right != null) {
-                fillInNextStack(node.right);
+            int rt = 0;
+            if (inRange(curIndex + 1)) {
+                rt = list.get(curIndex + 1).val;
+            } else {
+                // if cur node is the last we will have to expand
+                TreeNode next = stack.pop();
+                pushLeft(next.right);
+                list.add(next);
+                rt = next.val;
             }
-            visited.add(node);
-            prevStack.push(node);
-            return node.val;
+            curIndex++;
+            return rt;
         }
 
         public boolean hasPrev() {
-            return !prevStack.isEmpty() && prevStack.size() > 1;
+            return inRange(curIndex - 1);
         }
 
         public int prev() {
-            nextStack.push(prevStack.pop());
-            return prevStack.peek().val;
-        }
-
-        private void fillInNextStack(TreeNode node) {
-            while(node != null) {
-                nextStack.push(node);
-                node = node.left;
-            }
+            return list.get(--curIndex).val;
         }
     }
 
