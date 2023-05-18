@@ -14,63 +14,44 @@
  * }
  */
 class BSTIterator {
+        Stack<TreeNode> nextStack = new Stack<>();
+        Stack<TreeNode> prevStack = new Stack<>();
+        Set<TreeNode> visited = new HashSet<>();
 
-    // stack holds unvisited nodes
-    Stack<TreeNode> stack;
-    // list holds all visited nodes
-    List<TreeNode> popedNodes;
-    // always point to the latest visited node
-    int ptr;
-    public BSTIterator(TreeNode root) {
-        stack = new Stack();
-        popedNodes = new ArrayList();
-        ptr = -1;
-        
-        while(root != null) {
-            stack.push(root);
-            root = root.left;
+        public BSTIterator(TreeNode root) {
+            fillInNextStack(root);
         }
-    }
-    
-    public boolean hasNext() {
-        // pre() was invoked
-        if (ptr < popedNodes.size()-1 && popedNodes.size() > 0)
-            return true;
-        // prev points to end of list
-        return !stack.isEmpty();
-    }
-    
-    public int next() {
-        if (ptr < popedNodes.size()-1) {
-            return popedNodes.get(++ptr).val;
+
+        public boolean hasNext() {
+            return !nextStack.isEmpty();
         }
-        
-        if (!stack.isEmpty()) {
-            TreeNode cur = stack.pop();
-            TreeNode curRight = cur.right;
-            while (curRight != null) {
-                stack.push(curRight);
-                curRight = curRight.left;
+
+        public int next() {
+            TreeNode node = nextStack.pop();
+            if(!visited.contains(node) && node.right != null) {
+                fillInNextStack(node.right);
             }
-            popedNodes.add(cur);
-            ptr = popedNodes.size()-1;
-            return cur.val;
+            visited.add(node);
+            prevStack.push(node);
+            return node.val;
         }
-        
-        return popedNodes.get(0).val;
-    }
-    
-    public boolean hasPrev() {
-        return ptr > 0;
-    }
-    
-    public int prev() {
-        if (hasPrev()) {
-            return popedNodes.get(--ptr).val;
+
+        public boolean hasPrev() {
+            return !prevStack.isEmpty() && prevStack.size() > 1;
         }
-        return -1;
+
+        public int prev() {
+            nextStack.push(prevStack.pop());
+            return prevStack.peek().val;
+        }
+
+        private void fillInNextStack(TreeNode node) {
+            while(node != null) {
+                nextStack.push(node);
+                node = node.left;
+            }
+        }
     }
-}
 
 /**
  * Your BSTIterator object will be instantiated and called as such:
