@@ -14,39 +14,43 @@
  * }
  */
 class BSTIterator {
-    private int index;
+    private Deque<TreeNode> stack;
     private List<Integer> list;
+    private TreeNode last;
+    private int pointer;
 
     public BSTIterator(TreeNode root) {
+        last = root;
+        stack = new ArrayDeque<>();
         list = new ArrayList<>();
-        index = -1;
-        DLR(root, list);
-    }
-    
-    private void DLR(TreeNode root, List<Integer> list) {
-        if (root == null)
-            return;
-        DLR(root.left, list);
-        list.add(root.val);
-        DLR(root.right, list);
+        pointer = -1;
     }
     
     public boolean hasNext() {
-        return index + 1 < list.size();
+        return !stack.isEmpty() || last != null || pointer < list.size() - 1;
     }
     
     public int next() {
-        index++;
-        return list.get(index);
+        pointer += 1;
+        if (pointer == list.size()) {
+            while (last != null) {
+                stack.push(last);
+                last = last.left;
+            }
+            TreeNode curr = stack.pop();
+            last = curr.right;
+            list.add(curr.val);
+        }
+        return list.get(pointer);
     }
     
     public boolean hasPrev() {
-        return index - 1 >= 0;
+        return pointer > 0;
     }
     
     public int prev() {
-        index--;
-        return list.get(index);
+        pointer -= 1;
+        return list.get(pointer);
     }
 }
 
