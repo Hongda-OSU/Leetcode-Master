@@ -13,59 +13,46 @@
  *     }
  * }
  */
- class BSTIterator {
-        private Deque<TreeNode> stack = new ArrayDeque<>();
-        private List<TreeNode> list = new ArrayList<>();
-        private int curIndex = -1;
-        // curIndex is the cur element tht we are standing on
-        // curIndex- 1 is the prev value; curIndex+1 is the next value, if exists, in the list
-        // if curIndex+1 is too big we expand the list by adding the top of the stack to it and move nextIndex
+class BSTIterator {
+    private Deque<TreeNode> stack;
+    private List<Integer> list;
+    private TreeNode last;
+    private int pointer;
 
-        private void pushLeft(TreeNode p) {
-            while (p != null) {
-                stack.push(p);
-                p = p.left;
-            }
-        }
-
-        private boolean inRange(int i) {
-            return i >= 0 && i < list.size();
-        }
-
-        public BSTIterator(TreeNode root) {
-            pushLeft(root);
-        }
-
-        public boolean hasNext() {
-            if (inRange(curIndex + 1)) {
-                return true;
-            }
-            return !stack.isEmpty();
-        }
-
-        public int next() {
-            int rt = 0;
-            if (inRange(curIndex + 1)) {
-                rt = list.get(curIndex + 1).val;
-            } else {
-                // if cur node is the last we will have to expand
-                TreeNode next = stack.pop();
-                pushLeft(next.right);
-                list.add(next);
-                rt = next.val;
-            }
-            curIndex++;
-            return rt;
-        }
-
-        public boolean hasPrev() {
-            return inRange(curIndex - 1);
-        }
-
-        public int prev() {
-            return list.get(--curIndex).val;
-        }
+    public BSTIterator(TreeNode root) {
+        last = root;
+        stack = new ArrayDeque<>();
+        list = new ArrayList<>();
+        pointer = -1;
     }
+    
+    public boolean hasNext() {
+        return !stack.isEmpty() || last != null || pointer < list.size() - 1;
+    }
+    
+    public int next() {
+        pointer += 1;
+        if (pointer == list.size()) {
+            while (last != null) {
+                stack.push(last);
+                last = last.left;
+            }
+            TreeNode curr = stack.pop();
+            last = curr.right;
+            list.add(curr.val);
+        }
+        return list.get(pointer);
+    }
+    
+    public boolean hasPrev() {
+        return pointer > 0;
+    }
+    
+    public int prev() {
+        pointer -= 1;
+        return list.get(pointer);
+    }
+}
 
 /**
  * Your BSTIterator object will be instantiated and called as such:
