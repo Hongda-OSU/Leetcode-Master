@@ -15,38 +15,29 @@
  */
 class BSTIterator {
 
-    Deque<TreeNode> stack;
-    List<Integer> arr;
-    TreeNode last;
+    List<Integer> arr = new ArrayList();
     int pointer;
+    int n;
+    
+    public void inorder(TreeNode r, List<Integer> arr) {
+        if (r == null) return;
+        inorder(r.left, arr);
+        arr.add(r.val);
+        inorder(r.right, arr);
+    }
 
     public BSTIterator(TreeNode root) {
-        last = root;
-        stack = new ArrayDeque();
-        arr = new ArrayList();
+        inorder(root, arr);
+        n = arr.size();
         pointer = -1;
     }
     
     public boolean hasNext() {
-        return !stack.isEmpty() || last != null || pointer < arr.size() - 1;
+        return pointer < n - 1;
     }
     
     public int next() {
         ++pointer;
-        // if the pointer is out of precomputed range
-        if (pointer == arr.size()) {
-            // process all predecessors of the last node:
-            // go left till you can and then one step right
-            while (last != null) {
-                stack.push(last);
-                last = last.left;                
-            }
-            TreeNode curr = stack.pop();
-            last = curr.right;
-        
-            arr.add(curr.val);
-        }
-            
         return arr.get(pointer);
     }
     
