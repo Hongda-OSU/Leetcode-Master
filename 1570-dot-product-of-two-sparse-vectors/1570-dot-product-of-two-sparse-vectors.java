@@ -1,23 +1,22 @@
 class SparseVector {
-    public int[] arr;
-    SparseVector(int[] nums) {
-        this.arr = nums;
-    }
+    private int[] arr;
     
-    public int[] getArray(){
-        return this.arr;
+    SparseVector(int[] nums) {
+        arr = nums;
     }
     
 	// Return the dotProduct of two sparse vectors
     public int dotProduct(SparseVector vec) {
         int[] vectorArr = vec.getArray();
-        int[] arr = this.getArray();
+        int[] arr = getArray();
         int sum = 0;
-        
-        for(int i = 0; i < vectorArr.length; i++){
-            sum += vectorArr[i]*arr[i];
-        }
+        for (int i = 0; i < vectorArr.length; i++)
+            sum += vectorArr[i] * arr[i];
         return sum;
+    } 
+    
+    private int[] getArray() {
+        return arr;
     }
 }
 
