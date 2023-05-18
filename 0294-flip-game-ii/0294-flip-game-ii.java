@@ -1,28 +1,43 @@
 class Solution {
     public boolean canWin(String currentState) {
-        char[] charArray = currentState.toCharArray();
-        return canWinHelper(charArray ,new HashMap<String, Boolean>());
-    }
-    private boolean canWinHelper(char[] charArray, HashMap<String, Boolean> map) {
-        
-        String currentState = new String(charArray);
-        if(map.containsKey(currentState)) return map.get(currentState);
-        
-        for(int i=0;i<charArray.length-1;i++) {
-            // chance that the current player could make
-            if(charArray[i] == '+' && charArray[i+1] == '+') {
-                charArray[i] = '-';
-                charArray[i+1] = '-';
-                String opponent = new String(charArray);
-                if(!canWinHelper(opponent.toCharArray(), map)) {
-                    map.put(currentState , true);
-                    return true;
+        int curlen = 0, maxlen = 0;
+        List<Integer> boardInitState = new ArrayList<>();
+        for (int i = 0; i < currentState.length(); ++i) {
+            if (currentState.charAt(i) == '+') {
+                curlen++;
+            }
+            if (i + 1 == currentState.length() || currentState.charAt(i) == '-') {
+                if (curlen >= 2) {
+                    boardInitState.add(curlen);
                 }
-                charArray[i] = '+';
-                charArray[i+1] = '+';
+                maxlen = Math.max(maxlen, curlen);
+                curlen = 0;
             }
         }
-        map.put(currentState, false);
-        return false;
+        int[] g = new int[maxlen + 1];
+        for (int len = 2; len <= maxlen; ++len) {
+            Set<Integer> gsub = new HashSet<>();
+            for (int lenFirstGame = 0; lenFirstGame < len / 2; ++lenFirstGame) {
+                int lenSecondGame = len - lenFirstGame - 2;
+                gsub.add(g[lenFirstGame] ^ g[lenSecondGame]);
+            }
+            g[len] = firstMissingNumber(gsub);
+        }
+
+        int gFinal = 0;
+        for (int s : boardInitState) {
+            gFinal ^= g[s];
+        }
+        return gFinal != 0;
+    }
+
+    private int firstMissingNumber(Set<Integer> lut) {
+        int m = lut.size();
+        for (int i = 0; i < m; ++i) {
+            if (!lut.contains(i)) {
+                return i;
+            }
+        }
+        return m;
     }
 }
