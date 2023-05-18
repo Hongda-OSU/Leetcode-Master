@@ -1,28 +1,27 @@
 class SparseVector {
-    // Map the index to value for all non-zero values in the vector
-    Map<Integer, Integer> mapping;      
-
-    SparseVector(int[] nums) {
-        mapping = new HashMap<>();
-        for (int i = 0; i < nums.length; ++i) {
-            if (nums[i] != 0) {
-                mapping.put(i, nums[i]);        
-            }
-        }
+  Map<Integer, Integer> indexMap = new HashMap<>();
+  int n = 0;
+  SparseVector(int[] nums) {
+    for (int i = 0; i < nums.length; i++)
+      if (nums[i] != 0)
+        indexMap.put(i, nums[i]);
+    n = nums.length;
+  }
+  
+	// Return the dotProduct of two sparse vectors
+  public int dotProduct(SparseVector vec) {
+    if (indexMap.size() == 0 || vec.indexMap.size() == 0) return 0;
+    if (indexMap.size() > vec.indexMap.size())
+      return vec.dotProduct(this);
+    int productSum = 0;
+    for (Map.Entry<Integer, Integer> entry : indexMap.entrySet()) {
+      int index = entry.getKey();
+      Integer vecValue = vec.indexMap.get(index);
+      if (vecValue == null) continue; 
+      productSum += (entry.getValue() * vecValue);
     }
-
-    public int dotProduct(SparseVector vec) {        
-        int result = 0;
-
-        // iterate through each non-zero element in this sparse vector
-        // update the dot product if the corresponding index has a non-zero value in the other vector
-        for (Integer i : this.mapping.keySet()) {
-            if (vec.mapping.containsKey(i)) {
-                result += this.mapping.get(i) * vec.mapping.get(i);
-            }
-        }
-        return result;
-    }
+    return productSum;
+  }
 }
 
 // Your SparseVector object will be instantiated and called as such:
