@@ -1,29 +1,28 @@
 class Solution {
-    public boolean canWin(String s) {
-        if(s == null || s.length() == 0) return false;
-        int len = s.length();
-        Map<String, Boolean> memo = new HashMap<>();
-        char[] ch = s.toCharArray(); 
-        return dfs(ch, memo, len);
+    public boolean canWin(String currentState) {
+        char[] charArray = currentState.toCharArray();
+        return canWinHelper(charArray ,new HashMap<String, Boolean>());
     }
-    private boolean dfs(char[] ch, Map<String, Boolean> memo, int len){
-        Boolean res = memo.get(String.valueOf(ch));
-        if(res != null) return res;
+    private boolean canWinHelper(char[] charArray, HashMap<String, Boolean> map) {
         
-        for(int i = 0; i < len-1; i++){
-            if(ch[i] == '+' && ch[i+1] == '+'){
-                ch[i] = '-';
-                ch[i+1] = '-';
-                boolean ans = dfs(ch, memo, len);
-                ch[i] = '+';
-                ch[i+1] = '+';
-                if(!ans){
-                    memo.put(String.valueOf(ch), true);
+        String currentState = new String(charArray);
+        if(map.containsKey(currentState)) return map.get(currentState);
+        
+        for(int i=0;i<charArray.length-1;i++) {
+            // chance that the current player could make
+            if(charArray[i] == '+' && charArray[i+1] == '+') {
+                charArray[i] = '-';
+                charArray[i+1] = '-';
+                String opponent = new String(charArray);
+                if(!canWinHelper(opponent.toCharArray(), map)) {
+                    map.put(currentState , true);
                     return true;
                 }
+                charArray[i] = '+';
+                charArray[i+1] = '+';
             }
         }
-        memo.put(String.valueOf(ch), false);
+        map.put(currentState, false);
         return false;
     }
 }
