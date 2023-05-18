@@ -1,19 +1,13 @@
 class Solution {
-   public boolean canWin(String s) {
-  if (s == null || s.length() < 2) {
-    return false;
-  }
-    
-  for (int i = 0; i < s.length() - 1; i++) {
-    if (s.startsWith("++", i)) {
-      String t = s.substring(0, i) + "--" + s.substring(i + 2);
-      
-      if (!canWin(t)) {
-        return true;
-      }
+    public boolean canWin(String s) {
+        
+        for(int i=1;i<s.length();i++){
+            if(s.charAt(i)=='+'&&s.charAt(i-1)=='+' &&!canWin(s.substring(0,i-1)+"--"+s.substring(i+1,s.length())) ){
+               /*自己能翻牌+敌人会输=我们赢*/
+                return true;    
+            }
+        }    
+        
+        return false;
     }
-  }
-    
-  return false;
-}
 }
