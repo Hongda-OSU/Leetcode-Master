@@ -9,44 +9,30 @@
  * }
  */
 class Solution {
-    public ListNode reverseBetween(ListNode head, int m, int n) {
-
-        // Empty list
-        if (head == null) {
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        if (head == null)
             return null;
+        ListNode curr = head, prev = null;
+        while (left > 1) {
+            prev = curr;
+            curr = curr.next;
+            left--;
+            right--;
         }
-
-        // Move the two pointers until they reach the proper starting point
-        // in the list.
-        ListNode cur = head, prev = null;
-        while (m > 1) {
-            prev = cur;
-            cur = cur.next;
-            m--;
-            n--;
-        }
-
-        // The two pointers that will fix the final connections.
-        ListNode con = prev, tail = cur;
-
-        // Iteratively reverse the nodes until n becomes 0.
+        ListNode dummy = prev, tail = curr;
         ListNode third = null;
-        while (n > 0) {
-            third = cur.next;
-            cur.next = prev;
-            prev = cur;
-            cur = third;
-            n--;
+        while (right > 0) {
+            third = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = third;
+            right--;
         }
-
-        // Adjust the final connections as explained in the algorithm
-        if (con != null) {
-            con.next = prev;
-        } else {
+        if (dummy != null)
+            dummy.next = prev;
+        else
             head = prev;
-        }
-
-        tail.next = cur;
+        tail.next = curr;
         return head;
     }
 }
