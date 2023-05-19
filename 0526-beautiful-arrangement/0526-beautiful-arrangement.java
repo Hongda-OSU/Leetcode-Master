@@ -1,24 +1,26 @@
-public class Solution {
-    int count = 0;
-    
-    public int countArrangement(int N) {
-        if (N == 0) return 0;
-        helper(N, 1, new int[N + 1]);
-        return count;
+class Solution {
+   private int count = 0;
+    private void swap(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
     }
-    
-    private void helper(int N, int pos, int[] used) {
-        if (pos > N) {
+    private void helper(int[] nums, int start) {
+        if (start == 0) {
             count++;
             return;
         }
-        
-        for (int i = 1; i <= N; i++) {
-            if (used[i] == 0 && (i % pos == 0 || pos % i == 0)) {
-                used[i] = 1;
-                helper(N, pos + 1, used);
-                used[i] = 0;
-            }
+        for (int i = start; i > 0; i--) {
+            swap(nums, start, i);
+            if (nums[start] % start == 0 || start % nums[start] == 0) helper(nums, start-1);
+            swap(nums,i, start);
         }
+    }
+    public int countArrangement(int N) {
+        if (N == 0) return 0;
+        int[] nums = new int[N+1];
+        for (int i = 0; i <= N; i++) nums[i] = i;
+        helper(nums, N);
+        return count;
     }
 }
