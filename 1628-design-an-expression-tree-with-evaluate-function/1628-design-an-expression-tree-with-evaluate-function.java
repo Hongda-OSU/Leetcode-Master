@@ -8,54 +8,58 @@ abstract class Node {
     // define your fields here
 };
 
-class NumNode extends Node {
-    private int val;
-    public NumNode(int val) {
-        this.val = val;
+class TreeNode extends Node {
+    public String val;
+    public TreeNode left, right;
+    
+    public TreeNode(String str) {
+        this.val = str;
     }
+    
     public int evaluate() {
-        return this.val;
+        return dfs(this);
     }
-};
+    
+    private int dfs(TreeNode root) {
+        if (root.left == null && root.right == null) 
+            return Integer.valueOf(root.val);
+        int left = dfs(root.left), right = dfs(root.right), result = 0;
+        String oper = root.val;
+        if (oper.equals("+"))
+            result = left + right;
+        else if (oper.equals("-"))
+            result = left - right;
+        else if (oper.equals("*"))
+            result = left * right;
+        else 
+            result = left / right;
+        return result;
+    }
+}
 
-class OpNode extends Node {
-    private char op;
-    private Node left;
-    private Node right;
-    public OpNode(char op, Node left, Node right) {
-        this.op = op;
-        this.left = left;
-        this.right = right;
-    }
-    public int evaluate() {
-        switch(this.op) {
-            case '+':
-                return this.left.evaluate() + this.right.evaluate();
-            case '-':
-                return this.left.evaluate() - this.right.evaluate();
-            case '*':
-                return this.left.evaluate() * this.right.evaluate();
-            case '/':
-                return this.left.evaluate() / this.right.evaluate();
-            default:
-                return 0;
-        }
-    }
-};
+
+/**
+ * This is the TreeBuilder class.
+ * You can treat it as the driver code that takes the postinfix input 
+ * and returns the expression tree represnting it as a Node.
+ */
 
 class TreeBuilder {
+    public String operators = "+-*/";
+    public Stack<TreeNode> stack = new Stack<>();
+    
     Node buildTree(String[] postfix) {
-        Stack<Node> st = new Stack<Node>();
-        for (String s : postfix){
-            if(Character.isDigit(s.charAt(0))){
-                st.add(new NumNode(Integer.parseInt(s)));
-            }else{
-                Node right = st.pop();
-                Node left = st.pop();
-                st.add(new OpNode(s.charAt(0), left, right));
+        for (String str : postfix) {
+            if (operators.contains(str)) {
+                TreeNode curr = new TreeNode(str);
+                curr.right = stack.pop();
+                curr.left = stack.pop();
+                stack.push(curr);
+            } else {
+                stack.push(new TreeNode(str));
             }
         }
-        return st.peek();
+        return stack.pop();
     }
 };
 
