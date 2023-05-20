@@ -1,69 +1,34 @@
 class Solution {
-    int rows, cols;
-    int[][] grid;
-    int path_count;
-
-    protected void backtrack(int row, int col, int remain) {
-        // base case for the termination of backtracking
-        if (this.grid[row][col] == 2 && remain == 1) {
-            // reach the destination
-            this.path_count += 1;
-            return;
-        }
-
-        // mark the square as visited. case: 0, 1, 2
-        int temp = grid[row][col];
-        grid[row][col] = -4;
-        remain -= 1; // we now have one less square to visit
-
-        // explore the 4 potential directions around
-        int[] row_offsets = {0, 0, 1, -1};
-        int[] col_offsets = {1, -1, 0, 0};
-        for (int i = 0; i < 4; ++i) {
-            int next_row = row + row_offsets[i];
-            int next_col = col + col_offsets[i];
-
-            if (0 > next_row || next_row >= this.rows ||
-                0 > next_col || next_col >= this.cols)
-                // invalid coordinate
-                continue;
-
-            if (grid[next_row][next_col] < 0)
-                // either obstacle or visited square
-                continue;
-
-            backtrack(next_row, next_col, remain);
-        }
-
-        // unmark the square after the visit
-        grid[row][col] = temp;
-    }
-
+   int res = 0, empty = 1, sx, sy, ex, ey;
     public int uniquePathsIII(int[][] grid) {
-        int non_obstacles = 0, start_row = 0, start_col = 0;
-
-        this.rows = grid.length;
-        this.cols = grid[0].length;
-
-        // step 1). initialize the conditions for backtracking
-        //   i.e. initial state and final state
-        for (int row = 0; row < rows; ++row)
-            for (int col = 0; col < cols; ++col) {
-                int cell = grid[row][col];
-                if (cell >= 0)
-                    non_obstacles += 1;
-                if (cell == 1) {
-                    start_row = row;
-                    start_col = col;
+        int m = grid.length, n = grid[0].length;
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (grid[i][j] == 0) empty++;
+                else if (grid[i][j] == 1) {
+                    sx = i;
+                    sy = j;
                 }
             }
+        }
+        dfs(grid, sx, sy);
+        return res;
+    }
 
-        this.path_count = 0;
-        this.grid = grid;
-
-        // kick-off the backtracking
-        backtrack(start_row, start_col, non_obstacles);
-
-        return this.path_count;
+    public void dfs(int[][] grid, int x, int y) {
+        if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length || grid[x][y] < 0)
+            return;
+        if (grid[x][y] == 2) {
+            if (empty == 0) res++;
+            return;
+        }
+        grid[x][y] = -2;
+        empty--;
+        dfs(grid, x + 1, y);
+        dfs(grid, x - 1, y);
+        dfs(grid, x, y + 1);
+        dfs(grid, x, y - 1);
+        grid[x][y] = 0;
+        empty++;
     }
 }
