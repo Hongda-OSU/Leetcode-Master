@@ -1,40 +1,104 @@
 class Solution {
-    private int[][] cache;
-    private int endingMask;
-    
-    public int dp(int node, int mask, int[][] graph) {
-        if (cache[node][mask] != 0) {
-            return cache[node][mask];
-        }
-        if ((mask & (mask - 1)) == 0) {
-            // Base case - mask only has a single "1", which means
-            // that only one node has been visited (the current node)
-            return 0;
-        }
-        
-        cache[node][mask] = Integer.MAX_VALUE - 1; // Avoid infinite loop in recursion
-        for (int neighbor: graph[node]) {
-            if ((mask & (1 << neighbor)) != 0) {
-                int alreadyVisited = dp(neighbor, mask, graph);
-                int notVisited = dp(neighbor, mask ^ (1 << node), graph);
-                int betterOption = Math.min(alreadyVisited, notVisited);
-                cache[node][mask] = Math.min(cache[node][mask], 1 + betterOption);
-            }
-        }
-        
-        return cache[node][mask];
-    }
-    
     public int shortestPathLength(int[][] graph) {
-        int n = graph.length;
-        endingMask = (1 << n) - 1;
-        cache = new int[n + 1][endingMask + 1];
         
-        int best = Integer.MAX_VALUE;
-        for (int node = 0; node < n; node++) {
-            best = Math.min(best, dp(node, endingMask, graph));
+        HashMap<Integer, ArrayList<Integer>> hm = new HashMap<>();
+        
+        int n = graph.length;
+        
+        // Adjency list of graph
+        
+        for(int i=0;i<n;i++){
+            if(!hm.containsKey(i)){
+                hm.put(i, new ArrayList<Integer>());
+            }
+            
+            int m = graph[i].length;
+            for(int j=0;j<m;j++){
+                hm.get(i).add(graph[i][j]);
+            }
+            
         }
         
-        return best;
+        //dist 2d array
+        //row: bitmask -> visited node set bits are 1
+        //column: leading node
+        
+        int row = (int)Math.pow(2,n);
+        int col = n;
+        int dist[][] = new int[row][col];
+        
+        for(int i=0;i<row;i++){
+            Arrays.fill(dist[i], -1);
+        }
+        
+        
+        //Queue: [{leading node 1, mask},{leading node 2, mask} ... ]
+        LinkedList<int[]> q = new LinkedList<>();
+        
+        for(int i=0;i<n;i++){
+            
+            int lead = i;
+            int mask = setbit(0,i);
+            
+            q.add(new int[]{lead, mask});
+            dist[mask][lead] = 0;
+        }
+        
+        
+        // Applying simulatneous BFS
+        while(q.size()>0){
+            
+            
+            int size = q.size();
+            for(int i=0;i<size;i++){
+                
+                int[] path = q.remove();
+                
+                int lead = path[0];
+                int mask = path[1];
+                
+                if(mask == row-1){   //all nodes visited
+                    return dist[mask][lead];
+                }
+                
+                // iterate over neighbours of lead
+                if(hm.containsKey(lead)){
+                    
+                    for(int child: hm.get(lead)){
+                    
+                        int newlead = child;
+                        int newmask = setbit(mask, newlead);
+
+                        // avoid cycle: intelligent bfs : checking if this set is already visited 
+                        // set : lead, mask(visited nodes)
+                        if(dist[newmask][newlead]!=-1){
+                            continue;
+                        }
+
+                        dist[newmask][newlead] = dist[mask][lead]+1;
+                        q.add(new int[]{newlead, newmask});
+
+                    }
+
+                }
+                
+            }
+            
+        }
+        
+        
+        return 1221; //magic - LOL
+        
+        
+        
     }
+    
+    
+    private int setbit(int mask, int i){
+        return mask|(1<<i);
+    }
+    
+    
+    
+    
 }
