@@ -1,107 +1,107 @@
 class LFUCache {
-    public int capacity, minFrequency = 1;
-    public HashMap<Integer, Node> keyNodeMap = new HashMap<>();
-    public HashMap<Integer, NodeDLinkedList> freqNodeMap = new HashMap<>(); 
+    public static class Node {
+        public int key;
+        public int value;
+        public int freq;
+        public Node before, after;
+
+        public Node() {
+        }
+
+        public Node(int key, int value) {
+            this.key = key;
+            this.value = value;
+            this.freq = 1;
+        }
+
+        public void remove() {
+            this.before.after = after;
+            this.after.before = before;
+        }
+
+        public void add(Node n) {
+            this.before = n;
+            this.after = n.after;
+            n.after = this;
+            this.after.before = this;
+        }
+    }
+
+    public int cap;
+    public int size;
+    public int minFreq;
+    Node[] map;
+    Node[] freqmap;
 
     public LFUCache(int capacity) {
-        this.capacity = capacity;
+        this.cap = capacity;
+        this.size = 0;
+        this.minFreq = 1;
+        this.map = new Node[100001];
+        this.freqmap = new Node[20001];
     }
-    
+
     public int get(int key) {
-        Node node = keyNodeMap.get(key);
-        if (node != null) {
-            incrementFrequency(node);
-            return node.val;
-        } else {
+        Node n = map[key];
+        if (n == null) {
             return -1;
         }
+        update(key);
+        return n.value;
     }
-    
+
     public void put(int key, int value) {
-        if (capacity <= 0)
-            return;
-        if (keyNodeMap.containsKey(key)) {
-            Node node = keyNodeMap.get(key);
-            node.val = value;
-            incrementFrequency(node);
-            keyNodeMap.put(key, node);
-        } else {
-            Node node = new Node(key, value);
-            if (keyNodeMap.size() == capacity) {
-                Node last = freqNodeMap.get(minFrequency).removeLastNode();
-                keyNodeMap.remove(last.key);
+        Node n = map[key];
+        if (n == null) {
+            if (cap == 0) {
+                return;
             }
-            incrementFrequency(node);
-            keyNodeMap.put(key, node);
-            minFrequency = 1;
-        }
-    }
-    
-    public void incrementFrequency(Node node) {
-        int oldFreq = node.frequency;
-        if (freqNodeMap.containsKey(oldFreq)) {
-            NodeDLinkedList oldDll = freqNodeMap.get(oldFreq);
-            oldDll.remove(node);
-            if (node.frequency == minFrequency && oldDll.length == 0)
-                minFrequency++;
-        }
-        int newFreq = oldFreq + 1;
-        node.frequency = newFreq;
-        NodeDLinkedList newDll = freqNodeMap.getOrDefault(newFreq, new NodeDLinkedList());
-        newDll.add(node);
-        freqNodeMap.put(newFreq, newDll);
-    }
-}
-
-class Node {
-    public int key, val, frequency;
-    public Node next, prev;
-    
-    public Node(int key, int val) {
-        this.key = key;
-        this.val = val;
-        this.frequency = frequency;
-    }
-}
-
-class NodeDLinkedList {
-    public Node head, tail;
-    int length;
-    
-    public void add(Node node) {
-        node.prev = null;
-        node.next = null;
-        if (head == null) {
-            head = node;
-            tail = node;
+            ++size;
+            if (size > cap) {
+                Node head = freqmap[minFreq];
+                Node lfu = head.before;
+                lfu.remove();
+                map[lfu.key] = null;
+                if (head == head.after) {
+                    freqmap[minFreq] = null;
+                }
+                --size;
+            }
+            n = new Node(key, value);
+            map[key] = n;
+            if (freqmap[1] == null) {
+                Node head = new Node();
+                head.before = head;
+                head.after = head;
+                freqmap[1] = head;
+            }
+            n.add(freqmap[1]);
+            minFreq = 1;
         } else {
-            node.next = head;
-            head.prev = node;
-            head = node;
+            n.value = value;
+            update(key);
         }
-        length++;
     }
-    
-    public void remove(Node node) {
-        if (node == head) {
-            if (node == tail) 
-                tail = null;
-            head = head.next;
-        } else {
-            node.prev.next = node.next;
-            if (node == tail)
-                tail = node.prev;
-            else 
-                node.next.prev = node.prev;
+
+    public void update(int key) {
+        Node n = map[key];
+        n.remove();
+        int freq = n.freq;
+        if (freqmap[freq] == freqmap[freq].after) {
+            freqmap[freq] = null;
+            if (freq == minFreq) {
+                ++minFreq;
+                ;
+            }
         }
-        length--;
-    }
-    
-    public Node removeLastNode() {
-        Node tailNode = tail;
-        if (tailNode != null)
-            remove(tailNode);
-        return tailNode;
+        freq = ++n.freq;
+        if (freqmap[freq] == null) {
+            Node head = new Node();
+            head.before = head;
+            head.after = head;
+            freqmap[freq] = head;
+        }
+        n.add(freqmap[freq]);
     }
 }
 
