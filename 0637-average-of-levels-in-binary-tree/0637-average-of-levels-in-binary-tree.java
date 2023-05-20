@@ -4,29 +4,36 @@
  *     int val;
  *     TreeNode left;
  *     TreeNode right;
- *     TreeNode(int x) { val = x; }
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
  * }
  */
-public class Solution {
-    public List < Double > averageOfLevels(TreeNode root) {
-        List < Integer > count = new ArrayList < > ();
-        List < Double > res = new ArrayList < > ();
-        average(root, 0, res, count);
-        for (int i = 0; i < res.size(); i++)
-            res.set(i, res.get(i) / count.get(i));
-        return res;
+class Solution {
+    public List<Double> averageOfLevels(TreeNode root) {
+        List<Integer> count = new ArrayList<>();
+        List<Double> result = new ArrayList<>();
+        average(root, 0, result, count);
+        for (int i = 0; i < result.size(); i++)
+            result.set(i, result.get(i) / count.get(i));
+        return result;
     }
-    public void average(TreeNode t, int i, List < Double > sum, List < Integer > count) {
-        if (t == null)
+    
+    private void average(TreeNode node, int i, List<Double> list, List<Integer> count) {
+        if (node == null)
             return;
-        if (i < sum.size()) {
-            sum.set(i, sum.get(i) + t.val);
+        if (i < list.size()) {
+            list.set(i, list.get(i) + node.val);
             count.set(i, count.get(i) + 1);
         } else {
-            sum.add(1.0 * t.val);
+            list.add(1.0 * node.val);
             count.add(1);
         }
-        average(t.left, i + 1, sum, count);
-        average(t.right, i + 1, sum, count);
+        average(node.left, i + 1, list, count);
+        average(node.right, i + 1, list, count);
     }
 }
