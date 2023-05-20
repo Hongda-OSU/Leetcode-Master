@@ -1,37 +1,29 @@
-public class WordDistance {
-
-private Map<String, List<Integer>> map;
-
-public WordDistance(String[] words) {
-    map = new HashMap<String, List<Integer>>();
-    for(int i = 0; i < words.length; i++) {
-        String w = words[i];
-        if(map.containsKey(w)) {
-            map.get(w).add(i);
-        } else {
-            List<Integer> list = new ArrayList<Integer>();
+class WordDistance {
+    private Map<String, List<Integer>> map;
+    
+    public WordDistance(String[] words) {
+        map = new HashMap<>();
+        for (int i = 0; i < words.length; i ++) {
+            String word = words[i];
+            List<Integer> list = map.getOrDefault(word, new LinkedList<Integer>());
             list.add(i);
-            map.put(w, list);
+            map.put(word, list);
         }
     }
-}
-
-public int shortest(String word1, String word2) {
-    List<Integer> list1 = map.get(word1);
-    List<Integer> list2 = map.get(word2);
-    int ret = Integer.MAX_VALUE;
-    for(int i = 0, j = 0; i < list1.size() && j < list2.size(); ) {
-        int index1 = list1.get(i), index2 = list2.get(j);
-        if(index1 < index2) {
-            ret = Math.min(ret, index2 - index1);
-            i++;
-        } else {
-            ret = Math.min(ret, index1 - index2);
-            j++;
+    
+    public int shortest(String word1, String word2) {
+        List<Integer> list1 = map.get(word1);
+        List<Integer> list2 = map.get(word2);
+        
+        int min = Integer.MAX_VALUE;
+        for (int index1 : list1) {
+            for (int index2 : list2) {
+                min = Math.min(min, (int)Math.abs(index1 - index2));
+            }
         }
+        
+        return min;
     }
-    return ret;
-}
 }
 /**
  * Your WordDistance object will be instantiated and called as such:
