@@ -1,24 +1,26 @@
 class WordDistance {
 
-  HashMap<String,TreeSet<Integer>> map = new HashMap<>();	 
-    public WordDistance(String[] words) {
-        	int len = words.length;
+   HashMap<String,List<Integer>> map = new HashMap<>();	 	
+	 	public WordDistance(String[] words) {
+	 		int len = words.length;
 	        for(int i=0; i<len; i++){
-	        	TreeSet<Integer> ls = map.get(words[i]);
-	        	if(ls==null) ls=new TreeSet<>();
+	        	List<Integer> ls = map.get(words[i]);
+	        	if(ls==null) ls=new ArrayList<>();
 	        	ls.add(i);
 	        	map.put(words[i], ls);
 	        }
-    } 
+	    }
+	    
 	    public int shortest(String word1, String word2) {
-	        TreeSet<Integer> tree_1 = map.get(word1);
-	        TreeSet<Integer> tree_2 = map.get(word2);
+	    	List<Integer> list_1 = map.get(word1);
+	    	List<Integer> list_2 = map.get(word2); 
+	    	int size = list_2.size();
 	        int result=Integer.MAX_VALUE;
-	        for(int i:tree_1){
-	        	Integer floor = tree_2.floor(i);
-	        	Integer ceiling = tree_2.ceiling(i);
-	        	if(floor!=null) result=Math.min(result, Math.abs(i-floor));
-	        	if(ceiling!=null) result=Math.min(result, Math.abs(i-ceiling));
+	        for(int i:list_1){
+	        	int index = Collections.binarySearch(list_2, i);
+	        	if(index<0) index=-(index+1);
+	        	if(index>0) result=Math.min(Math.abs(i-list_2.get(index-1)), result);
+	        	if(index<size) result=Math.min(Math.abs(i-list_2.get(index)), result); 
 	        }
 	        return result;
 	    }
