@@ -1,5 +1,5 @@
 class Solution {
-    private int result = 0, empty = 1, x1, y1, x2, y2;
+    private int result = 0, empty = 1, x, y;
     
     public int uniquePathsIII(int[][] grid) {
         int m = grid.length, n = grid[0].length;
@@ -8,12 +8,12 @@ class Solution {
                 if (grid[i][j] == 0)
                     empty++;
                 else if (grid[i][j] == 1) {
-                    x1 = i;
-                    y1= j;
+                    x = i;
+                    y = j;
                 }
             }
         }
-        dfs(grid, x1, y1);
+        dfs(grid, x, y);
         return result;
     }
     
