@@ -28,12 +28,12 @@ class Solution {
         }
         if (sol.size() != 0 && onesol.size() >= sol.size()) return;    //pruning
         int zeroBit = 0;
-        while (((cur>>zeroBit)&1) == 1) zeroBit++;   
+        while (((cur >> zeroBit) & 1) == 1) zeroBit++;   
         for (int i = 0; i < pe.length; i++) {
             int per = pe[i];
-            if (((per>>zeroBit)&1) == 1) {
+            if (((per >> zeroBit) & 1) == 1) {
                 onesol.add(i); // when a person can cover a zero bit in the current number, we can add him
-                search(cur|per, pe, onesol, n);
+                search(cur | per, pe, onesol, n);
                 onesol.remove(onesol.size() - 1);  //search in a backtracking way
             }
         } 
