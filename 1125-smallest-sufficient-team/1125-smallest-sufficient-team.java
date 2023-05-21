@@ -26,9 +26,11 @@ class Solution {
                 sol = new ArrayList<>(onesol);
             return;
         }
-        if (sol.size() != 0 && onesol.size() >= sol.size()) return;    
+        if (sol.size() != 0 && onesol.size() >= sol.size()) 
+            return;    
         int zeroBit = 0;
-        while (((cur >> zeroBit) & 1) == 1) zeroBit++;   
+        while (((cur >> zeroBit) & 1) == 1) 
+            zeroBit++;   
         for (int i = 0; i < pe.length; i++) {
             int per = pe[i];
             if (((per >> zeroBit) & 1) == 1) {
