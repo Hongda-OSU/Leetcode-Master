@@ -4,7 +4,8 @@ class Solution {
     public int[] smallestSufficientTeam(String[] req_skills, List<List<String>> people) {
         Map<String, Integer> idx = new HashMap<>(); 
         int n = 0;
-        for (String s : req_skills) idx.put(s, n++);///skills are represented by 0, 1, 2....
+        for (String s : req_skills) 
+            idx.put(s, n++);///skills are represented by 0, 1, 2....
         int[] pe = new int[people.size()];
         for (int i = 0; i < pe.length; i++) {
             for (String p : people.get(i)) {
@@ -14,15 +15,15 @@ class Solution {
         } // each person is transferred to a number, of which the bits of 1 means the guy has the skill
         search(0, pe, new ArrayList<Integer>(), n);  
         int[] ans = new int[sol.size()];
-        for (int i = 0; i < sol.size(); i++) ans[i] = sol.get(i);
+        for (int i = 0; i < sol.size(); i++) 
+            ans[i] = sol.get(i);
         return ans;
     }
     
     private void search(int cur, int[] pe, List<Integer> onesol, int n) { 
-        if (cur == (1<<n) - 1) {  // when all bits are 1, all skills are coverred
-            if (sol.size() == 0 || onesol.size() < sol.size()) {
+        if (cur == (1 << n) - 1) {  // when all bits are 1, all skills are coverred
+            if (sol.size() == 0 || onesol.size() < sol.size()) 
                 sol = new ArrayList<>(onesol);
-            }
             return;
         }
         if (sol.size() != 0 && onesol.size() >= sol.size()) return;    //pruning
