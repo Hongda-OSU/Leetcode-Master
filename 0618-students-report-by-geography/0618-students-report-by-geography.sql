@@ -1,15 +1,13 @@
-SELECT
-  MAX((CASE WHEN X.continent = 'America' THEN X.name ELSE NULL END)) AS "America",
-  MAX((CASE WHEN X.continent = 'Asia' THEN X.name ELSE NULL END)) AS "Asia",
-  MAX((CASE WHEN X.continent = 'Europe' THEN X.name ELSE NULL END)) AS "Europe"
+# Write your MySQL query statement below
+SELECT 
+    MAX((CASE WHEN x.continent = 'America' THEN x.name ELSE NULL END)) AS "America",
+    MAX((CASE WHEN x.continent = 'Asia' THEN x.name ELSE NULL END)) AS "Asia",
+     MAX((CASE WHEN x.continent = 'Europe' THEN x.name ELSE NULL END)) AS "Europe"
 FROM
-  (
-    SELECT
-      S.continent,
-      S.name,
-      ROW_NUMBER() OVER(PARTITION BY S.continent ORDER BY S.name) AS rn
-    FROM
-      student S
-  ) X
-GROUP BY
-  X.rn;
+(
+    SELECT s.continent,
+        s.name,
+        ROW_NUMBER() OVER(PARTITION BY s.continent ORDER BY s.name) AS rn
+    FROM Student s
+) x
+GROUP BY x.rn;
