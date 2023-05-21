@@ -13,7 +13,7 @@ class Solution {
                 p[i] += 1 << skill;
             }
         }
-        search(0, p, new ArrayList<Integer>(), n);
+        search(0, p, new ArrayList<>(), n);
         int[] result = new int[list.size()];
         for (int i = 0; i < list.size(); i++)
             result[i] = list.get(i);
