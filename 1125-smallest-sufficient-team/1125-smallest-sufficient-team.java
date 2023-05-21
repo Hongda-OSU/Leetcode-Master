@@ -1,43 +1,40 @@
 class Solution {
-    private List<Integer> list = new ArrayList<>();
+    private List<Integer> sol = new ArrayList<>();
     
     public int[] smallestSufficientTeam(String[] req_skills, List<List<String>> people) {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> idx = new HashMap<>(); 
         int n = 0;
-        for (String str : req_skills)
-            map.put(str, n++);
-        int[] p = new int[people.size()];
-        for (int i = 0; i < p.length; i++) {
-            for (String s : people.get(i)) {
-                int skill = map.get(s);
-                p[i] += 1 << skill;
+        for (String s : req_skills) idx.put(s, n++);///skills are represented by 0, 1, 2....
+        int[] pe = new int[people.size()];
+        for (int i = 0; i < pe.length; i++) {
+            for (String p : people.get(i)) {
+                int skill = idx.get(p);
+                pe[i] += 1 << skill;
             }
-        }
-        search(0, p, new ArrayList<>(), n);
-        int[] result = new int[list.size()];
-        for (int i = 0; i < list.size(); i++)
-            result[i] = list.get(i);
-        return result;
+        } // each person is transferred to a number, of which the bits of 1 means the guy has the skill
+        search(0, pe, new ArrayList<Integer>(), n);  
+        int[] ans = new int[sol.size()];
+        for (int i = 0; i < sol.size(); i++) ans[i] = sol.get(i);
+        return ans;
     }
     
-    private void search(int curr, int[] people, List<Integer> l, int n) {
-        if (curr == (1 << n) - 1) {
-            if (list.size() == 0 || l.size() < list.size())
-                list = new ArrayList<>(l);
-            return;
-        }
-        if (list.size() != 0 && l.size() > list.size())
-            return;
-        int zero = 0;
-        while (((curr >> zero) & 1) == 1)
-            zero++;
-        for (int i = 0; i < people.length; i++) {
-            int p = people[i];
-            if (((p >> zero) & 1) == 1) {
-                l.add(i);
-                search(curr | p, people, l, n);
-                l.remove(l.size() - 1);
+    public void search(int cur, int[] pe, List<Integer> onesol, int n) { 
+        if (cur == (1<<n) - 1) {  // when all bits are 1, all skills are coverred
+            if (sol.size() == 0 || onesol.size() < sol.size()) {
+                sol = new ArrayList<>(onesol);
             }
+            return;
         }
-    } 
+        if (sol.size() != 0 && onesol.size() >= sol.size()) return;    //pruning
+        int zeroBit = 0;
+        while (((cur>>zeroBit)&1) == 1) zeroBit++;   
+        for (int i = 0; i < pe.length; i++) {
+            int per = pe[i];
+            if (((per>>zeroBit)&1) == 1) {
+                onesol.add(i); // when a person can cover a zero bit in the current number, we can add him
+                search(cur|per, pe, onesol, n);
+                onesol.remove(onesol.size() - 1);  //search in a backtracking way
+            }
+        } 
+    }
 }
