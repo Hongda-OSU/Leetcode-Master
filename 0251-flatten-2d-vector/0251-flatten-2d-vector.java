@@ -1,28 +1,29 @@
 class Vector2D {
-    int indexList, indexEle;
-    int[][] vec; 
-    public Vector2D(int[][] v) {
-        indexList = 0; //index of list in the vec
-        indexEle = 0; // index of element in current list of vec
-        vec = v;
+    private int indexList, indexElement;
+    private int[][] vec;
+
+    public Vector2D(int[][] vec) {
+        indexList = 0;
+        indexElement = 0;
+        this.vec = vec;
     }
     
     public int next() {
-        if(hasNext()) {
-            int res = vec[indexList][indexEle];
-            indexEle++;
-            return res;
+        if (hasNext()) {
+            int result = vec[indexList][indexElement];
+            indexElement++;
+            return result;
         }
         return -1;
     }
     
     public boolean hasNext() {
-        while(indexList < vec.length){
-            if(indexEle < vec[indexList].length)
+        while (indexList < vec.length) {
+            if (indexElement < vec[indexList].length)
                 return true;
-            else{
+            else {
                 indexList++;
-                indexEle = 0;
+                indexElement =0;
             }
         }
         return false;
