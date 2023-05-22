@@ -2,46 +2,40 @@ class Solution {
     public boolean canDistribute(int[] nums, int[] quantity) {
         int[] arr = new int[1001];
         int max = 0;
-        for (int n : nums){
-            max = Math.max(++arr[n], max);
-        }
+        for (int num : nums)
+            max = Math.max(max, ++arr[num]);
         int min = Arrays.stream(quantity).max().getAsInt();
-        if (max < min){ // optimization 2
+        if (max < min)
             return false;
-        }
-        int[] map = new int[max+1]; // freq map
+        int[] map = new int[max + 1];
         BitSet bit = new BitSet();
-        for (int i = 0; i <= 1000; i++) if (arr[i] > 0){ // optimization 1
-            map[arr[i]]++;
-            bit.set(arr[i]);
+        for (int i = 0; i <= 1000; i++) {
+            if (arr[i] > 0) {
+                map[arr[i]]++;
+                bit.set(arr[i]);
+            }
         }
-        return solve(0, map, quantity, bit);
+        return helper(0, map, quantity, bit);
     }
-
-    private boolean solve(int idx, int[] map, int[] q, BitSet bit){
-        if (idx==q.length){
+    
+    private boolean helper(int index, int[] map, int[] q, BitSet bit) {
+        if (index == q.length)
             return true;
-        }
-        for (int key = bit.nextSetBit(0); key >= 0; key = bit.nextSetBit(key+1)){
-            if (q[idx]>key){
+        for (int key = bit.nextSetBit(0); key >= 0; key = bit.nextSetBit(key + 1)) {
+            if (q[index] > key)
                 continue;
-            }
-            if (--map[key]==0){ // optimization 3
+            if (--map[key] == 0) 
                 bit.clear(key);
+            if (key - q[index] > 0) {
+                map[key - q[index]]++;
+                bit.set(key - q[index]);
             }
-            if (key-q[idx]>0){
-                map[key-q[idx]]++;
-                bit.set(key-q[idx]);
-            }
-            if (solve(idx+1, map, q, bit)){
+            if (helper(index + 1, map, q, bit))
                 return true;
-            }
-            if (key-q[idx]>0&&--map[key-q[idx]]==0){
-                bit.clear(key-q[idx]);
-            }
-            if (++map[key]==1){
+            if (key - q[index] > 0 && --map[key - q[index]] == 0)
+                bit.clear(key - q[index]);
+            if (++map[key] == 1)
                 bit.set(key);
-            }
         }
         return false;
     }
