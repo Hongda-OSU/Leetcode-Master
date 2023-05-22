@@ -1,52 +1,50 @@
 class Solution {
-    
-    int r, c;
-    int[][] memo;
-    List<Integer> masks;
-    
+    int m, n;
+    Map<String, Integer> memo;
     public int maxStudents(char[][] seats) {
-        r = seats.length;
-        c = seats[0].length;
-        memo = new int[r][1<<c];
-        for (int i = 0; i < r; i++) {
-            Arrays.fill(memo[i], -1);
-        }
-        return getMax(seats, 0, 0);
-    }
-    
-    private int getMax(char[][] seats, int curRow, int prevRowMask) {
-        if (curRow == r) {
-            return 0;
-        }
-        if (memo[curRow][prevRowMask] != -1){
-            return memo[curRow][prevRowMask];
-        }
-        masks = new LinkedList<>(); // reset the masks list for backtrack
-        backtrack(seats[curRow], 0, prevRowMask, 0); // backtrack results store in masks list
-        int res = 0;
-        for (int m : masks) {
-            res = Math.max(res, Integer.bitCount(m) + getMax(seats, curRow + 1, m));
-        }
-        memo[curRow][prevRowMask] = res;
-        return res;
-    }
-    
-    // this returns all combination of legal seat assignment for a given row based on prevous row's mask
-    private void backtrack(char[] seats, int cur, int prevRowMask, int curRowMask) {
-        if (cur == c) {
-            masks.add(curRowMask);
-            return;
-        }
-        // cur seat is not taken
-        backtrack(seats, cur + 1, prevRowMask, curRowMask);
+        m=seats.length;
+        if(m==0) return 0;
+        n = seats[0].length;
         
-        // cur seat is taken, check if left, upper left and upper right positions are empty
-        if (seats[cur] != '#' 
-            && (cur == 0 || (((curRowMask & (1 << (cur-1))) == 0) && (prevRowMask & (1 << (cur-1))) == 0))
-            && (cur == c - 1 || ((prevRowMask & (1 << (cur+1))) == 0))) {
-            curRowMask |= (1 << (cur));
-            backtrack(seats, cur + 1, prevRowMask, curRowMask);
-            curRowMask ^= (1 << (cur));
+        memo = new HashMap<String, Integer>();
+        StringBuilder sb = new StringBuilder();
+        for(char[] row: seats){
+            sb.append(row);
         }
+        
+        return dfs(sb.toString());
+    }
+	
+	/* dfs returns the max student we can place if start with the given state */
+
+    public int dfs(String state){
+        if(memo.containsKey(state)) return memo.get(state);
+        int max = 0;
+        char[] C = state.toCharArray();
+        for(int i = 0; i<m; i++){
+            for(int j = 0; j<n; j++){
+			//we see an empty seat, there are two choices, place a student here or leave it empty.
+                if(C[i*n+j]== '.'){
+                    //choice (1): we choose not to place a student, but we place a x to mark this seat as unanvailable
+					// so we don't repeatedly search this state again. 
+					
+                    C[i*n+j] = 'x';
+                    max = Math.max(max, dfs(new String(C)));
+     
+					 //choice (2): we place a student, but this makes left, right, bottom left, bottom right seat unavailable. 
+                    if(j+1<n){
+                        if(i<m-1 && C[(i+1)*n+j+1] == '.') C[(i+1)*n+j+1] = 'x';
+                        if(C[i*n+j+1] == '.') C[i*n+j+1] = 'x';
+                    }
+                    if(j-1>=0){
+                        if(i<m-1 && C[(i+1)*n+j-1] == '.') C[(i+1)*n+j-1]= 'x';
+                        if(C[i*n+j-1] == '.') C[i*n+j-1] = 'x';
+                    }
+                    max = Math.max(max, 1+dfs(new String(C)));
+                }
+            }
+        }
+        memo.put(state, max);
+        return max; 
     }
 }
