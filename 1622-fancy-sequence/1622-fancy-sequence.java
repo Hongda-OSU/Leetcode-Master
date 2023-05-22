@@ -1,52 +1,71 @@
 class Fancy {
-    private static final int MOD = 1000000007;
-
-    // cache inverse values for 0-100
-    private static final int[] INV = IntStream.range(0, 101).map(Fancy::modInverse).toArray();
-
-    // Modular multiplicative inverse x => a * x % MOD == 1
-    private static int modInverse(int a) {
-        int m = MOD, y = 0, x = 1;
-        while (a > 1) {
-            int q = a / m;
-            int t = m;
-            m = a % m;
-            a = t;
-            t = y;
-
-            y = x - q * y;
-            x = t;
-        }
-        return x < 0 ? x + MOD : x;
-    }
-
-    private long mul = 1; // cumulative multiplication (%MOD)
-    private long add = 0; // cumulative addition (%MOD)
-
-    private long rmul = 1; // reverse cumulative multiplication (%MOD)
+    private static final int MOD = 1_000_000_007;
+    private List<Position> list = new ArrayList<>();
     
-    // store base values, i.e. reverse cumulative transform are applied before addition 
-    private final List<Integer> list = new ArrayList<>();
+    public Fancy() {
+        list.add(new Position(0));
+    }
     
     public void append(int val) {
-        list.add((int) (((MOD - add + val) * rmul) % MOD));
+        list.add(new Position(val));
     }
-
+    
     public void addAll(int inc) {
-        add = (add + inc) % MOD;
+        add(list.size() - 1, inc);
     }
-
+    
     public void multAll(int m) {
-        mul = (mul * m) % MOD;
-        rmul = (rmul * INV[m]) % MOD;
-        add = (add * m) % MOD;
+        mult(list.size() - 1, m);
     }
-
+    
     public int getIndex(int idx) {
-        if (idx < list.size()) {
-            return (int) (((list.get(idx) * mul) + add) % MOD);
-        } else {
+        if (idx > list.size() - 2)
             return -1;
+        
+        return query(idx);
+    }
+    
+    private int query(int i) {
+        i++;
+
+        long val = list.get(i).val;
+        
+        while (i < list.size()) {
+            Position p = list.get(i);
+            val = (val * p.mult) % MOD;
+            val = (val + p.add) % MOD;
+            
+            i += i & -i;
+        }
+
+        return (int) val;
+    }
+    
+    private void add(int i, long val) {
+        while (i > 0) {
+            Position p = list.get(i);
+            p.add = (int) ((p.add + val) % MOD);
+
+            i -= i & -i;
+        }
+    }
+    
+    private void mult(int i, long val) {
+        while (i > 0) {
+            Position p = list.get(i);
+            p.add = (int) ((val * p.add) % MOD);
+            p.mult = (int) ((val * p.mult) % MOD);
+            i -= i & -i;
+        }
+    }
+    
+    class Position {
+        int val;
+        int mult = 1;
+        int add = 0;
+        
+        Position(int val) {
+            this.val = val;
         }
     }
 }
