@@ -16,23 +16,22 @@ class Solution {
             }
         }
         boolean[] visited = new boolean[n * n];
-        Queue<Integer> q = new LinkedList<>();
+        Queue<Integer> queue = new LinkedList<>();
         int start = arr[0] > -1 ? arr[0] - 1 : 0;
-        q.offer(start);
+        queue.offer(start);
         visited[start] = true;
         int step = 0;
-        while (!q.isEmpty()) {
-            int size = q.size();
+        while (!queue.isEmpty()) {
+            int size = queue.size();
             while (size-- > 0) {
-                int cur = q.poll();
-                if (cur == n * n - 1) {
+                int curr = queue.poll();
+                if (curr == n * n - 1)
                     return step;
-                }
-                for (int next = cur + 1; next <= Math.min(cur + 6, n * n - 1); next++) {
-                    int dest = arr[next] > -1 ? arr[next] - 1 : next;
+                for (int next = curr + 1; next <= Math.min(curr + 6, n * n - 1); next++) {
+                    int dest = arr[next] > -1 ? arr[next] - 1 : next; 
                     if (!visited[dest]) {
                         visited[dest] = true;
-                        q.offer(dest);
+                        queue.offer(dest);
                     }
                 }
             }
