@@ -1,35 +1,66 @@
 class Solution {
-    int m, n;
-    Map<String, Integer> memo;
-    int[][] dirs = {{0, 1}, {0, -1}, {1, -1}, {1, 1}};
+    char[][] seats;
+    int m;
+    int n;
     public int maxStudents(char[][] seats) {
-        m = seats.length;
-        n = seats[0].length;
-        memo = new HashMap<>();
-        StringBuilder sb = new StringBuilder();
-        for (char[] row : seats) sb.append(row);
-        return dfs(sb.toString());
+        this.seats = seats;
+        this.m = seats.length;
+        this.n = seats[0].length;
+        int res = 0;
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                if (seats[i][j] == '.') {
+                    int[] tmp = new int[1];
+                    dfs(i, j, tmp, copy(seats));
+                    res = Math.max(res, tmp[0]);
+                } 
+        return res;
     }
     
-    private int dfs(String state) {
-        if (memo.containsKey(state)) return memo.get(state);
-        int res = 0;
-        char[] s = state.toCharArray();
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (s[i * n + j] == '.') {
-                    s[i * n + j] = 'x';  //pick empty seat
-                    res = Math.max(res, dfs(new String(s))); //放弃seat，我们这里不+1
-                    for (int[] dir : dirs) { //lock seats
-                        int x = i + dir[0], y = j + dir[1];
-                        if (x < 0 || x >= m || y < 0 || y >= n) continue;
-                        if (s[x * n + y] == '.') s[x * n + y] = 'x';
-                    }
-                    res = Math.max(res, dfs(new String(s)) + 1); //1，3间隔的点在这里被覆盖到了。只有ban seat之后我们算+1
-                }
-            }
+    int[][] dirs = {{0, 1}, {0, -1}, {-1, -1}, {-1, 1}};
+    
+    private void dfs(int startX, int startY, int[] res, char[][] seats) {
+        seats[startX][startY] = 'X';
+        for (int[] dir : dirs) {
+            int x = startX + dir[0], y = startY + dir[1];
+            if (x < 0 || x >= m || y < 0 || y >= n) continue;
+            if (seats[x][y] == '.') seats[x][y] = '#';
         }
-        memo.put(state, res);
-        return res;
+        
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                if (seats[i][j] == '.')
+                    if (checkValid(i, j, seats))
+                        banSeat(i, j, seats);
+        
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                if (seats[i][j] == 'X') res[0]++;
+    }
+    
+    private void banSeat(int startX, int startY, char[][] seats) {
+        seats[startX][startY] = 'X';
+        for (int[] dir : dirs) {
+            int x = startX + dir[0], y = startY + dir[1];
+            if (x < 0 || x >= m || y < 0 || y >= n) continue;
+            seats[x][y] = '#';
+        }
+    }
+    
+    private boolean checkValid(int startX, int startY, char[][] seats) {
+        for (int[] dir : dirs) {
+            int x = startX + dir[0], y = startY + dir[1];
+            if (x < 0 || x >= m || y < 0 || y >= n) continue;
+            if (seats[x][y] == 'X') return false;
+        }
+        return true;
+    }
+    
+    private char[][] copy(char[][] seats) {
+        char[][] tmp = new char[m][n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                tmp[i][j] = seats[i][j];
+        return tmp;
     }
 }
