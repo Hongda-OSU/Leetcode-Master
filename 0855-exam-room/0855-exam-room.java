@@ -1,33 +1,62 @@
 class ExamRoom {
+    
+    private PriorityQueue<int[]> pq;
+    private int N;
 
-    int N;
-    ArrayList<Integer> L = new ArrayList<>();
-    public ExamRoom(int n) {
-        N = n;
-    }
-
-    public int seat() {
-        if (L.size() == 0) {
-            L.add(0);
-            return 0;
-        }
-        int d = Math.max(L.get(0), N - 1 - L.get(L.size() - 1));
-        for (int i = 0; i < L.size() - 1; ++i) d = Math.max(d, (L.get(i + 1) - L.get(i)) / 2);
-        if (L.get(0) == d) {
-            L.add(0, 0);
-            return 0;
-        }
-        for (int i = 0; i < L.size() - 1; ++i)
-            if ((L.get(i + 1) - L.get(i)) / 2 == d) {
-                L.add(i + 1, (L.get(i + 1) + L.get(i)) / 2);
-                return L.get(i + 1);
+    public ExamRoom(int N) {
+        this.N = N;
+        pq = new PriorityQueue<>((a, b) -> {
+            if ((b[1] - b[0]) / 2 == (a[1] - a[0]) / 2) {
+                return a[0] - b[0];
             }
-        L.add(N - 1);
-        return N - 1;
+            return (b[1] - b[0]) / 2 - (a[1] - a[0]) / 2;
+        });
     }
-
+    
+    public int seat() {
+        if (pq.size() == 0) {
+            pq.offer(new int[]{0, 2 * (N - 1)});
+            return 0;
+        } else {
+            int[] longest = pq.poll();
+            int result = longest[0] + (longest[1] - longest[0]) / 2;
+            if (result != 0) { // result = 0, we don't need to add the left side
+                pq.offer(new int[]{longest[0], result});
+            }
+            if (result != N - 1) { // result = N - 1, we don't need to add the right side
+                pq.offer(new int[]{result, longest[1]});
+            }
+            return result;
+        }
+    }
+    
     public void leave(int p) {
-        for (int i = 0; i < L.size(); ++i) if (L.get(i) == p) L.remove(i);
+        if (pq.size() == 1 && (pq.peek()[1] >= N || pq.peek()[0] < 0)) { // Edge cases: Only [0, 2N] or [-N , N] in pq
+            pq.clear();
+            return;
+        }
+        int[] p1 = null, p2 = null; // p1: left side, p2: right side
+        for (int[] pair : pq) {
+            if (pair[1] == p) {
+                p1 = pair;
+            }
+            if (pair[0] == p) {
+                p2 = pair;
+            }
+        }
+        if (p1 != null) {
+            pq.remove(p1);
+        }
+        if (p2 != null) {
+            pq.remove(p2);
+        }
+        if (p1 == null || p1[0] < 0) { // No left side found or p is the left most position in current seats.
+            p1 = new int[]{-p2[1], p};
+        }
+        if (p2 == null || p2[1] >= N) { // No right side found or p is the right most position in current seats.
+            p2 = new int[]{p, p1[0] + 2 * (N - p1[0] - 1)};
+        }
+        pq.offer(new int[]{p1[0], p2[1]});
     }
 }
 
