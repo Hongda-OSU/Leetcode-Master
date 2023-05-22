@@ -1,6 +1,7 @@
 class Fancy {
     private static final int MOD = 1_000_000_007;
-    private static final int[] INV = IntStream.range(0, 101).map(Fancy::modInverse).toArray();
+    private static final int[] INV = 
+        IntStream.range(0, 101).map(Fancy::modInverse).toArray();
 
     private static int modInverse(int a) {
         int m = MOD, y = 0, x = 1;
