@@ -1,66 +1,45 @@
+/**
+the same as 
+[2123. Minimum Operations to Remove Adjacent Ones in Matrix](https://leetcode.com/problems/minimum-operations-to-remove-adjacent-ones-in-matrix/)  (Bipartile, boy girl and girl boy matches, Hungarian, unweighted) 
+ */
 class Solution {
-    char[][] seats;
-    int m;
-    int n;
+    int m, n;
+    Integer[][] match;
+    int[][] seen;
+    private static final int[][] dirs = {{0, 1}, {0, -1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
     public int maxStudents(char[][] seats) {
-        this.seats = seats;
-        this.m = seats.length;
-        this.n = seats[0].length;
-        int res = 0;
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
+        m = seats.length;
+        n = seats[0].length;
+
+        match = new Integer[m][n];
+        seen = new int[m][n];
+        int ans = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
                 if (seats[i][j] == '.') {
-                    int[] tmp = new int[1];
-                    dfs(i, j, tmp, copy(seats));
-                    res = Math.max(res, tmp[0]);
-                } 
-        return res;
-    }
-    
-    int[][] dirs = {{0, 1}, {0, -1}, {-1, -1}, {-1, 1}};
-    
-    private void dfs(int startX, int startY, int[] res, char[][] seats) {
-        seats[startX][startY] = 'X';
-        for (int[] dir : dirs) {
-            int x = startX + dir[0], y = startY + dir[1];
-            if (x < 0 || x >= m || y < 0 || y >= n) continue;
-            if (seats[x][y] == '.') seats[x][y] = '#';
+                    ans++;
+                    if (match[i][j] == null) 
+                        ans -= dfs(seats, i, j, seen[i][j] = i * n + j);
+                }
+            }
         }
-        
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                if (seats[i][j] == '.')
-                    if (checkValid(i, j, seats))
-                        banSeat(i, j, seats);
-        
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                if (seats[i][j] == 'X') res[0]++;
+        return ans;
     }
-    
-    private void banSeat(int startX, int startY, char[][] seats) {
-        seats[startX][startY] = 'X';
+
+    private int dfs(char[][] seats, int x, int y, int v) {
         for (int[] dir : dirs) {
-            int x = startX + dir[0], y = startY + dir[1];
-            if (x < 0 || x >= m || y < 0 || y >= n) continue;
-            seats[x][y] = '#';
+            int tx = x + dir[0];
+            int ty = y + dir[1];
+            // only invisted girls with whom the boy has connection and has not invited before
+            if (tx >= 0 && tx < m && ty >= 0 && ty < n && seats[tx][ty] == '.' && seen[tx][ty] != v) {
+                seen[tx][ty] = v;
+                if (match[tx][ty] == null || dfs(seats, match[tx][ty] / n, match[tx][ty] % n, v) == 1) {
+                    match[x][y] = tx * n + ty;
+                    match[tx][ty] = x * n + y;
+                    return 1;
+                }
+            }
         }
-    }
-    
-    private boolean checkValid(int startX, int startY, char[][] seats) {
-        for (int[] dir : dirs) {
-            int x = startX + dir[0], y = startY + dir[1];
-            if (x < 0 || x >= m || y < 0 || y >= n) continue;
-            if (seats[x][y] == 'X') return false;
-        }
-        return true;
-    }
-    
-    private char[][] copy(char[][] seats) {
-        char[][] tmp = new char[m][n];
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                tmp[i][j] = seats[i][j];
-        return tmp;
+        return 0;
     }
 }
