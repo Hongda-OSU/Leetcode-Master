@@ -1,62 +1,63 @@
 class ExamRoom {
-    
-    private PriorityQueue<int[]> pq;
-    private int N;
-
-    public ExamRoom(int N) {
-        this.N = N;
-        pq = new PriorityQueue<>((a, b) -> {
-            if ((b[1] - b[0]) / 2 == (a[1] - a[0]) / 2) {
-                return a[0] - b[0];
+    class Interval {
+        int start;
+        int end;
+        int length;
+        public Interval(int start, int end) {
+            this.start = start;
+            this.end = end;
+            if (start == 0 || end == N - 1) {
+                this.length = end - start;
+            } else {
+                this.length = (end - start) / 2;
             }
-            return (b[1] - b[0]) / 2 - (a[1] - a[0]) / 2;
-        });
+        }
+    }
+    private PriorityQueue<Interval> pq;
+    private int N;
+    
+    public ExamRoom(int N) {
+        this.pq = new PriorityQueue<>((a, b) -> a.length != b.length ? b.length - a.length : a.start - b.start);
+        this.N = N;
+        pq.offer(new Interval(0, N - 1));
     }
     
     public int seat() {
-        if (pq.size() == 0) {
-            pq.offer(new int[]{0, 2 * (N - 1)});
-            return 0;
+        Interval in = pq.poll();
+        int result;
+        if (in.start == 0) {
+            result = 0;
+        } else if (in.end == N - 1) {
+            result = N - 1;
         } else {
-            int[] longest = pq.poll();
-            int result = longest[0] + (longest[1] - longest[0]) / 2;
-            if (result != 0) { // result = 0, we don't need to add the left side
-                pq.offer(new int[]{longest[0], result});
-            }
-            if (result != N - 1) { // result = N - 1, we don't need to add the right side
-                pq.offer(new int[]{result, longest[1]});
-            }
-            return result;
+            result = in.start + in.length;
         }
+        
+        if (result > in.start) {
+            pq.offer(new Interval(in.start, result - 1));   
+        }
+        if (in.end > result) {
+            pq.offer(new Interval(result + 1, in.end));   
+        }
+        return result;
     }
     
     public void leave(int p) {
-        if (pq.size() == 1 && (pq.peek()[1] >= N || pq.peek()[0] < 0)) { // Edge cases: Only [0, 2N] or [-N , N] in pq
-            pq.clear();
-            return;
-        }
-        int[] p1 = null, p2 = null; // p1: left side, p2: right side
-        for (int[] pair : pq) {
-            if (pair[1] == p) {
-                p1 = pair;
+        List<Interval> list = new ArrayList(pq);
+        Interval prev = null;
+        Interval next = null;
+        for (Interval in: list) {
+            if (in.end + 1 == p) {
+                prev = in;
             }
-            if (pair[0] == p) {
-                p2 = pair;
+            if (in.start - 1 == p) {
+                next = in;
             }
         }
-        if (p1 != null) {
-            pq.remove(p1);
-        }
-        if (p2 != null) {
-            pq.remove(p2);
-        }
-        if (p1 == null || p1[0] < 0) { // No left side found or p is the left most position in current seats.
-            p1 = new int[]{-p2[1], p};
-        }
-        if (p2 == null || p2[1] >= N) { // No right side found or p is the right most position in current seats.
-            p2 = new int[]{p, p1[0] + 2 * (N - p1[0] - 1)};
-        }
-        pq.offer(new int[]{p1[0], p2[1]});
+        pq.remove(prev);
+        pq.remove(next);
+        pq.offer(new Interval(prev == null ? p : prev.start, next == null ? p : next.end));
+        
     }
 }
 
