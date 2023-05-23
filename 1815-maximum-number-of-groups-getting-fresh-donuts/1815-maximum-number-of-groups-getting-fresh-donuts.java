@@ -1,53 +1,85 @@
 class Solution {
-    public int maxHappyGroups(int batchSize, int[] groups) {
-        int n = groups.length;
-        int[] cnt = new int[batchSize];
-        int res = 0;
-        int remgroup = 0;
-        for(int i = 0; i < n; i++){
-            int gr = groups[i] % batchSize;
-            cnt[gr]++;
-            if(gr != 0) remgroup++;
+    
+    HashMap<Long, Integer> map = new HashMap<>();
+    
+    class State {
+        long mask = 0;
+        
+        State(long v) {
+            mask = v;
         }
-        for(int i = 1; i <= batchSize / 2; i++){
-            int val = Math.min(cnt[i], cnt[batchSize - i]);
-            if(batchSize % 2 == 0 && i == batchSize / 2){
-                val = cnt[i] / 2;
-            }
-            res += val;
-            cnt[i] -= val;
-            cnt[batchSize - i] -= val;
-            remgroup -= val * 2;
+        
+        public boolean isEmpty(int i) {
+            return ((mask >> (i*5)) & 31L) == 0;
         }
-        res += cnt[0];
-        res += dfs(0, cnt, remgroup, new HashMap<>());
-        return(res);
+        
+        public void add(int i, long v) {
+            mask += v << (i*5);
+        }
+        
+        public void minus1(int i) {
+            mask -= 1L << (i*5);
+        }
     }
-        
-        
-    public int dfs(int curr, int[] cnt, int remgroup, Map<String, Integer> memo){
-        int n = cnt.length;
-        if(remgroup == 0) return(0);
-        String key = curr + Arrays.toString(cnt);
-        if(memo.containsKey(key)) return(memo.get(key));
-        int res = 0;
-        if(curr == 0){
-            res++;
-            curr = n;
+    
+    public int maxHappyGroups(int batchSize, int[] groups) {
+        int[] cnt = new int[batchSize];
+        for (int g : groups) {
+            cnt[g % batchSize]++;
         }
-        int val = 0;
-        for(int i = 1; i < n; i++){
-            //remainder of i cnt is 0
-            if(cnt[i] == 0) continue;
-            cnt[i]--;
-            int currem = remgroup - 1;
-            int nextcurr = curr - i;
-            if(nextcurr < 0) nextcurr += n;
-            val = Math.max(val, dfs(nextcurr, cnt, currem, memo));
-            cnt[i]++;
+        
+        // optimization
+        // try to combine groups to pairs
+        for (int i = 1; i < batchSize; i++) {
+            if (cnt[i] == 0) {
+                continue;
+            }
+            
+            int search = batchSize - i;
+            
+            if (search == i) {
+                cnt[0] += cnt[i] / 2;
+                cnt[i] = cnt[i] % 2;
+                continue;
+            }
+            
+            int min = Math.min(cnt[i], cnt[search]);
+            cnt[0] += min;
+            cnt[i] -= min;
+            cnt[search] -= min;
         }
-        res += val;
-        memo.put(key, res);
-        return(res);
+        
+        State state = new State(0);
+        for (int i = 1; i < batchSize; i++) {
+            state.add(i, cnt[i]);
+        }
+        
+        return dfs(0, batchSize, state) + cnt[0];
+    }
+    
+    public int dfs(int rem, int batchSize, State state) {
+        if (state.mask == 0) {
+            return 0;
+        }
+        if (map.containsKey(state.mask)) {
+            return map.get(state.mask);
+        }
+        
+        int max = 0;
+        
+        for (int i = 1; i < batchSize; i++) {
+            if (state.isEmpty(i)) {
+                continue;
+            }
+            State newState = new State(state.mask);
+            newState.minus1(i);
+            max = Math.max(max, dfs((batchSize-i+rem)%batchSize, batchSize, newState));
+        }
+        
+        max += (rem == 0) ? 1 : 0;
+        
+        map.put(state.mask, max);
+        
+        return max;
     }
 }
