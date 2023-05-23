@@ -1,18 +1,37 @@
 class Solution {
-   int gcd(int a, int b) { return b == 0 ? a : gcd(b, a % b); }
-int dfs(int[] n, int[][] dp, int i, int mask) {
-    if (i > n.length / 2)
-        return 0;
-    if (dp[i][mask] == 0)
-        for (int j = 0; j < n.length; ++j)
-            for (int k = j + 1; k < n.length; ++k) {
-                int new_mask = (1 << j) + (1 << k);
-                if ((mask & new_mask) == 0)
-                    dp[i][mask] = Math.max(dp[i][mask], i * gcd(n[j], n[k]) + dfs(n, dp, i + 1, mask + new_mask));
+    public int maxScore(int[] nums) {
+        int[] dp = new int[1 << 14];
+        Arrays.fill(dp, -1);
+        int m = nums.length;
+        int[][] gcd = new int[m][m];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < m; j++) 
+                gcd[i][j] = gcd(nums[i], nums[j]);
+        }
+        return helper(nums, 1, 0, dp, gcd);
+    }
+    
+    private int helper(int[] nums, int op, int mask, int[] dp, int[][] gcd) {
+        int m = nums.length, n = m / 2;
+        if (op > n)
+            return 0;
+        if (dp[mask] != -1)
+            return dp[mask];
+        for (int i = 0; i < m; i++) {
+            if ((mask & (1 << i)) != 0)
+                continue;
+            for (int j = i + 1; j < m; j++) {
+                if ((mask & (1 << j)) != 0)
+                    continue;
+                int newMask = (1 << i) | (1 << j) | mask;
+                int score = op * gcd[i][j] + helper(nums, op + 1, newMask, dp, gcd);
+                dp[mask] = Math.max(dp[mask], score);
             }
-    return dp[i][mask];
-}
-int maxScore(int[] n) {
-    return dfs(n, new int[n.length / 2 + 1][1 << n.length], 1, 0);
-}
+        }
+        return dp[mask];
+    }
+    
+     private int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
 }
