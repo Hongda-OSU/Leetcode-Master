@@ -27,64 +27,64 @@ class Excel {
         return table[row][column - 'A'].getValue();
     }
     
-    class Cell {
-    public int val = 0;
-    public HashMap<Cell, Integer> formula = new HashMap<>();
+    private class Cell {
+        public int val = 0;
+        public HashMap<Cell, Integer> formula = new HashMap<>();
     
-    public Cell(int val) {
-        setValue(val);
-    }
+        public Cell(int val) {
+            setValue(val);
+        }
     
-    public Cell(String[] formulaStr) {
-        setFormula(formulaStr);
-    }
+        public Cell(String[] formulaStr) {
+            setFormula(formulaStr);
+        }
     
-    public void setValue(int val) {
-        formula.clear();
-        this.val = val;
-    }
+        public void setValue(int val) {
+            formula.clear();
+            this.val = val;
+        }
     
-    public void setFormula(String[] formulaStr) {
-        formula.clear();
-        for (String str : formulaStr) {
-            if (str.indexOf(":") < 0) {
-                int[] pos = getPos(str);
-                addFormulaCell(pos[0], pos[1]);
-            } else {
-                String[] pos = str.split(":");
-                int[] start = getPos(pos[0]);
-                int[] end = getPos(pos[1]);
-                for (int r = start[0]; r <= end[0]; r++) {
-                    for (int c = start[1]; c <= end[1]; c++) 
-                        addFormulaCell(r, c);
+        public void setFormula(String[] formulaStr) {
+            formula.clear();
+            for (String str : formulaStr) {
+                if (str.indexOf(":") < 0) {
+                    int[] pos = getPos(str);
+                    addFormulaCell(pos[0], pos[1]);
+                } else {
+                    String[] pos = str.split(":");
+                    int[] start = getPos(pos[0]);
+                    int[] end = getPos(pos[1]);
+                    for (int r = start[0]; r <= end[0]; r++) {
+                        for (int c = start[1]; c <= end[1]; c++) 
+                            addFormulaCell(r, c);
+                    }
                 }
             }
         }
-    }
     
-    public int getValue() {
-        if (formula.isEmpty())
-            return val;
-        int sum = 0;
-        for (Cell cell : formula.keySet())
-            sum += cell.getValue() * formula.get(cell);
-        return sum;
-    }
+        public int getValue() {
+            if (formula.isEmpty())
+                return val;
+            int sum = 0;
+            for (Cell cell : formula.keySet())
+                sum += cell.getValue() * formula.get(cell);
+            return sum;
+        }
     
-    private int[] getPos(String str) {
-        int[] pos = new int[2];
-        pos[1] = str.charAt(0) - 'A';
-        pos[0] = Integer.parseInt(str.substring(1));
-        return pos;
-    }
+        private int[] getPos(String str) {
+            int[] pos = new int[2];
+            pos[1] = str.charAt(0) - 'A';
+            pos[0] = Integer.parseInt(str.substring(1));
+            return pos;
+        }
     
-    private void addFormulaCell(int r, int c) {
-        if (table[r][c] == null)
-            table[r][c] = new Cell(0);
-        Cell cell = table[r][c];
-        formula.put(cell, (formula.containsKey(cell) ? formula.get(cell) : 0) + 1);
+        private void addFormulaCell(int r, int c) {
+            if (table[r][c] == null)
+                table[r][c] = new Cell(0);
+            Cell cell = table[r][c];
+            formula.put(cell, (formula.containsKey(cell) ? formula.get(cell) : 0) + 1);
+        }
     }
-}
 }
 
 
