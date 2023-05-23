@@ -1,41 +1,46 @@
 class Solution {
-    private int size;
-    
     public int totalNQueens(int n) {
-        size = n;
-        return backtrack(0, new HashSet<>(), new HashSet<>(), new HashSet<>());
+        char board[][] = new char[n][n];
+        for(char i[] : board)
+            Arrays.fill(i, '.');
+        return dfs(0, board);
     }
-    
-    private int backtrack(int row, Set<Integer> diagonals, Set<Integer> antiDiagonals, Set<Integer> cols) {
-        // Base case - N queens have been placed
-        if (row == size) {
-            return 1;
-        }
-        
-        int solutions = 0;
-        for (int col = 0; col < size; col++) {
-            int currDiagonal = row - col;
-            int currAntiDiagonal = row + col;
-            // If the queen is not placeable
-            if (cols.contains(col) || diagonals.contains(currDiagonal) || antiDiagonals.contains(currAntiDiagonal)) {
-                continue;    
+    public int dfs(int col, char board[][]){
+        if(col == board.length) return 1;
+        int count = 0;
+        for(int row = 0; row < board.length; row++){
+            if(isSafe(board, row, col)){
+                board[row][col] = 'Q';
+                count += dfs(col + 1, board);
+                board[row][col] = '.';
             }
-            
-            // "Add" the queen to the board
-            cols.add(col);
-            diagonals.add(currDiagonal);
-            antiDiagonals.add(currAntiDiagonal);
-
-            // Move on to the next row with the updated board state
-            solutions += backtrack(row + 1, diagonals, antiDiagonals, cols);
-
-            // "Remove" the queen from the board since we have already
-            // explored all valid paths using the above function call
-            cols.remove(col);
-            diagonals.remove(currDiagonal);
-            antiDiagonals.remove(currAntiDiagonal); 
+        }
+        return count;
+    }
+    public boolean isSafe(char board[][], int row, int col){
+        int dupRow = row;
+        int dupCol = col;
+        
+        while(row >= 0 && col >= 0){
+            if(board[row][col] == 'Q') return false;
+            row--;
+            col--;
         }
         
-        return solutions;
+        row = dupRow;
+        col = dupCol;
+        while(col >= 0){
+            if(board[row][col] == 'Q') return false;
+            col--;
+        }
+        
+        row = dupRow;
+        col = dupCol;
+        while(col >= 0 && row < board.length){
+            if(board[row][col] == 'Q') return false;
+            row++;
+            col--;
+        }
+        return true;
     }
 }
