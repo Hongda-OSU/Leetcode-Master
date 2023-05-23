@@ -1,51 +1,40 @@
 class Solution {
-    public int maxScore(int[] nums) {
-        int maxStates = 1 << nums.length; // 2^(nums array size)
-        int finalMask = maxStates - 1;
+    public int func(int[] nums, int op, int mask, int[] dp, int[][] gcd) {
+        int m = nums.length, n = nums.length/2;
 
-        // 'dp[i]' stores max score we can get after picking remaining numbers represented by 'i'.
-        int[] dp = new int[maxStates];
+        if(op > n) return 0;
+        if(dp[mask] != -1) return dp[mask];
 
-        // Iterate on all possible states one-by-one.
-        for (int state = finalMask; state >= 0; state--) {
-            // If we have picked all numbers, we know we can't get more score as no number is remaining.
-            if (state == finalMask) {
-                dp[state] = 0;
-                continue;
-            }
+        for(int i=0; i<m; i++) {
+            if( (mask & (1<<i)) != 0 ) continue;
+            for(int j=i+1; j<m; j++) {
+                if( (mask & (1<<j)) != 0 ) continue;
 
-            int numbersTaken = Integer.bitCount(state);
-            int pairsFormed = numbersTaken / 2;
-            // States representing even numbers are taken are only valid.
-            if (numbersTaken % 2 != 0) {
-                continue;
-            }
-
-            // We have picked 'pairsFormed' pairs, we try all combinations of one more pair now.
-            // We iterate on two numbers using two nested for loops.
-            for (int firstIndex = 0; firstIndex < nums.length; firstIndex++) {
-                for (int secondIndex = firstIndex + 1; secondIndex < nums.length; secondIndex++) {
-                    // We only choose those numbers which were not already picked.
-                    if (((state >> firstIndex) & 1) == 1 || ((state >> secondIndex) & 1) == 1) {
-                        continue;
-                    }
-                    int currentScore = (pairsFormed + 1) * gcd(nums[firstIndex], nums[secondIndex]);
-                    int stateAfterPickingCurrPair = state | (1 << firstIndex) | (1 << secondIndex);
-                    int remainingScore = dp[stateAfterPickingCurrPair];
-                    dp[state] = Math.max(dp[state], currentScore + remainingScore);
-                }
+                int newMask = (1<<i) | (1<<j) | mask;
+                int score = op * gcd[i][j] + func(nums, op+1, newMask, dp, gcd);
+                dp[mask] = Math.max(dp[mask], score);
             }
         }
 
-        // Returning score we get from 'n' remaining numbers of array.
-        return dp[0];
+        return dp[mask];
     }
 
-    // Helper method to calculate GCD using Euclidean algorithm.
-    private int gcd(int a, int b) {
-        if (b == 0) {
-            return a;
+    public int maxScore(int[] nums) {
+        int[] dp = new int[1<<14];
+        Arrays.fill(dp, -1);
+
+        int m = nums.length, n = nums.length/2;
+        int[][] gcd = new int[m][m];
+        for(int i=0; i<m; i++) {
+            for(int j=0; j<m; j++) {
+                gcd[i][j] = gcd(nums[i], nums[j]);
+            }
         }
-        return gcd(b, a % b);
+
+        return func(nums, 1, 0, dp, gcd);
+    }
+
+    private int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
     }
 }
