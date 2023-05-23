@@ -1,40 +1,35 @@
 class Solution {
-    public int func(int[] nums, int op, int mask, int[] dp, int[][] gcd) {
-        int m = nums.length, n = nums.length/2;
-
-        if(op > n) return 0;
-        if(dp[mask] != -1) return dp[mask];
-
-        for(int i=0; i<m; i++) {
-            if( (mask & (1<<i)) != 0 ) continue;
-            for(int j=i+1; j<m; j++) {
-                if( (mask & (1<<j)) != 0 ) continue;
-
-                int newMask = (1<<i) | (1<<j) | mask;
-                int score = op * gcd[i][j] + func(nums, op+1, newMask, dp, gcd);
-                dp[mask] = Math.max(dp[mask], score);
-            }
-        }
-
-        return dp[mask];
-    }
-
     public int maxScore(int[] nums) {
-        int[] dp = new int[1<<14];
-        Arrays.fill(dp, -1);
-
-        int m = nums.length, n = nums.length/2;
-        int[][] gcd = new int[m][m];
-        for(int i=0; i<m; i++) {
-            for(int j=0; j<m; j++) {
-                gcd[i][j] = gcd(nums[i], nums[j]);
+        int n = nums.length;
+        Map<Integer, Integer> gcdVal = new HashMap<>();
+        for (int i = 0; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                gcdVal.put((1 << i) + (1 << j), gcd(nums[i], nums[j]));
             }
         }
-
-        return func(nums, 1, 0, dp, gcd);
+        
+        int[] dp = new int[1 << n];
+        
+        for (int i = 0; i < (1 << n); ++i) {
+            int bits = Integer.bitCount(i); // how many numbers are used
+            if (bits % 2 != 0) // odd numbers, skip it
+                continue;
+            for (int k : gcdVal.keySet()) {
+                if ((k & i) != 0) // overlapping used numbers
+                    continue;
+                dp[i ^ k] = Math.max(dp[i ^ k], dp[i] + gcdVal.get(k) * (bits / 2 + 1));
+            }
+        }
+        
+        return dp[(1 << n) - 1];
     }
-
-    private int gcd(int a, int b) {
-        return b == 0 ? a : gcd(b, a % b);
+    
+    public int gcd(int a, int b) {
+        if (b == 0)   
+            return a;     
+        return gcd(b, a % b);   
     }
 }
+
+// Time: O(2^n * n^2)
+// Space: O(2 ^ n)
