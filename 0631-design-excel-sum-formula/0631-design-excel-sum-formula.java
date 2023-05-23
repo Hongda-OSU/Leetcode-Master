@@ -1,87 +1,129 @@
 public class Excel {
-    Cell[][] table;
+    private final static int BASE = 'A';
+    private final Expression[][] spreadsheet;
 
     public Excel(int H, char W) {
-        table = new Cell[H+1][W-'A'+1];
+        this.spreadsheet = new Expression[H+1][W - BASE+1];
     }
-    
+
     public void set(int r, char c, int v) {
-        if(table[r][c-'A'] == null) table[r][c-'A'] = new Cell (v); 
-        else table[r][c-'A'].setValue(v); 
+        spreadsheet[r][c - BASE] = new Value(v);
     }
-    
+
     public int get(int r, char c) {
-        if( table[r][c-'A'] == null) return 0;
-        else return table[r][c-'A'].getValue();  
-    }
-    
-    public int sum(int r, char c, String[] strs) {
-        if (table[r][c-'A'] == null) {
-            table[r][c-'A'] = new Cell(strs);
+        Expression cell = spreadsheet[r][c - BASE];
+        if (cell != null) {
+            return cell.evaluate(this);
         } else {
-            table[r][c-'A'].setFormula(strs);
+            return 0;
         }
-        
-        return table[r][c-'A'].getValue();
     }
-    
-    
-    private class Cell{
-        int val=0;
-        HashMap<Cell, Integer> formula=new HashMap<>();//one cell might appear multiple times
-        
-        public Cell(int val){
-            setValue(val); 
+
+    public int sum(int r, char c, String[] strs) {
+        Expression[] expressions = new Expression[strs.length];
+
+        for (int i = 0; i < strs.length; i++) {
+            String[] split = strs[i].split(":");
+            if (split.length == 1) {
+                expressions[i] = new Reference(split[0]);
+            } else {
+                String topLeft = split[0];
+                String bottomRight = split[1];
+                expressions[i] = new Rectangle(topLeft, bottomRight);
+            }
         }
-        public Cell(String[] formulaStr){
-            setFormula(formulaStr);
+
+        spreadsheet[r][c - BASE] = new Formula(expressions);
+        return spreadsheet[r][c - BASE].evaluate(this);
+    }
+
+    private int getRow(String cell) {
+        return Integer.valueOf(cell.substring(1));
+    }
+
+    private int getColumn(String cell) {
+        return cell.charAt(0) - BASE;
+    }
+
+    private interface Expression {
+        int evaluate(Excel excel);
+    }
+
+    private class Value implements Expression {
+        private final int value;
+
+        Value(int value) {
+            this.value = value;
         }
-        
-        public void setValue(int val) {           
-            formula.clear(); //will not be treated as a formula cell anymore        
-            this.val = val;
+
+        public int evaluate(Excel excel) {
+            return value;
         }
-        
-        public void setFormula(String[] formulaStr){
-            formula.clear();            
-            for(String str : formulaStr){
-                if (str.indexOf(":")<0){
-                    int[] pos = getPos(str);
-                    addFormulaCell(pos[0], pos[1]);
-                } else {
-                    String[] pos = str.split(":");
-                    int[] startPos = getPos(pos[0]);
-                    int[] endPos = getPos(pos[1]);
-                    for(int r = startPos[0]; r<=endPos[0]; r++){
-                        for(int c = startPos[1]; c<=endPos[1]; c++){
-                            addFormulaCell(r, c);
-                        }
+    }
+
+    private class Formula implements Expression {
+        private final Expression[] expressions;
+
+        Formula(Expression[] expressions) {
+            this.expressions = expressions;
+        }
+
+        public int evaluate(Excel excel) {
+            int value = 0;
+
+            for (Expression expression : expressions) {
+                value += expression.evaluate(excel);
+            }
+
+            return value;
+        }
+    }
+
+    private class Reference implements Expression {
+        private final int row;
+        private final int column;
+
+        Reference(String cell) {
+            this.row = getRow(cell);
+            this.column = getColumn(cell);
+        }
+
+        public int evaluate(Excel excel) {
+            Expression cell = excel.spreadsheet[row][column];
+            if (cell != null) {
+                return cell.evaluate(excel);
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    private class Rectangle implements Expression {
+        private final int rowStart;
+        private final int rowEnd;
+        private final int columnStart;
+        private final int columnEnd;
+
+        Rectangle(String topLeft, String bottomRight) {
+            this.rowStart = getRow(topLeft);
+            this.rowEnd = getRow(bottomRight);
+            this.columnStart = getColumn(topLeft);
+            this.columnEnd = getColumn(bottomRight);
+        }
+
+        public int evaluate(Excel excel) {
+            int value = 0;
+
+            for (int i = rowStart; i <= rowEnd; i++) {
+                for (int j = columnStart; j <= columnEnd; j++) {
+                    Expression cell = excel.spreadsheet[i][j];
+                    if (cell != null) {
+                        value += cell.evaluate(excel);
                     }
                 }
             }
-        }
-        
-        private int[] getPos(String str){
-            int[] pos = new int[2];
-            pos[1]=str.charAt(0)-'A';
-            pos[0]=Integer.parseInt(str.substring(1));
-            return pos;
-        }
-        
-        private void addFormulaCell(int r, int c){
-            if(table[r][c] == null) table[r][c] = new Cell(0);
-            Cell rangeCell = table[r][c];                            
-            formula.put(rangeCell, (formula.containsKey(rangeCell)? formula.get(rangeCell) : 0)+1);
-        }
-        
-        //recursive method
-        private int getValue(){
-            if(this.formula.isEmpty()) return this.val;
-            int sum = 0;
-            for(Cell cell : formula.keySet()){
-                sum+=cell.getValue()*formula.get(cell);
-            }
-            return sum;
+
+            return value;
         }
     }
 }
