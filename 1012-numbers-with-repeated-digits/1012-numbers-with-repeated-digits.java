@@ -1,29 +1,25 @@
 class Solution {
-   public int numDupDigitsAtMostN(int N) {
-        // Transform N + 1 to arrayList
-        ArrayList<Integer> L = new ArrayList<Integer>();
-        for (int x = N + 1; x > 0; x /= 10)
-            L.add(0, x % 10);
-
-        // Count the number with digits < N
-        int res = 0, n = L.size();
-        for (int i = 1; i < n; ++i)
-            res += 9 * A(9, i - 1);
-
-        // Count the number with same prefix
-        HashSet<Integer> seen = new HashSet<>();
-        for (int i = 0; i < n; ++i) {
-            for (int j = i > 0 ? 0 : 1; j < L.get(i); ++j)
-                if (!seen.contains(j))
-                    res += A(9 - i, n - i - 1);
-            if (seen.contains(L.get(i))) break;
-            seen.add(L.get(i));
+    public int numDupDigitsAtMostN(int n) {
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = n + 1; i > 0; i /= 10) 
+            list.add(0, i % 10);
+        int result = 0, size = list.size();
+        for (int i = 1; i < size; i++)
+            result += 9 * helper(9, i - 1);
+        HashSet<Integer> visited = new HashSet<>();
+        for (int i = 0; i < size; i++) {
+            for (int j = i > 0 ? 0 : 1; j < list.get(i); j++) {
+                if (!visited.contains(j))
+                    result += helper(9 - i, size - i - 1);
+            }
+            if (visited.contains(list.get(i)))
+                break;
+            visited.add(list.get(i));
         }
-        return N - res;
+        return n - result;
     }
-
-
-    public int A(int m, int n) {
-        return n == 0 ? 1 : A(m, n - 1) * (m - n + 1);
+    
+    private int helper(int m, int n) {
+        return n == 0 ? 1 : helper(m, n - 1) * (m - n + 1);
     }
 }
