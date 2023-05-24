@@ -1,40 +1,79 @@
-class BIT { // one-based indexing
-    int[] bit;
-    BIT(int size) {
-        bit = new int[size + 1];
+public class NumArray {
+
+    class SegmentTreeNode {
+        int start, end;
+        SegmentTreeNode left, right;
+        int sum;
+
+        public SegmentTreeNode(int start, int end) {
+            this.start = start;
+            this.end = end;
+            this.left = null;
+            this.right = null;
+            this.sum = 0;
+        }
     }
-    int getSum(int idx) { // Get sum in range [1..idx]
-        int sum = 0;
-        for (; idx > 0; idx -= idx & (-idx))
-            sum += bit[idx];
-        return sum;
+      
+    SegmentTreeNode root = null;
+   
+    public NumArray(int[] nums) {
+        root = buildTree(nums, 0, nums.length-1);
     }
-    int getSumRange(int left, int right) { // left, right inclusive
-        return getSum(right) - getSum(left - 1);
+
+    private SegmentTreeNode buildTree(int[] nums, int start, int end) {
+        if (start > end) {
+            return null;
+        } else {
+            SegmentTreeNode ret = new SegmentTreeNode(start, end);
+            if (start == end) {
+                ret.sum = nums[start];
+            } else {
+                int mid = start  + (end - start) / 2;             
+                ret.left = buildTree(nums, start, mid);
+                ret.right = buildTree(nums, mid + 1, end);
+                ret.sum = ret.left.sum + ret.right.sum;
+            }         
+            return ret;
+        }
     }
-    void addValue(int idx, int val) { 
-        for (; idx < bit.length; idx += idx & (-idx))
-            bit[idx] += val;
+   
+    void update(int i, int val) {
+        update(root, i, val);
+    }
+   
+    void update(SegmentTreeNode root, int pos, int val) {
+        if (root.start == root.end) {
+           root.sum = val;
+        } else {
+            int mid = root.start + (root.end - root.start) / 2;
+            if (pos <= mid) {
+                 update(root.left, pos, val);
+            } else {
+                 update(root.right, pos, val);
+            }
+            root.sum = root.left.sum + root.right.sum;
+        }
+    }
+
+    public int sumRange(int i, int j) {
+        return sumRange(root, i, j);
+    }
+    
+    public int sumRange(SegmentTreeNode root, int start, int end) {
+        if (root.end == end && root.start == start) {
+            return root.sum;
+        } else {
+            int mid = root.start + (root.end - root.start) / 2;
+            if (end <= mid) {
+                return sumRange(root.left, start, end);
+            } else if (start >= mid+1) {
+                return sumRange(root.right, start, end);
+            }  else {    
+                return sumRange(root.right, mid+1, end) + sumRange(root.left, start, mid);
+            }
+        }
     }
 }
-class NumArray {
-    BIT bit;
-    int[] nums;
-    public NumArray(int[] nums) {
-        this.nums = nums;
-        bit = new BIT(nums.length);
-        for (int i = 0; i < nums.length; ++i)
-            bit.addValue(i+1, nums[i]);
-    }
-    public void update(int index, int val) {
-        int diff = val - nums[index]; // get diff amount of `val` compared to current value
-        bit.addValue(index + 1, diff); // add this `diff` amount at index `index+1` of BIT, plus 1 because in BIT it's 1-based indexing
-        nums[index] = val; // update latest value of `nums[index]`
-    }
-    public int sumRange(int left, int right) {
-        return bit.getSum(right+1) - bit.getSum(left);
-    }
-}       
 
 /**
  * Your NumArray object will be instantiated and called as such:
