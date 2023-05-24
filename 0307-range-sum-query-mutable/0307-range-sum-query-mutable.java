@@ -1,39 +1,57 @@
-public class NumArray {
-    int[] tree;
+class NumArray {
+  static class BinaryIndexedTree {
+    int[] nums;
+    int[] BIT;
     int n;
 
-    public NumArray(int[] nums) {
-        n = nums.length;
-        tree = new int[n << 1];
-        buildTree(nums);
+    public BinaryIndexedTree(int[] nums) {
+      this.nums = nums;
+      this.n = nums.length;
+      BIT = new int[n + 1];
+      for (int i = 0; i < n; i++) {
+        init(i, nums[i]);
+      }
     }
 
-    private void buildTree(int[] nums) {
-        for (int i = n; i < n << 1; i++) {
-            tree[i] = nums[i - n];
-        }
-
-        for (int i = n - 1; i > 0; i--) {
-            tree[i] = tree[i << 1] + tree[i << 1 | 1];
-        }
+    void init(int i, int val) {
+      i++;
+      while (i <= n) {
+        BIT[i] += val;
+        i += (i & -i);
+      }
     }
 
     void update(int i, int val) {
-        for (tree[i += n] = val; i > 0; i >>= 1) {
-            tree[i >> 1] = tree[i] + tree[i ^ 1];
-        }
+      int diff = val - nums[i];
+      nums[i] = val;
+      init(i, diff);
     }
 
-    public int sumRange(int i, int j) {
-        int ret = 0;
-        for (i += n, j += n; i <= j; i >>= 1, j >>= 1) {
-            if ((i & 1) == 1) ret += tree[i++];
-            if ((j & 1) == 0) ret += tree[j--];
-        }
-        return ret;
+    int getSum(int i) {
+      i++;
+      int ret = 0;
+      while (i > 0) {
+        ret += BIT[i];
+        i -= (i & -i);
+      }
+      return ret;
     }
+  }
+
+  BinaryIndexedTree binaryIndexedTree;
+
+  public NumArray(int[] nums) {
+    binaryIndexedTree = new BinaryIndexedTree(nums);
+  }
+
+  public void update(int index, int val) {
+    binaryIndexedTree.update(index, val);
+  }
+
+  public int sumRange(int left, int right) {
+    return binaryIndexedTree.getSum(right) - binaryIndexedTree.getSum(left - 1);
+  }
 }
-
 /**
  * Your NumArray object will be instantiated and called as such:
  * NumArray obj = new NumArray(nums);
