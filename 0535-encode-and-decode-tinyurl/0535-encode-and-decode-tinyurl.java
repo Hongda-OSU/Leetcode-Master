@@ -1,27 +1,18 @@
 public class Codec {
-    String alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    HashMap<String, String> map = new HashMap<>();
-    Random rand = new Random();
-    String key = getRand();
-
-    public String getRand() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            sb.append(alphabet.charAt(rand.nextInt(62)));
-        }
-        return sb.toString();
-    }
+    Map<Integer, String> map = new HashMap<>();
+    Random r = new Random();
+    int key = r.nextInt(Integer.MAX_VALUE);
 
     public String encode(String longUrl) {
         while (map.containsKey(key)) {
-            key = getRand();
+            key = r.nextInt(Integer.MAX_VALUE);
         }
         map.put(key, longUrl);
         return "http://tinyurl.com/" + key;
     }
 
     public String decode(String shortUrl) {
-        return map.get(shortUrl.replace("http://tinyurl.com/", ""));
+        return map.get(Integer.parseInt(shortUrl.replace("http://tinyurl.com/", "")));
     }
 }
 
