@@ -1,5 +1,6 @@
 public class Codec {
-    private static final String alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String alphabet = 
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private HashMap<String, String> map = new HashMap<>();
     private Random rand = new Random();
     private String key = getRandom();
