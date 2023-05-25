@@ -1,62 +1,56 @@
-public class RandomizedCollection {
+class RandomizedCollection {
 
-    ArrayList<Integer> result;
-    HashMap<Integer, LinkedHashSet<Integer>> map;
-    
+    List<Integer> nums;
+    Map<Integer, Set<Integer>> idxMap;
+    Random random;
+
     public RandomizedCollection() {
-        result = new ArrayList<Integer>();
-        map = new HashMap<Integer, LinkedHashSet<Integer>>();
+        nums = new ArrayList<>();
+        idxMap = new HashMap<>();
+        random = new Random();
     }
-    
-    /** Inserts a value to the collection. Returns true if the collection did not already contain the specified element. */
+
     public boolean insert(int val) {
-        // Add item to map if it doesn't already exist.
-        boolean alreadyExists = map.containsKey(val);
-        if(!alreadyExists) {
-            map.put(val, new LinkedHashSet<Integer>());
+        boolean response = !idxMap.containsKey(val);
+
+        if (response) {
+            idxMap.put(val, new HashSet<>());
         }
-        map.get(val).add(result.size());
-        result.add(val);
-        return !alreadyExists;
+        idxMap.get(val).add(nums.size());
+        nums.add(val);
+
+        return response;
     }
-    
-    /** Removes a value from the collection. Returns true if the collection contained the specified element. */
+
     public boolean remove(int val) {
-        if(!map.containsKey(val)) {
+        if (!idxMap.containsKey(val)) {
             return false;
         }
-        // Get arbitary index of the ArrayList that contains val
-        LinkedHashSet<Integer> valSet = map.get(val);
-        int indexToReplace = valSet.iterator().next();
-        
-        // Obtain the set of the number in the last place of the ArrayList
-        int numAtLastPlace = result.get(result.size() - 1);
-        LinkedHashSet<Integer> replaceWith = map.get(numAtLastPlace);
-        
-        // Replace val at arbitary index with very last number
-        result.set(indexToReplace, numAtLastPlace);
-        
-        // Remove appropriate index
-        valSet.remove(indexToReplace);
-        
-        // Don't change set if we were replacing the removed item with the same number
-        if(indexToReplace != result.size() - 1) {
-            replaceWith.remove(result.size() - 1);
-            replaceWith.add(indexToReplace);
+
+        Set<Integer> idxSet = idxMap.get(val);
+        int idxToBeRemoved = idxSet.iterator().next();
+        if (idxSet.size() == 1) {
+            idxMap.remove(val);
+        } else {
+            idxSet.remove(idxToBeRemoved);
         }
-        result.remove(result.size() - 1);
-        
-        // Remove map entry if set is now empty, then return
-        if(valSet.isEmpty()) {
-            map.remove(val);
+
+        int lastIdx = nums.size() - 1;
+        if (idxToBeRemoved != lastIdx) {
+            int lastVal = nums.get(lastIdx);
+            Set<Integer> lastIdxSet = idxMap.get(lastVal);
+            lastIdxSet.add(idxToBeRemoved);
+            lastIdxSet.remove(lastIdx);
+            nums.set(idxToBeRemoved, lastVal);
         }
+
+        nums.remove(lastIdx);
+
         return true;
     }
-    
-    /** Get a random element from the collection. */
+
     public int getRandom() {
-        // Get linearly random item
-        return result.get((int)(Math.random() * result.size()));
+        return nums.get(random.nextInt(nums.size()));
     }
 }
 
