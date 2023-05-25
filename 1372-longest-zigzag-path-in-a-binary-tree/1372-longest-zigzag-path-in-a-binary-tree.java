@@ -14,23 +14,20 @@
  * }
  */
 class Solution {
-    public int maxLength=0;
-    public void solve(TreeNode root,int dir,int currLength){
-        if(root==null) return;
-        maxLength=Math.max(maxLength,currLength);
-        if(dir==1){
-            solve(root.left,0,currLength+1);
-            solve(root.right,1,1);
-        }
-        else{
-            solve(root.right,1,currLength+1);
-            solve(root.left,0,1);
-        }
-    }
+  int max = 0;
 
-    public int longestZigZag(TreeNode root) {
-        solve(root,0,0);
-        solve(root,1,0);
-        return maxLength;
-    }
+  private int longestZigZag(TreeNode node, boolean isRight) {
+    if (node == null) return 0;
+
+    var l = longestZigZag(node.left, true);
+    var r = longestZigZag(node.right, false);
+
+    max = Math.max(max, 1 + (isRight ? l : r));
+
+    return 1 + (isRight ? r : l);
+  }
+
+  public int longestZigZag(TreeNode root) {
+    return Math.max(longestZigZag(root, true), max) - 1;
+  }
 }
