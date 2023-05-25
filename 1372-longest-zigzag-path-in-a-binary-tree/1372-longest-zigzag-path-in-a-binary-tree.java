@@ -14,20 +14,17 @@
  * }
  */
 class Solution {
-  int max = 0;
-
-  private int longestZigZag(TreeNode node, boolean isRight) {
-    if (node == null) return 0;
-
-    var l = longestZigZag(node.left, true);
-    var r = longestZigZag(node.right, false);
-
-    max = Math.max(max, 1 + (isRight ? l : r));
-
-    return 1 + (isRight ? r : l);
-  }
-
-  public int longestZigZag(TreeNode root) {
-    return Math.max(longestZigZag(root, true), max) - 1;
-  }
+    private int max = 0;
+    
+    public int longestZigZag(TreeNode root) {
+        return Math.max(zigZagHelper(root, true), max) - 1;
+    }
+    
+    private int zigZagHelper(TreeNode node, boolean isRight) {
+        if (node == null)
+            return 0;
+        int left = zigZagHelper(node.left, true), right = zigZagHelper(node.right, false);
+        max = Math.max(max, 1 + (isRight ? left : right));
+        return 1 + (isRight ? right : left);
+    }
 }
