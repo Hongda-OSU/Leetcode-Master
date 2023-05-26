@@ -1,30 +1,63 @@
 class UndergroundSystem {
-    Map<Integer, Pair<String, Integer>> checkInMap = new HashMap<>();  // Uid - {StationName, Time}
-    Map<String, Pair<Double, Integer>> routeMap = new HashMap<>(); // RouteName - {TotalTime, Count}
+    static class TripInfo {
+        int userId;
+        String sourceStation, destinationStation;
+        int startTimestamp, endTimestamp;
 
-    public UndergroundSystem() {}
+        public TripInfo(int usrId, String sourceStation, int startTimestamp) {
+            this.userId = userId;
+            this.sourceStation = sourceStation;
+            this.startTimestamp = startTimestamp;
+        }
+    }
 
+    static class TripsAnalyticDetails {
+        String sourceStation, destinationStation;
+        long totalTrips;
+        long totalTime;
+
+        public TripsAnalyticDetails() {}
+
+    }
+
+    Map<Integer, TripInfo> activeTrips;
+
+    Map<String, Map<String, TripsAnalyticDetails>> analyticsDetails;
+
+    public UndergroundSystem() {
+        activeTrips = new HashMap<>();
+        analyticsDetails = new HashMap<>();
+    }
+    
     public void checkIn(int id, String stationName, int t) {
-        checkInMap.put(id, new Pair<>(stationName, t));
+        activeTrips.put(id, new TripInfo(id, stationName, t));
+        
     }
-
+    
     public void checkOut(int id, String stationName, int t) {
-        Pair<String, Integer> checkIn = checkInMap.get(id);
-        checkInMap.remove(id); // Remove after using it which will not make HashTable big
+        TripInfo activeTrip = activeTrips.remove(id);
+        activeTrip.destinationStation = stationName;
+        activeTrip.endTimestamp = t;
 
-        String routeName = checkIn.getKey() + "_" + stationName;
-        int totalTime = t - checkIn.getValue();
+         Map<String, TripsAnalyticDetails> stationAnalytics = analyticsDetails.getOrDefault(activeTrip.sourceStation, new HashMap<>());
+         TripsAnalyticDetails destinationDetails = stationAnalytics.getOrDefault(stationName, new TripsAnalyticDetails());
+         destinationDetails.destinationStation = stationName;
+         destinationDetails.totalTime += activeTrip.endTimestamp - activeTrip.startTimestamp;
+         destinationDetails.totalTrips++;
 
-        Pair<Double, Integer> route = routeMap.getOrDefault(routeName, new Pair<>(0.0, 0));
-        routeMap.put(routeName, new Pair<>(route.getKey() + totalTime, route.getValue() + 1));
+         stationAnalytics.put(destinationDetails.destinationStation, destinationDetails);
+         analyticsDetails.put(activeTrip.sourceStation, stationAnalytics);
     }
-
+    
     public double getAverageTime(String startStation, String endStation) {
-        String routeName = startStation + "_" + endStation;
-        Pair<Double, Integer> trip = routeMap.get(routeName);
-        return trip.getKey() / trip.getValue();
+        TripsAnalyticDetails details = analyticsDetails.getOrDefault(startStation, new HashMap<>()).getOrDefault(endStation, new TripsAnalyticDetails());
+        long totalTime = details.totalTime;
+        long totalTrips = details.totalTrips;
+        return totalTrips == 0 ? 0 : (1.0 * totalTime) / totalTrips;
+        
     }
 }
+
 
 /**
  * Your UndergroundSystem object will be instantiated and called as such:
