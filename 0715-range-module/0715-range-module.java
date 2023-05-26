@@ -1,73 +1,62 @@
 class RangeModule {
-    private TreeMap<Integer, Integer> map = new TreeMap<>();
-    
-	/* Start with earliest interval available in the tree */
-	/* And then gradually merge until there's no overlapping intervals in the tree */
+    SegmentNode root;
+    int max = (int) Math.pow(10,9);
+    public RangeModule() {
+        root = new SegmentNode(0,max,false);
+    }
+
     public void addRange(int left, int right) {
-        if (right <= left) return;
-        Map.Entry<Integer, Integer> e = map.floorEntry(left);
-        
-        if (e != null && e.getValue() >= left) {
-            map.remove(e.getKey());
-            left = e.getKey();
-            right = Math.max(right, e.getValue());
-        }
-        
-        while (true) {
-            e = map.ceilingEntry(left);
-            
-            if (e == null || e.getKey() > right) {
-                break;
-            }
-            
-            map.remove(e.getKey());
-            right = Math.max(right, e.getValue());
-        }
-        
-        map.put(left, right);
+        update(root,left,right,true);
     }
-    
+    private boolean update(SegmentNode node,int l,int r,boolean state){
+        if(l<=node.l && r>=node.r){
+            node.state = state;
+            node.left = null;
+            node.right = null;
+            return node.state;
+        }
+        if(l>=node.r || r<=node.l) return node.state;
+        int mid = node.l + (node.r - node.l) / 2;
+        if(node.left==null){
+            node.left = new SegmentNode(node.l,mid,node.state);
+            node.right = new SegmentNode(mid,node.r,node.state);
+        }
+        boolean left = update(node.left, l, r,state);
+        boolean right = update(node.right, l, r,state);
+        node.state = left && right;
+        return node.state;
+    }
+
     public boolean queryRange(int left, int right) {
-        Map.Entry<Integer, Integer> e = map.floorEntry(left);
-        
-        if (e == null) {
-            return false;
-        } else {
-            return e.getKey() <= left && right <= e.getValue();
+        return query(root,left,right);
+    }
+    private boolean query(SegmentNode node,int l,int r){
+        if(l>=node.r || r<=node.l) return true;
+        if((l<=node.l && r>=node.r) || (node.left==null)) return node.state;
+        int mid = node.l + (node.r - node.l) / 2;
+        if(r<=mid){
+            return query(node.left,l,r);
+        }else if(l>=mid){
+            return query(node.right,l,r);
+        }else{
+            return query(node.left,l,r) && query(node.right,l,r);
         }
     }
-    
-	/* Start with earliest interval available in the tree */
+
     public void removeRange(int left, int right) {
-        if (right <= left) return;
-        Map.Entry<Integer, Integer> e = map.floorEntry(left);
-        
-        if (e != null && e.getValue() >= left) {
-            map.remove(e.getKey());
-            map.put(e.getKey(), left);
-            
-            if (e.getValue() > right) {
-                map.put(right, e.getValue());
-            }
-        }
-        
-        while (true) {
-            e = map.ceilingEntry(left);
-            
-            if (e == null || e.getKey() > right) {
-                break;
-            }
-            
-            map.remove(e.getKey());
-            
-            if (e.getValue() > right) {
-                map.put(right, e.getValue());
-                break;
-            }
-        }
+        update(root,left,right,false);
     }
 }
-
+class SegmentNode{
+    public int l, r;
+    public boolean state;
+    public SegmentNode left, right;
+    public SegmentNode(int l,int r,boolean state){
+        this.l = l;
+        this.r = r;
+        this.state = state;
+    }
+}
 
 /**
  * Your RangeModule object will be instantiated and called as such:
