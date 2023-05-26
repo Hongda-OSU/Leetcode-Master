@@ -14,34 +14,30 @@
  * }
  */
 class Solution {
-    private Map<Integer, List<TreeNode>> memo = new HashMap<>();
-
     public List<TreeNode> allPossibleFBT(int n) {
         if (n % 2 == 0) {
-            return new ArrayList<TreeNode>();
-        }
-        if (n == 1) {
-            return Arrays.asList(new TreeNode());
-        }
-        if (memo.containsKey(n)) {
-            return memo.get(n);
+            return new ArrayList<>();
         }
 
-        List<TreeNode> res = new ArrayList<TreeNode>();
-        for (int i = 1; i < n; i += 2) {
-            List<TreeNode> left = allPossibleFBT(i);
-            List<TreeNode> right = allPossibleFBT(n - i - 1);
-
-            for (TreeNode l : left) {
-                for (TreeNode r : right) {
-                    TreeNode root = new TreeNode();
-                    root.left = l;
-                    root.right = r;
-                    res.add(root);
+        List<List<TreeNode>> dp = new ArrayList<>();
+        for (int i = 0; i <= n; i++) {
+            dp.add(new ArrayList<>());
+        }
+        
+        dp.get(1).add(new TreeNode(0));
+        for (int l = 3; l <= n; l += 2) {
+            for (int i = 1; i < l - 1; i += 2) {
+                int j = l - 1 - i;
+                for (TreeNode left : dp.get(i)) {
+                    for (TreeNode right : dp.get(j)) {
+                        TreeNode root = new TreeNode(0);
+                        root.left = left;
+                        root.right = right;
+                        dp.get(l).add(root);
+                    }
                 }
             }
         }
-        memo.put(n, res);
-        return res;
+        return dp.get(n);
     }
 }
