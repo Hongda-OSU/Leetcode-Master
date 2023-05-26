@@ -1,34 +1,73 @@
 class RangeModule {
-    private TreeMap<Integer, Integer> map;
-
-    public RangeModule() {
-        map = new TreeMap<>();
-    }
+    private TreeMap<Integer, Integer> map = new TreeMap<>();
     
+	/* Start with earliest interval available in the tree */
+	/* And then gradually merge until there's no overlapping intervals in the tree */
     public void addRange(int left, int right) {
-        Map.Entry<Integer,Integer> leftEntry = map.floorEntry(left), rightEntry = map.floorEntry(right);
-        if (leftEntry != null && leftEntry.getValue() >= left)
-            left = leftEntry.getKey();
-        if (rightEntry != null && rightEntry.getValue() > right)
-            right = rightEntry.getValue();
-        map.subMap(left, right).clear();
+        if (right <= left) return;
+        Map.Entry<Integer, Integer> e = map.floorEntry(left);
+        
+        if (e != null && e.getValue() >= left) {
+            map.remove(e.getKey());
+            left = e.getKey();
+            right = Math.max(right, e.getValue());
+        }
+        
+        while (true) {
+            e = map.ceilingEntry(left);
+            
+            if (e == null || e.getKey() > right) {
+                break;
+            }
+            
+            map.remove(e.getKey());
+            right = Math.max(right, e.getValue());
+        }
+        
         map.put(left, right);
     }
     
     public boolean queryRange(int left, int right) {
-        Map.Entry<Integer,Integer> leftEntry = map.floorEntry(left);
-        return leftEntry != null && leftEntry.getValue() >= right;
+        Map.Entry<Integer, Integer> e = map.floorEntry(left);
+        
+        if (e == null) {
+            return false;
+        } else {
+            return e.getKey() <= left && right <= e.getValue();
+        }
     }
     
+	/* Start with earliest interval available in the tree */
     public void removeRange(int left, int right) {
-        Map.Entry<Integer,Integer> leftEntry = map.floorEntry(left), rightEntry = map.floorEntry(right);
-        if (leftEntry != null && leftEntry.getValue() > left)
-            map.put(leftEntry.getKey(), left);
-        if (rightEntry != null && rightEntry.getValue() > right)
-            map.put(right, rightEntry.getValue());
-        map.subMap(left, right).clear();
+        if (right <= left) return;
+        Map.Entry<Integer, Integer> e = map.floorEntry(left);
+        
+        if (e != null && e.getValue() >= left) {
+            map.remove(e.getKey());
+            map.put(e.getKey(), left);
+            
+            if (e.getValue() > right) {
+                map.put(right, e.getValue());
+            }
+        }
+        
+        while (true) {
+            e = map.ceilingEntry(left);
+            
+            if (e == null || e.getKey() > right) {
+                break;
+            }
+            
+            map.remove(e.getKey());
+            
+            if (e.getValue() > right) {
+                map.put(right, e.getValue());
+                break;
+            }
+        }
     }
 }
+
 
 /**
  * Your RangeModule object will be instantiated and called as such:
