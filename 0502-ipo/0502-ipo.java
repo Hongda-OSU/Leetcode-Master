@@ -1,37 +1,38 @@
 class Solution {
-    class Project implements Comparable<Project> {
-        int capital, profit;
-
-        public Project(int capital, int profit) {
-            this.capital = capital;
-            this.profit = profit;
+    public int findMaximizedCapital(int k, int W, int[] Profits, int[] Capital) {
+        int maxCapital = 0;
+        for (int i = 0; i < Capital.length; i++) {
+            maxCapital = Math.max(Capital[i], maxCapital);
         }
 
-        public int compareTo(Project project) {
-            return capital - project.capital;
-        }
-    }
-
-    public int findMaximizedCapital(int k, int w, int[] profits, int[] capital) {
-        int n = profits.length;
-        Project[] projects = new Project[n];
-        for (int i = 0; i < n; i++) {
-            projects[i] = new Project(capital[i], profits[i]);
-        }
-        Arrays.sort(projects);
-        // PriorityQueue is a min heap, but we need a max heap, so we use
-        // Collections.reverseOrder()
-        PriorityQueue<Integer> q = new PriorityQueue<Integer>(n, Collections.reverseOrder());
-        int ptr = 0;
-        for (int i = 0; i < k; i++) {
-            while (ptr < n && projects[ptr].capital <= w) {
-                q.add(projects[ptr++].profit);
+        if (W >= maxCapital) {
+            PriorityQueue<Integer> maxHeap = new PriorityQueue<Integer>(new Comparator<Integer>() {
+                @Override
+                public int compare(Integer a, Integer b) {
+                    return a - b;
+                }
+            });
+            for (int p : Profits) {
+                maxHeap.add(p);
+                if (maxHeap.size() > k) maxHeap.poll();
             }
-            if (q.isEmpty()) {
-                break;
-            }
-            w += q.poll();
+            for (int h : maxHeap) W += h;
+            return W;
         }
-        return w;
+
+        int index;
+        int n = Profits.length;
+        for (int i = 0; i < Math.min(k, n); i++) {
+            index = -1;
+            for (int j = 0; j < n; ++j) {
+                if (W >= Capital[j] && (index == -1 || Profits[index] < Profits[j])) {
+                    index = j;
+                }
+            }
+            if (index == -1) break;
+            W += Profits[index];
+            Capital[index] = Integer.MAX_VALUE;
+        }
+        return W;
     }
 }
