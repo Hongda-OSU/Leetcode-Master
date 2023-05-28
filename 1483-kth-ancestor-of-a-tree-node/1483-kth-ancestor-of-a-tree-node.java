@@ -1,56 +1,65 @@
 class TreeAncestor {
 
-     
-    List<Integer>[] tree;       
-    List<List<Integer>> level;  // nodes in a level
-    int[] dfn;            // dfs number
-    int ndfn;             // dfs number starts wih 0
-    int[] depth;          // depth of each node
-    
-    public TreeAncestor(int n, int[] parent) {
-        tree = new List[n];
-        for (int i = 0; i < n; i++) {
-            tree[i] = new ArrayList<>();
-        }
-        level = new ArrayList<>();
-        dfn = new int[n];
-        ndfn = 0;
-        depth = new int[n];
-        
-        for (int i = 1; i < n; i++) {      // build tree
-            tree[parent[i]].add(i);
-        }
-        dfs(0, 0);
-    }
-    
-    private void dfs(int n, int dep) {
-        if (level.size() == dep) {
-            level.add(new ArrayList<>());
-        }
-        dfn[n] = ndfn++;                              // mark dfs number
-        depth[n] = dep;                               // save the depth  
-        level.get(dep).add(n);                    // save nodes into level
-        for (int child : tree[n]) {
-            dfs(child, dep + 1);
-        }
-    }
-    
-    public int getKthAncestor(int node, int k) {
-        int d = depth[node];
-        if (d - k < 0) return -1;
-        List<Integer> list = level.get(d - k);
-        int left = 0, right = list.size();
-        while (left < right) {                                       // binary search
-            int mid = left + (right - left) / 2;               
-            if (dfn[list.get(mid)] < dfn[node]) {        // find the first node larger than or equal to dfn[node]
-                left = mid + 1;
-            } else {
-                right = mid;
+        int[][] values;
+
+        int[] reIndex;
+
+        int[] offset;
+
+        public TreeAncestor(int n, int[] parent) {
+            reIndex = new int[n];
+            offset = new int[n];
+            int[] t = new int[n];
+            int len = 0;
+            for (int i = 1; i < n; i++) {
+                if (t[parent[i]] == 0) {
+                    len++;
+                }
+                t[parent[i]]--;
+            }
+            len = n - len;
+            values = new int[len][0];
+            int[] temp = new int[n];
+            len = 0;
+            for (int i = 0; i < n; i++) {
+                if (t[i] == 0) {
+                    init(parent, temp, 0, len, i);
+                    len++;
+                }
             }
         }
-        return list.get(left - 1);                             // anc
-}
-}
+
+        private void init(int[] parent, int[] temp, int index, int base, int cur) {
+            if (cur == -1) {
+                int[] nums = new int[index];
+                System.arraycopy(temp, 0, nums, 0, index);
+                values[base] = nums;
+                return;
+            }
+            if (offset[cur] > 0) {
+                int ol = values[reIndex[cur]].length - offset[cur];
+                int[] nums = new int[index + ol];
+                System.arraycopy(temp, 0, nums, 0, index);
+                System.arraycopy(values[reIndex[cur]], offset[cur], nums, index, ol);
+                values[base] = nums;
+                return;
+            }
+            offset[cur] = index;
+            reIndex[cur] = base;
+            temp[index] = cur;
+            init(parent, temp, index + 1, base, parent[cur]);
+        }
+
+        public int getKthAncestor(int node, int k) {
+            int index = reIndex[node];
+            int off = offset[node];
+            if (off + k >= values[index].length) {
+                return -1;
+            }
+            return values[index][off + k];
+        }
+    }
+
 /**
  * Your TreeAncestor object will be instantiated and called as such:
  * TreeAncestor obj = new TreeAncestor(n, parent);
