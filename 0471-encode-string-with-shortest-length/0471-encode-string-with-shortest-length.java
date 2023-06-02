@@ -1,40 +1,35 @@
 class Solution {
-     public String encode(String s) {
-    String[][] dp = new String[s.length()][s.length()];
-    
-    for(int l=0;l<s.length();l++) {
-        for(int i=0;i<s.length()-l;i++) {
-            int j = i+l;
-            String substr = s.substring(i, j+1);
-            // Checking if string length < 5. In that case, we know that encoding will not help.
-            if(j - i < 4) {
-                dp[i][j] = substr;
-            } else {
-                dp[i][j] = substr;
-                // Loop for trying all results that we get after dividing the strings into 2 and combine the   results of 2 substrings
-                for(int k = i; k<j;k++) {
-                    if((dp[i][k] + dp[k+1][j]).length() < dp[i][j].length()){
-                        dp[i][j] = dp[i][k] + dp[k+1][j];
-                    }
-                }
-                
-                // Loop for checking if string can itself found some pattern in it which could be repeated.
-                for(int k=0;k<substr.length();k++) {
-                    String repeatStr = substr.substring(0, k+1);
-                    if(repeatStr != null 
-                       && substr.length()%repeatStr.length() == 0 
-                       && substr.replaceAll(repeatStr, "").length() == 0) {
-                          String ss = substr.length()/repeatStr.length() + "[" + dp[i][i+k] + "]";
-                          if(ss.length() < dp[i][j].length()) {
-                            dp[i][j] = ss;
-                          }
-                     }
+    String[][] dp;
+    public String encode(String s) {
+        int n = s.length();
+        dp = new String[n][n];
+        return dfs(s, 0, n -1);
+    }
+
+    String dfs(String s, int l, int r){
+        int n = s.length();
+        if(l > r)
+            return "";
+        if(dp[l][r] != null)
+            return dp[l][r];
+        String res = s.charAt(l) + dfs(s, l + 1, r);
+        int[] lps = new int[r - l + 1];
+        int lp = 0;
+        for(int j = 1; j < r - l + 1; j++){
+            while(lp > 0 && s.charAt(l + j) != s.charAt(l + lp)){
+                lp = lps[lp - 1];
+            }
+            if(s.charAt(l + j) == s.charAt(l + lp)){
+                lps[j] = ++lp;
+                int len = (j + 1) - lps[j];
+                if((j + 1) % len == 0){
+                    int mul = (j + 1)/len;
+                    String next = mul + "[" + dfs(s, l, l + len - 1) + "]" + dfs(s, l + j + 1, r);
+                    if(next.length() < res.length())
+                        res = next;
                 }
             }
         }
+        return dp[l][r] = res;
     }
-    
-    return dp[0][s.length()-1];
-}
-
 }
