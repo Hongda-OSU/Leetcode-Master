@@ -32,25 +32,25 @@ class Solution {
                 if (lowNIdx == 1)
                     dpHC[0] = Math.min(dpHC[0], dp[house - 1][currColor][0]);
             } else {
-                    int[] costH = cost[house];
-                    int[][] dpHMinus1 = dp[house - 1];
-                    int prevHouseColor = houses[house - 1];
-                    for (int color = n - 1; color >= 0; color--) {
-                        int[] dpHC = dp[house][color];
-                        for (int nIdx = highNIdx; nIdx >= lowNIdx; nIdx--) {
-                            dpHC[nIdx] = Math.min(dpHC[nIdx], dpHMinus1[color][nIdx] + costH[color]);
-                            if (prevHouseColor > 0 && prevHouseColor - 1 != color)
-                                dpHC[nIdx - 1] = dpHMinus1[prevHouseColor - 1][nIdx] + costH[color];
-                            else
-                                dpHC[nIdx - 1] = min(dpHMinus1, color, nIdx) + costH[color];
-                        }
-                        if (lowNIdx == 1)
-                            dpHC[0] = Math.min(dpHC[0], dpHMinus1[color][0] + costH[color]);
+                int[] costH = cost[house];
+                int[][] dpHMinus1 = dp[house - 1];
+                int prevHouseColor = houses[house - 1];
+                for (int color = n - 1; color >= 0; color--) {
+                    int[] dpHC = dp[house][color];
+                    for (int nIdx = highNIdx; nIdx >= lowNIdx; nIdx--) {
+                        dpHC[nIdx] = Math.min(dpHC[nIdx], dpHMinus1[color][nIdx] + costH[color]);
+                        if (prevHouseColor > 0 && prevHouseColor - 1 != color)
+                            dpHC[nIdx - 1] = dpHMinus1[prevHouseColor - 1][nIdx] + costH[color];
+                        else
+                            dpHC[nIdx - 1] = min(dpHMinus1, color, nIdx) + costH[color];
                     }
+                    if (lowNIdx == 1)
+                        dpHC[0] = Math.min(dpHC[0], dpHMinus1[color][0] + costH[color]);
                 }
-                if (lowNIdx > 1) 
-                    lowNIdx--;    
             }
+            if (lowNIdx > 1) 
+                lowNIdx--;    
+        }
         int min = MAX_COST;
         for (int color = n - 1; color >= 0; color--) 
             min = Math.min(min, dp[m - 1][color][0]);
