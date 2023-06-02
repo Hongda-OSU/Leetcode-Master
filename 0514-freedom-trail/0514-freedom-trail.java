@@ -1,22 +1,39 @@
-public class Solution {
+class Solution {
+    char[] ring, key;
+    Integer[][] dp;
     public int findRotateSteps(String ring, String key) {
-        int n = ring.length();
-        int m = key.length();
-        int[][] dp = new int[m + 1][n];
+        this.ring = ring.toCharArray();
+        this.key = key.toCharArray();
+        dp = new Integer[ring.length()][key.length()];
+        return dfs(0, 0);
+    }
+    
+    int dfs(int ringIndex, int keyIndex) {
+        if (keyIndex >= key.length)
+            return 0;
+        if (dp[ringIndex][keyIndex] != null)
+            return dp[ringIndex][keyIndex];
+        if (ring[ringIndex] == key[keyIndex])
+            return dp[ringIndex][keyIndex] = 
+                1 + dfs(ringIndex, keyIndex + 1);
         
-        for (int i = m - 1; i >= 0; i--) {
-            for (int j = 0; j < n; j++) {
-                dp[i][j] = Integer.MAX_VALUE;
-                for (int k = 0; k < n; k++) {
-                    if (ring.charAt(k) == key.charAt(i)) {
-                        int diff = Math.abs(j - k);
-                        int step = Math.min(diff, n - diff);
-                        dp[i][j] = Math.min(dp[i][j], step + dp[i + 1][k]);
-                    }
-                }
-            }
+        char target = key[keyIndex];
+        int i = ringIndex, steps = 1;
+        while (ring[i] != target) {
+            i = i == ring.length - 1 ? 0 : i + 1;
+            ++steps;
         }
+        int clockwise = steps + dfs(i, keyIndex + 1);
         
-        return dp[0][0] + m;
+        i = ringIndex;
+        steps = 1;
+        while (ring[i] != target) {
+            i = i == 0 ? ring.length - 1 : i - 1;
+            ++steps;
+        }
+        int counterClockwise = steps + dfs(i, keyIndex + 1);
+        
+        return dp[ringIndex][keyIndex] =
+            Math.min(clockwise, counterClockwise);
     }
 }
