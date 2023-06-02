@@ -1,20 +1,18 @@
-public class Solution {
-    public int numberOfArithmeticSlices(int[] arr) {
-        Map<Long, List<Integer>> indexes = new HashMap<>();
-        int[][] length = new int[arr.length][arr.length];
+class Solution {
+    public int numberOfArithmeticSlices(int[] nums) {
+        Map<Long, List<Integer>> map = new HashMap<>();
+        int[][] length = new int[nums.length][nums.length];
         int count = 0;
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = i + 1; j < arr.length; j++) {
-                List<Integer> ix = indexes.get(arr[i] - (arr[j] - (long) arr[i]));
-                if (ix == null) {
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                List<Integer> list = map.get(nums[i] - (nums[j] - (long)nums[i]));
+                if (list == null)
                     continue;
-                }
-                for (int k : ix) {
-                    length[i][j] += length[k][i] + 1;
-                }
+                for (int num : list) 
+                    length[i][j] += length[num][i] + 1;
                 count += length[i][j];
             }
-            indexes.computeIfAbsent((long) arr[i], k -> new ArrayList<>()).add(i);
+            map.computeIfAbsent((long) nums[i], num -> new ArrayList<>()).add(i);
         }
         return count;
     }
