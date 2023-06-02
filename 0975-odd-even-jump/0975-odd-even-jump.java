@@ -1,58 +1,41 @@
 class Solution {
     public int oddEvenJumps(int[] arr) {
         
-        int[] count = new int[100001];
-        boolean[][] res = new boolean[2][arr.length];
-        res[0][arr.length - 1] = true;
-        res[1][arr.length - 1] = true;
-        count[arr[arr.length - 1]] = arr.length;
-        int min = arr[arr.length - 1], max = arr[arr.length - 1];
-        int result = 1;
-        for(int i = arr.length - 2; i >= 0; i--) {
-            int nextSmallIndex = findNextSmall(count, min, max, arr[i]);
-            int nextLargeIndex = findNextLarge(count, min, max, arr[i]);
-            if(nextSmallIndex == -1) {
-                res[0][i] = false;
-            } else {
-                res[0][i] = res[1][nextSmallIndex];
-            }
-
-            if(nextLargeIndex == -1) {
-                res[1][i] = false;
-            } else {
-                res[1][i] = res[0][nextLargeIndex];
-            }
-
-            count[arr[i]] = i + 1;
-            min = Math.min(min, arr[i]);
-            max = Math.max(max, arr[i]);
-            // System.out.println(arr[i] + " " + nextSmallIndex + " " + nextLargeIndex + " " + i + " " + res[0][i] + " " + res[1][i]);
-            if(res[0][i]) {
-                result++;
-            }
+        int len = arr.length;
+        int minjmp[] = new int[len];
+        int maxjmp[] = new int[len];
+        
+        TreeMap<Integer, Integer> map = new TreeMap<>();
+        int evjmp, oddjmp;
+        for(int i = len-1; i>=0; i--) 
+        {
+            Integer minpos = map.floorKey(arr[i]);
+            evjmp = (minpos != null)?map.get(minpos):len; //default len, to show not possible
+            
+            if(evjmp != len && (evjmp == len-1 || maxjmp[evjmp] == len-1))
+                evjmp = len-1; //check the last pos reachability
+            
+            Integer maxpos = map.ceilingKey(arr[i]);
+            oddjmp = (maxpos != null) ? map.get(maxpos):len;
+            
+            if(oddjmp != len && (oddjmp == len-1 || minjmp[oddjmp] == len-1))
+                oddjmp = len-1;//check the last pos reachability
+            
+            minjmp[i] = evjmp; //specify possible jump path, if not possible assign len
+            maxjmp[i] = oddjmp;//specify possible jump path, if not possible assign len
+            
+            map.put(arr[i],i); //put the current index
         }
-
-        return result;
-
-    }
-
-    int findNextSmall(int[] count, int min, int max, int val) {
-
-        for(int i=val; i <= max; i++) {
-            if(count[i] != 0) {
-                return count[i]-1;
-            }
+        
+        int res = 0;
+        
+        for(int i = 0; i< len-1; i++) {
+            
+            if(maxjmp[i] == len-1)
+                res++;
         }
-        return -1;
+        
+        return res+1; //since last position will always be the answer
     }
-
-    int findNextLarge(int[] count, int min, int max, int val) {
-
-        for(int i=val; i >= min; i--) {
-            if(count[i] != 0) {
-                return count[i]-1;
-            }
-        }
-        return -1;
-    }
+    
 }
