@@ -1,21 +1,26 @@
 class Solution {
-   public int constrainedSubsetSum(int[] arr, int k) {
-        int n = arr.length;
-        int[] dp = new int[n];
-        Deque<Integer> deque = new LinkedList<>();
-        int ans = Integer.MIN_VALUE;
-        for (int i = 0; i < n; i++) {
-            int max = Math.max(0, deque.isEmpty() ? 0 : dp[deque.peekFirst()]);
-            dp[i] = arr[i] + max;
-            ans = Math.max(ans, dp[i]);
-            while (!deque.isEmpty() && dp[i] >= dp[deque.peekLast()]) { // If dp[i] >= deque.peekLast() -> Can discard the tail since it's useless
+    public int constrainedSubsetSum(int[] nums, int k) {
+        int result = nums[0], n = nums.length;
+        Deque<Tuple> deque = new ArrayDeque<>();
+        deque.offerLast(new Tuple(nums[0], 0));
+        for (int i = 1; i < n; i++) {
+            if (i - deque.peekFirst().idx > k) 
+                deque.pollFirst();
+            int curr = Math.max(nums[i], deque.peekFirst().sum + nums[i]);
+            while (!deque.isEmpty() && deque.peekLast().sum <= curr) 
                 deque.pollLast();
-            }
-            deque.addLast(i);
-            if (i - deque.peekFirst() + 1 > k) { // remove the last element of range k
-                deque.removeFirst();
-            }
+            deque.offerLast(new Tuple(curr, i));
+            result = Math.max(curr, result);
         }
-        return ans;
+        return result;
+    }
+}
+
+class Tuple {
+    public int sum, idx;
+    
+    public Tuple(int sum, int idx) {
+        this.sum = sum;
+        this.idx = idx;
     }
 }
