@@ -1,30 +1,19 @@
 class Solution {
-   public int calculateMinimumHP(int[][] dungeon) {
-    if (dungeon == null || dungeon.length == 0 || dungeon[0].length == 0) return 0;
+    public int calculateMinimumHP(int[][] dungeon) {
+        int m = dungeon.length, n = dungeon[0].length;
+        int[][] memo = new int[m][n];
+        helper(0, 0, dungeon, memo);
+        return memo[0][0];
+    }
     
-    int m = dungeon.length;
-    int n = dungeon[0].length;
-    
-    int[][] health = new int[m][n];
-
-    health[m - 1][n - 1] = Math.max(1 - dungeon[m - 1][n - 1], 1);
-
-    for (int i = m - 2; i >= 0; i--) {            
-        health[i][n - 1] = Math.max(health[i + 1][n - 1] - dungeon[i][n - 1], 1);
+    private int helper(int i, int j, int[][] dungeon, int[][] memo) {
+        if (i == dungeon.length - 1 && j == dungeon[0].length - 1)
+            return memo[i][j] = dungeon[i][j] <= 0 ? 1 - dungeon[i][j] : 1;
+        if (i >= dungeon.length || j >= dungeon[0].length)
+            return Integer.MAX_VALUE;
+        if (memo[i][j] != 0)
+            return memo[i][j];
+        int result = Math.min(helper(i + 1, j, dungeon, memo), helper(i, j + 1, dungeon, memo)) - dungeon[i][j];
+        return memo[i][j] = result <= 0 ? 1 : result;
     }
-
-    for (int j = n - 2; j >= 0; j--) {
-        health[m - 1][j] = Math.max(health[m - 1][j + 1] - dungeon[m - 1][j], 1);
-    }
-
-    for (int i = m - 2; i >= 0; i--) {
-        for (int j = n - 2; j >= 0; j--) {
-            int down = Math.max(health[i + 1][j] - dungeon[i][j], 1);
-            int right = Math.max(health[i][j + 1] - dungeon[i][j], 1);
-            health[i][j] = Math.min(right, down);
-        }
-    }
-
-    return health[0][0];
-}
 }
