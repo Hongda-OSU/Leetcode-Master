@@ -1,24 +1,21 @@
 class Solution {
-    public int boxDelivering(int[][] A, int portsCount, int B, int W) {
-        int n = A.length, need = 0, j = 0, lastj = 0, dp[] = new int[n + 1];
-        for (int i = 0; i < n; ++i) {
-            while (j < n && B > 0 && W >= A[j][1]) {
-                B -= 1;
-                W -= A[j][1];
-                if (j == 0 || A[j][0] != A[j - 1][0]) {
-                    lastj = j;
-                    need++;
-                }
-                dp[++j] = 200000;
+    public int boxDelivering(int[][] boxes, int portsCount, int maxBoxes, int maxWeight) {
+        int n = boxes.length;
+        int[] trips = new int[n + 1];
+        int start = 0, diff = 0;
+        for (int i = 0; i < n; i++) {
+            maxWeight -= boxes[i][1];
+            maxBoxes--;
+            if (i > 0 && boxes[i][0] != boxes[i - 1][0])
+                diff++;
+            while (maxWeight < 0 || maxBoxes < 0 || (start < i && trips[start + 1] == trips[start])) {
+                maxWeight += boxes[start++][1];
+                maxBoxes++;
+                if (boxes[start][0] != boxes[start - 1][0])
+                    diff--;
             }
-            dp[j] = Math.min(dp[j], dp[i] + need + 1);
-            dp[lastj] = Math.min(dp[lastj], dp[i] + need);
-            B += 1;
-            W += A[i][1];
-            if (i == n - 1 || A[i][0] != A[i + 1][0]) {
-                need--;
-            }
+            trips[i + 1] = trips[start] + diff + 2;
         }
-        return dp[n];
+        return trips[n];
     }
 }
