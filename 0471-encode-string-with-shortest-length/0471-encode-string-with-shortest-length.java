@@ -1,35 +1,35 @@
 class Solution {
-    String[][] dp;
+    private String[][] dp;
+    
     public String encode(String s) {
         int n = s.length();
         dp = new String[n][n];
-        return dfs(s, 0, n -1);
+        return dfs(s, 0, n - 1);
     }
-
-    String dfs(String s, int l, int r){
-        int n = s.length();
-        if(l > r)
+    
+    private String dfs(String str, int left, int right) {
+        int n = str.length();
+        if (left > right)
             return "";
-        if(dp[l][r] != null)
-            return dp[l][r];
-        String res = s.charAt(l) + dfs(s, l + 1, r);
-        int[] lps = new int[r - l + 1];
+        if (dp[left][right] != null)
+            return dp[left][right];
+        String result = str.charAt(left) + dfs(str, left + 1, right);
+        int[] lps = new int[right - left + 1];
         int lp = 0;
-        for(int j = 1; j < r - l + 1; j++){
-            while(lp > 0 && s.charAt(l + j) != s.charAt(l + lp)){
+        for (int j = 1; j < right - left + 1; j++) {
+            while (lp > 0 && str.charAt(left + j) != str.charAt(left + lp))
                 lp = lps[lp - 1];
-            }
-            if(s.charAt(l + j) == s.charAt(l + lp)){
+            if (str.charAt(left + j) == str.charAt(left + lp)) {
                 lps[j] = ++lp;
                 int len = (j + 1) - lps[j];
-                if((j + 1) % len == 0){
-                    int mul = (j + 1)/len;
-                    String next = mul + "[" + dfs(s, l, l + len - 1) + "]" + dfs(s, l + j + 1, r);
-                    if(next.length() < res.length())
-                        res = next;
+                if ((j + 1) % len == 0) {
+                    int mul = (j + 1) / len;
+                    String next = mul + "[" + dfs(str, left, left + len - 1) + "]" + dfs(str, left + j + 1, right);
+                    if (next.length() < result.length())
+                        result = next;
                 }
             }
         }
-        return dp[l][r] = res;
+        return dp[left][right] = result;
     }
 }
