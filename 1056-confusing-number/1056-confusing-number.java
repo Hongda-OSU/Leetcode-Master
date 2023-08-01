@@ -1,19 +1,20 @@
 class Solution {
     public boolean confusingNumber(int n) {
-        Map<Character, Character> inverseMap = new HashMap<>() {{
-            put('0', '0');
-            put('1', '1');
-            put('6', '9');
-            put('8', '8');
-            put('9', '6');
+        Map<Integer, Integer> inverseMap = new HashMap<>() {{
+            put(0, 0);
+            put(1, 1);
+            put(6, 9);
+            put(8, 8);
+            put(9, 6);
         }};
-        StringBuilder sb = new StringBuilder();
-        for (char ch : String.valueOf(n).toCharArray()) {
-            if (!inverseMap.containsKey(ch)) 
+        int copy = n, temp = 0;
+        while (copy > 0) {
+            int result = copy % 10;
+            if (!inverseMap.containsKey(result))
                 return false;
-            sb.append(inverseMap.get(ch));
+            temp = temp * 10 + inverseMap.get(result);
+            copy /= 10;
         }
-        sb.reverse();
-        return Integer.parseInt(sb.toString()) != n;
+        return temp != n;
     }
 }
