@@ -13,6 +13,6 @@ class Solution {
                     return s.substring(i).equals(t.substring(i + 1));
             }
         }
-        return (sLen + 1 == tLen);
+        return sLen + 1 == tLen;
     }
 }
