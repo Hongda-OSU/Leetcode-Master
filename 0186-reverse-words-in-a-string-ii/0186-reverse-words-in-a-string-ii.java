@@ -1,35 +1,26 @@
 class Solution {
     public void reverseWords(char[] s) {
-        reverse(s, 0, s.length-1);
-        int f; 
-        int start = 0;
-
-        while( (f = findSpace(start, s))!=-1) {
-            reverse(s, start, f-1);
-            start = f + 1;
-        }
-        reverse(s, start, s.length-1);
+        reverse(s, 0, s.length - 1);
+        reverseEachWord(s);
     }
-
-    int findSpace(int start, char[]s) {
-        int n = s.length;
-        int i = start;
-
-        while(i<n && s[i] !=' ') {
-            i++;
+    
+    private void reverse(char[] arr, int left, int right) {
+        while (left < right) {
+            char temp = arr[left];
+            arr[left++] = arr[right];
+            arr[right--] = temp;
         }
-        if (i == n)
-          return -1;
-        return i;
     }
-
-    void reverse(char []s, int start, int end) {
-        while(start < end) {
-            char t = s[start];
-            s[start] = s[end];
-            s[end] = t;
-            start++;
-            end--;
+    
+    private void reverseEachWord(char[] arr) {
+        int n = arr.length;
+        int start = 0, end = 0;
+        while (start < n) {
+            while (end < n && arr[end] != ' ')
+                end++;
+            reverse(arr, start, end - 1);
+            start = end + 1;
+            end++;
         }
     }
 }
