@@ -1,18 +1,27 @@
 class Solution {
-    public int numKLenSubstrNoRepeats(String S, int K) {
-        int ans = 0;
-        Set<Character> set = new HashSet<>();
-        int i = 0;
-        
-        for (int j = 0; j < S.length(); j++) {
-            while (set.contains(S.charAt(j))) {
-                set.remove(S.charAt(i++));
+    public int numKLenSubstrNoRepeats(String s, int k) {
+        char[] str = s.toCharArray();
+        int n = str.length;
+        if (n < k) {
+            return 0;
+        }
+        int repeated = 0;
+        int[] cnt = new int[26];
+        for (int i = 0; i < k; i++) {
+            if (++cnt[str[i] - 'a'] == 2) {
+                ++repeated;
             }
-            set.add(S.charAt(j));
-            
-            if (j - i + 1 == K) {
+        }
+        int ans = repeated > 0 ? 0 : 1;
+        for (int i = k; i < n; i++) {
+            if (cnt[str[i - k] - 'a']-- == 2) {
+                --repeated;
+            }
+            if (++cnt[str[i] - 'a'] == 2) {
+                ++repeated;
+            }
+            if (repeated == 0) {
                 ans++;
-                set.remove(S.charAt(i++));
             }
         }
         return ans;
