@@ -1,12 +1,14 @@
 public class Solution {
     public boolean canPermutePalindrome(String s) {
-        Set<Character> set=new HashSet<Character>();
-        for(int i=0; i<s.length(); ++i){
-            if (!set.contains(s.charAt(i)))
-                set.add(s.charAt(i));
-            else 
-                set.remove(s.charAt(i));
+        char[] A = new char[256];
+        int count=0;
+        for(int i=0; i<s.length(); i++){
+            if(A[s.charAt(i)]>0)A[s.charAt(i)]--;
+            else A[s.charAt(i)]++;
         }
-        return set.size()==0 || set.size()==1;
+        for(int i=0; i<256; i++){
+            if(A[i]!=0)count++;
+        }
+        return count<=1;
     }
 }
