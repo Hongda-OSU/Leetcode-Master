@@ -1,31 +1,39 @@
 class Solution {
-public
-    boolean areSentencesSimilar(String[] sentence1, String[] sentence2,
-                                List<List<String>> similarPairs) {
-        if (sentence1.length != sentence2.length) {
-            return false;
-        }
-        Map<String, Set<String>> wordToSimilarWords = new HashMap<>();
-        for (List<String> pair : similarPairs) {
-            wordToSimilarWords.computeIfAbsent(pair.get(0), value->new HashSet<String>())
-                .add(pair.get(1));
-            wordToSimilarWords.computeIfAbsent(pair.get(1), value->new HashSet<String>())
-                .add(pair.get(0));
-        }
-
-        for (int i = 0; i < sentence1.length; i++) {
-            // If the words are equal, continue.
-            if (sentence1[i].equals(sentence2[i])) {
-                continue;
+    public boolean areSentencesSimilar(String[] a, String[] b, List<List<String>> similarPairs) {
+        if(a.length != b.length)  return false;
+        
+        Map<String,List<String>> map = new HashMap<>();
+        
+        
+        for(List<String> pair: similarPairs){
+            String s1 = pair.get(0);
+            String s2 = pair.get(1);
+            
+            
+            if(map.containsKey(s1) == false){
+                map.put(s1, new ArrayList<String>());
             }
-            // If the words form a similar pair, continue.
-            if (wordToSimilarWords.containsKey(sentence1[i]) &&
-                wordToSimilarWords.get(sentence1[i]).contains(sentence2[i])) {
-                continue;
+            if(map.containsKey(s2) == false){
+                map.put(s2, new ArrayList<String>());
             }
-            return false;
+            map.get(s1).add(s2);
+            map.get(s2).add(s1);
+            
         }
-
+        
+        for(int i=0;i<a.length;i++){
+            
+            if(a[i].equals(b[i])) continue;
+               
+            if(map.containsKey(a[i])){
+                if(map.get(a[i]).contains(b[i]) == false) return false;
+            }else{
+                return false;
+            }
+          
+            
+        }
         return true;
+        
     }
 }
