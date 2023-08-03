@@ -1,39 +1,53 @@
 class Solution {
-    public boolean areSentencesSimilar(String[] a, String[] b, List<List<String>> similarPairs) {
-        if(a.length != b.length)  return false;
-        
-        Map<String,List<String>> map = new HashMap<>();
-        
-        
-        for(List<String> pair: similarPairs){
-            String s1 = pair.get(0);
-            String s2 = pair.get(1);
-            
-            
-            if(map.containsKey(s1) == false){
-                map.put(s1, new ArrayList<String>());
+    public boolean areSentencesSimilar(String[] sentence1, String[] sentence2, List<List<String>> similarPairs) {
+        if (sentence1.length!=sentence2.length){
+            return false;
+        }
+        HashMap<String,List<String>> map = new HashMap<String,List<String>>();
+        String temp1,temp2;
+        for (List<String> liss: similarPairs){
+            temp1 = liss.get(0);
+            temp2 = liss.get(1);
+            if (map.containsKey(temp1)){
+                map.get(temp1).add(temp2);
+                //liss.add(temp2);
             }
-            if(map.containsKey(s2) == false){
-                map.put(s2, new ArrayList<String>());
+            else{
+                //List<String> liss = new ArrayList<>();
+                //liss.add(temp2);
+                map.put(temp1,new ArrayList<>());
+                map.get(temp1).add(temp2);
             }
-            map.get(s1).add(s2);
-            map.get(s2).add(s1);
+            if (map.containsKey(temp2)){
+                map.get(temp2).add(temp1);
+            }
+            else{
+                map.put(temp2,new ArrayList<>());
+                map.get(temp2).add(temp1);
+            }
             
         }
-        
-        for(int i=0;i<a.length;i++){
-            
-            if(a[i].equals(b[i])) continue;
-               
-            if(map.containsKey(a[i])){
-                if(map.get(a[i]).contains(b[i]) == false) return false;
-            }else{
-                return false;
+        boolean have;
+        for (int i = 0;i<sentence1.length;i++){
+            if (!sentence1[i].equals(sentence2[i])){
+                if (!map.containsKey(sentence1[i])){
+                    return false;
+                }
+                else{
+                    List<String> liss = map.get(sentence1[i]);
+                    have = false;
+                    for (String str: liss){
+                        if (str.equals(sentence2[i])){
+                            have = true;
+                            break;
+                        }
+                    }
+                    if (!have){
+                        return false;
+                    }
+                }
             }
-          
-            
         }
         return true;
-        
     }
 }
