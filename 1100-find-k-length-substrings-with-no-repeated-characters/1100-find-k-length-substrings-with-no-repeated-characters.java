@@ -16,11 +16,12 @@ class Solution {
         int result = repeated > 0 ? 0 : 1;
         
         for (int i = k; i < n; i++) {
-            // remove old character
+            // remove old character from count
             count[arr[i - k] - 'a']--;
+            // check is there repeat character
             if (count[arr[i - k] - 'a'] == 1)
                 repeated--;
-            // add new character
+            // add new character to count
             count[arr[i] - 'a']++;
             if (count[arr[i] - 'a'] == 2)
                 repeated++;
