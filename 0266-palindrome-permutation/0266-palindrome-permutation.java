@@ -1,14 +1,17 @@
-public class Solution {
+class Solution {
     public boolean canPermutePalindrome(String s) {
-        char[] A = new char[256];
-        int count=0;
-        for(int i=0; i<s.length(); i++){
-            if(A[s.charAt(i)]>0)A[s.charAt(i)]--;
-            else A[s.charAt(i)]++;
+        char[] arr = new char[256];
+        int count = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (arr[s.charAt(i)] > 0)
+                arr[s.charAt(i)]--;
+            else
+                arr[s.charAt(i)]++;
         }
-        for(int i=0; i<256; i++){
-            if(A[i]!=0)count++;
+        for (int i = 0; i < 256; i++) {
+            if (arr[i] != 0)
+                count++;
         }
-        return count<=1;
+        return count <= 1;
     }
 }
