@@ -1,17 +1,16 @@
 class Solution {
     public int countElements(int[] arr) {
-    Arrays.sort(arr);
-    int count = 0;
-    int runLength = 1;
-    for (int i = 1; i < arr.length; i++) {
-        if (arr[i - 1] != arr[i]) {
-            if (arr[i - 1] + 1 == arr[i]) {
-                count += runLength;
-            }
-            runLength = 0;
+        int hash[] = new int [1002];
+        for(int i = 0; i < arr.length; ++i) {
+            hash[arr[i]]++;
         }
-        runLength++;
+        int c = 0;
+        for(int i = 0 ; i < arr.length; ++i){
+            int x = arr[i] + 1;
+            if(hash[x] > 0) {
+                ++c;
+            }
+        }
+        return c;
     }
-    return count;
-}
 }
