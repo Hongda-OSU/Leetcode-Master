@@ -1,23 +1,13 @@
 class Solution {
-public int calculateTime(String keyboard, String word) {
-        //fill mapping for the keyboard chars and indexes
-        int[] map = new int[26];
-        int j = 0;
-        for (char ch : keyboard.toCharArray()) {
-            map[ch - 'a'] = j++;
-        }
-        
-        int res = 0;
-        //reuse j as a placeholder for the previously typed char. Starting from 0
-        j = 0;
+    public int calculateTime(String keyboard, String word) {
+        int[] mapping = new int[26];
+        for (int i = 0; i < keyboard.length(); i++) 
+            mapping[keyboard.charAt(i) - 'a'] = i;
+        int prev = 0, result = 0;
         for (char ch : word.toCharArray()) {
-            //find position of the current char as per keyboard mapping
-            int idx = map[ch - 'a'];
-            //add difference to the result
-            res += Math.abs(j - idx);
-            //save current as previous position for the next iteration
-            j = idx;
+            result += Math.abs(prev - mapping[ch - 'a']);
+            prev = mapping[ch - 'a'];
         }
-        return res;
-    }
+        return result;
+    } 
 }
