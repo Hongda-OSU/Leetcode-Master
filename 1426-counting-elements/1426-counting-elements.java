@@ -1,16 +1,14 @@
 class Solution {
     public int countElements(int[] arr) {
-        int hash[] = new int [1002];
-        for(int i = 0; i < arr.length; ++i) {
-            hash[arr[i]]++;
-        }
-        int c = 0;
-        for(int i = 0 ; i < arr.length; ++i){
+        int[] mapping = new int[1002];
+        for (int i = 0; i < arr.length; i++)
+            mapping[arr[i]]++;
+        int result = 0;
+        for (int i = 0; i < arr.length; i++) {
             int x = arr[i] + 1;
-            if(hash[x] > 0) {
-                ++c;
-            }
+            if (mapping[x] > 0)
+                result++;
         }
-        return c;
-    }
+        return result;
+    } 
 }
