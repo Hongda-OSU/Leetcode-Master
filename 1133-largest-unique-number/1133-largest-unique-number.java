@@ -1,17 +1,12 @@
 class Solution {
-public int largestUniqueNumber(int[] A) {
-        Map<Integer, Integer> count = new HashMap<Integer, Integer>();
-        // Store counts of each element
-        for (int i : A) {
-          count.put(i, count.getOrDefault(i, 0) + 1);
+    public int largestUniqueNumber(int[] nums) {
+        int[] frequency = new int[1001];
+        for (int num : nums)
+            frequency[num]++;
+        for (int i = frequency.length - 1; i >= 0; i--) {
+            if (frequency[i] == 1)
+                return i;
         }
-        int result = -1;
-        for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
-            // If count of the integer is 1 get maximum.
-            if (entry.getValue() == 1) {
-              result = Math.max(result, entry.getKey());
-            }
-        }
-        return result;
+        return -1;
     }
 }
