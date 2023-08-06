@@ -3,19 +3,20 @@ class Solution {
         int n = words.size();
         int[][] mat = new int[n][n];
         
-        for (int i=0;i<n;i++){
-            char[] ch = words.get(i).toCharArray();
-            //individual string should not be greater than that of the words length
-            if (ch.length > n) return false;
-            //assign character to the matrix
-            for(int j=0;j<ch.length;j++)
-                mat[i][j] = ch[j];
+        for (int i = 0; i < n; i++) {
+            char[] arr = words.get(i).toCharArray();
+            if (arr.length > n)
+                return false;
+            for (int j = 0; j < arr.length; j++)
+                mat[i][j] = arr[j];
         }
         
-        //check if each characters are same
-        for (int i=0;i<n;i++)
-            for (int j=i;j<n;j++)
-                if(mat[i][j] != mat[j][i]) return false;
+        for (int i = 0; i < n; i++) {
+            for (int j = 1; j < n; j++) {
+                if (mat[i][j] != mat[j][i])
+                    return false;
+            }
+        }
         return true;
     }
 }
