@@ -1,77 +1,37 @@
 class Solution {
-    int m, n;
-    boolean findAndCrush(int[][] board) {
-        boolean complete = true;
-
-        // Check vertically adjacent candies
-        for (int r = 1; r < m - 1; r++) {
-            for (int c = 0; c < n; c++) {
-                if (board[r][c] == 0) {
-                    continue;
-                }
-                if (Math.abs(board[r][c]) == Math.abs(board[r - 1][c]) && Math.abs(board[r][c]) == Math.abs(board[r + 1][c])) {
-                    board[r][c] = -Math.abs(board[r][c]);
-                    board[r - 1][c] = -Math.abs(board[r - 1][c]);
-                    board[r + 1][c] = -Math.abs(board[r + 1][c]);
-                    complete = false;
-                }
-            }
-        }
-
-        // Check horizontally adjacent candies
-        for (int r = 0; r < m; r++) {
-            for (int c = 1; c < n - 1; c++) {
-                if (board[r][c] == 0) {
-                    continue;
-                }
-                if (Math.abs(board[r][c]) == Math.abs(board[r][c - 1]) && Math.abs(board[r][c]) == Math.abs(board[r][c + 1])) {
-                    board[r][c] = -Math.abs(board[r][c]);
-                    board[r][c - 1] = -Math.abs(board[r][c - 1]);
-                    board[r][c + 1] = -Math.abs(board[r][c + 1]);
-                    complete = false;
-                }
-            }
-        }
-
-        // Set the value of each candy to be crushed as 0
-        for (int r = 0; r < m; r++) {
-            for (int c = 0; c < n; c++) {
-                if (board[r][c] < 0) {
-                    board[r][c] = 0;
-                }
-            }
-        }
-
-        return complete;
-    }
-
-    void drop(int[][] board) {
-        for (int c = 0; c < n; c++) {
-            int lowestZero = -1;
-
-            // Iterate over each column
-            for (int r = m - 1; r >= 0; r--) {
-                if (board[r][c] == 0) {
-                    lowestZero = Math.max(lowestZero, r);
-                } else if (lowestZero >= 0) {
-                    int temp = board[r][c];
-                    board[r][c] = board[lowestZero][c];
-                    board[lowestZero][c] = temp;
-                    lowestZero--;
-                }
-            }
-        }
-    }
-
     public int[][] candyCrush(int[][] board) {
-        m = board.length;
-        n = board[0].length;
-
-        // Continue with the three steps until we can no longer find any crushable candies.
-        while (!findAndCrush(board)) {
-            drop(board);
+        int N = board.length, M = board[0].length;
+        boolean found = true;
+        while (found) {
+            found = false;
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < M; j++) {
+                    int val = Math.abs(board[i][j]);
+                    if (val == 0) continue;
+                    if (j < M - 2 && Math.abs(board[i][j + 1]) == val && Math.abs(board[i][j + 2]) == val) {
+                        found = true;
+                        int ind = j;
+                        while (ind < M && Math.abs(board[i][ind]) == val) board[i][ind++] = -val;
+                    }
+                    if (i < N - 2 && Math.abs(board[i + 1][j]) == val && Math.abs(board[i + 2][j]) == val) {
+                        found = true;
+                        int ind = i;
+                        while (ind < N && Math.abs(board[ind][j]) == val) board[ind++][j] = -val;           
+                    }
+                }
+            }
+            if (found) { // move positive values to the bottom, then set the rest to 0
+                for (int j = 0; j < M; j++) {
+                    int storeInd = N - 1;
+                    for (int i = N - 1; i >= 0; i--) {
+                        if (board[i][j] > 0) {
+                            board[storeInd--][j] = board[i][j];
+                        }
+                    }
+                    for (int k = storeInd; k >= 0; k--) board[k][j] = 0;
+                }
+            }
         }
-
         return board;
     }
 }
