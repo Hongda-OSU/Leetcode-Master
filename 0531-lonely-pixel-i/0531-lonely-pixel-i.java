@@ -1,24 +1,26 @@
-public class Solution {
-    public int findLonelyPixel(char[][] pic) {
-        int m = pic.length;
-        int n = pic[0].length;
-        int[] rows = new int[m];
-        int[] cols = new int[n];
-
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                rows[i] += pic[i][j] == 'B' ? 1 : 0;
-                cols[j] += pic[i][j] == 'B' ? 1 : 0;
+class Solution {
+    public int findLonelyPixel(char[][] picture) {
+        int m = picture.length, n = picture[0].length;
+        int[] row = new int[m], col = new int[n];
+        for (int i = 0; i < picture.length; i++) {
+            int count = 0, index = -1;
+            for (int j = 0; j < picture[0].length; j++) {
+                if (picture[i][j] == 'B') {
+                    count++;
+                    index = j;
+                    col[j]++;
+                }
             }
+            // only one black this row
+            if (count == 1)
+                row[i] = index + 1;
         }
-
-        int lonely = 0;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n && rows[i] > 0; j++) {
-                lonely += (pic[i][j] == 'B' && rows[i] == 1 && cols[j] == 1) ? 1 : 0;
-            }
+        
+        int result = 0;
+        for (int r : row) {
+            if (r > 0 && col[r - 1] == 1)
+                result++;
         }
-
-        return lonely;     
+        return result;
     }
 }
