@@ -1,15 +1,13 @@
-class Solution {
+public class Solution {
     public boolean validWordSquare(List<String> words) {
-        for (int wordNum = 0; wordNum < words.size(); ++wordNum) {
-            for (int charPos = 0; charPos < words.get(wordNum).length(); ++charPos) {
-                // charPos (curr 'row' word) is bigger than column word, or
-                // wordNum (curr 'column' word) is bigger than row word, or 
-                // characters at index (wordNum,charPos) and (charPos,wordNum) are not equal.
-                if (charPos >= words.size() || 
-                    wordNum >= words.get(charPos).length() || 
-                    words.get(wordNum).charAt(charPos) != words.get(charPos).charAt(wordNum)){
+        if(words == null || words.size() == 0){
+            return true;
+        }
+        int n = words.size();
+        for(int i=0; i<n; i++){
+            for(int j=0; j<words.get(i).length(); j++){
+                if(j >= n || words.get(j).length() <= i || words.get(j).charAt(i) != words.get(i).charAt(j))
                     return false;
-                }
             }
         }
         return true;
