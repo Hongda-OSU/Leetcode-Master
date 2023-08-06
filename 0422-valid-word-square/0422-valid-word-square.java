@@ -1,15 +1,21 @@
-public class Solution {
+class Solution {
     public boolean validWordSquare(List<String> words) {
-        if(words == null || words.size() == 0){
-            return true;
-        }
         int n = words.size();
-        for(int i=0; i<n; i++){
-            for(int j=0; j<words.get(i).length(); j++){
-                if(j >= n || words.get(j).length() <= i || words.get(j).charAt(i) != words.get(i).charAt(j))
-                    return false;
-            }
+        int[][] mat = new int[n][n];
+        
+        for (int i=0;i<n;i++){
+            char[] ch = words.get(i).toCharArray();
+            //individual string should not be greater than that of the words length
+            if (ch.length > n) return false;
+            //assign character to the matrix
+            for(int j=0;j<ch.length;j++)
+                mat[i][j] = ch[j];
         }
+        
+        //check if each characters are same
+        for (int i=0;i<n;i++)
+            for (int j=i;j<n;j++)
+                if(mat[i][j] != mat[j][i]) return false;
         return true;
     }
 }
