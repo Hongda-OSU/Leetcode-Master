@@ -1,12 +1,12 @@
 class Solution {
     public String parseTernary(String expression) {
-        int i = 0;
-        for ( ; i < expression.length(); ) {
-            
-            if (expression.charAt(i) != 'T' && expression.charAt(i) != 'F'
-            || i == expression.length() - 1 || expression.charAt(i + 1) == ':') {
+        int i = 0, n = expression.length();
+        
+        for (; i < n;) {
+            if (expression.charAt(i) != 'T' && expression.charAt(i) != 'F' 
+                || i == n - 1 || expression.charAt(i + 1) == ':') 
                 break;
-            }
+            
             if (expression.charAt(i) == 'T') {
                 i += 2;
             } else {
@@ -20,7 +20,6 @@ class Solution {
                 }
             }
         }
-
         return expression.substring(i, i + 1);
     }
 }
