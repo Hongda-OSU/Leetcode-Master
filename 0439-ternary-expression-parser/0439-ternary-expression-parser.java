@@ -1,52 +1,24 @@
-class TreeNode {
-    char val;
-    TreeNode left;
-    TreeNode right;
-    
-    TreeNode(char val) {
-        this.val = val;
-    }
-}
-
 class Solution {
-    int index = 0;
-    
     public String parseTernary(String expression) {
-        
-        // Construct Binary Tree
-        TreeNode root = constructTree(expression);
-        
-        // Parse the binary tree till we reach the leaf node
-        while (root.left != null && root.right != null) {
-            if (root.val == 'T') {
-                root = root.left;
-            } else {
-                root = root.right;
-            }
-        }
-        
-        return String.valueOf(root.val);
-    }
-    
-    private TreeNode constructTree(String expression) {
-        
-        // Storing current character of expression
-        TreeNode root = new TreeNode(expression.charAt(index));
+    if (expression == null || expression.length() == 0) return "";
+    Deque<Character> stack = new LinkedList<>();
 
-        // If last character of expression, return
-        if (index == expression.length() - 1) {
-            return root;
+    for (int i = expression.length() - 1; i >= 0; i--) {
+        char c = expression.charAt(i);
+        if (!stack.isEmpty() && stack.peek() == '?') {
+
+            stack.pop(); //pop '?'
+            char first = stack.pop();
+            stack.pop(); //pop ':'
+            char second = stack.pop();
+
+            if (c == 'T') stack.push(first);
+            else stack.push(second);
+        } else {
+            stack.push(c);
         }
-        
-        // Check next character
-        index++;
-        if (expression.charAt(index) == '?') {
-            index++;
-            root.left = constructTree(expression);
-            index++;
-            root.right = constructTree(expression);
-        }
-        
-        return root;
     }
+
+    return String.valueOf(stack.peek());
+}
 }
