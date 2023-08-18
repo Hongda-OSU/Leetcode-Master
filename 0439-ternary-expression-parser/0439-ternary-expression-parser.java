@@ -1,35 +1,29 @@
 class Solution {
     public String parseTernary(String expression) {
-        Deque<Character> s1 = new LinkedList<>();
-        Deque<Character> s2 = new LinkedList<>();
         
-        // Judge form right to left. So we add all char to s1.
-        for(char exp : expression.toCharArray()) {
-            // We don't need ":" due to one-digit number.
-            if(exp != ':') {
-                s1.push(exp);
-            }
-        }
+        // Initialize a stack
+        Stack<Character> stack = new Stack<>();
         
-        // If meet "?", we should check which digit needs to be kept.
-        while(s1.size() + s2.size() > 1) {
-            char nowC = s1.pop();
+        // Traverse the expression from right to left
+        for (int i = expression.length() - 1; i >= 0; i--) {
             
-            if(nowC == '?') {
-                char nextC = s1.pop();
-                
-                if(nextC == 'T') {
-                    char temp = s2.pop();
-                    s2.pop();
-                    s2.push(temp);
-                } else{
-                    s2.pop();
-                }
-            } else {
-                s2.push(nowC);
+            // If stack top is ?, then replace next four characters
+            // with E1 or E2 depending on the value of B
+            if (!stack.isEmpty() && stack.peek() == '?') {
+                stack.pop();
+                char onTrue = stack.pop();
+                stack.pop();
+                char onFalse = stack.pop();
+                stack.push(expression.charAt(i) == 'T' ? onTrue : onFalse);
+            }
+            
+            // Otherwise, push this character
+            else {
+                stack.push(expression.charAt(i));
             }
         }
         
-        return s2.pop().toString();
+        // Return the final character
+        return String.valueOf(stack.peek());
     }
 }
