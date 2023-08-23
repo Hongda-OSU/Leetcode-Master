@@ -13,71 +13,47 @@
  *     }
  * }
  */
-
-/**
- * Definition for a binary tree node.
- * public class TreeNode {
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode(int x) { val = x; }
- * }
- */
-public class Solution {
-
-    public boolean isLeaf(TreeNode t) {
-        return t.left == null && t.right == null;
-    }
-
-    public void addLeaves(List<Integer> res, TreeNode root) {
-        if (isLeaf(root)) {
-            res.add(root.val);
-        } else {
-            if (root.left != null) {
-                addLeaves(res, root.left);
-            }
-            if (root.right != null) {
-                addLeaves(res, root.right);
-            }
-        }
-    }
-
+class Solution {
     public List<Integer> boundaryOfBinaryTree(TreeNode root) {
-        ArrayList<Integer> res = new ArrayList<>();
-        if (root == null) {
-            return res;
+        List<Integer> result = new ArrayList<>();
+        result.add(root.val);
+        formLeftBoundary(root.left, result);
+        addLeaves(root.left, result);
+        addLeaves(root.right, result);
+        formRightBoundary(root.right, result);
+        return result;
+    }
+    
+    private void formLeftBoundary(TreeNode node, List<Integer> list) {
+        if (node == null)
+            return;
+        if (node.left != null) {
+            list.add(node.val);
+            formLeftBoundary(node.left, list);
+        } else if (node.right != null) {
+            list.add(node.val);
+            formLeftBoundary(node.right, list);
         }
-        if (!isLeaf(root)) {
-            res.add(root.val);
+    }
+    
+    private void formRightBoundary(TreeNode node, List<Integer> list) {
+        if (node == null)
+            return;
+        if (node.right != null) {
+            formRightBoundary(node.right, list);
+            list.add(node.val);
+        } else if (node.left != null) {
+            formRightBoundary(node.left, list);
+            list.add(node.val);
         }
-        TreeNode t = root.left;
-        while (t != null) {
-            if (!isLeaf(t)) {
-                res.add(t.val);
-            }
-            if (t.left != null) {
-                t = t.left;
-            } else {
-                t = t.right;
-            }
-
-        }
-        addLeaves(res, root);
-        Stack<Integer> s = new Stack<>();
-        t = root.right;
-        while (t != null) {
-            if (!isLeaf(t)) {
-                s.push(t.val);
-            }
-            if (t.right != null) {
-                t = t.right;
-            } else {
-                t = t.left;
-            }
-        }
-        while (!s.empty()) {
-            res.add(s.pop());
-        }
-        return res;
+    }
+    
+    private void addLeaves(TreeNode node, List<Integer> list) {
+        if (node == null)
+            return;
+        addLeaves(node.left, list);
+        if (node.left == null && node.right == null)
+            list.add(node.val);
+        addLeaves(node.right, list);
     }
 }
