@@ -10,21 +10,21 @@
  */
 class Solution {
     public ListNode deleteNodes(ListNode head, int m, int n) {
-        ListNode root = head;
-        while (head != null) {
-            int m1 = m, n1 = n;
-            while (head != null && m1 > 1) {
-                head = head.next;
-                m1 -= 1;
+        ListNode curr = head;
+        ListNode lastM = head;     
+        while (curr != null) {
+            int mCount = m, nCount = n;
+            while (curr != null && mCount != 0) {
+                lastM = curr;
+                curr = curr.next;
+                mCount--;
             }
-            ListNode dummy = head;
-            while (head != null && n1 >= 0) {
-                head = head.next;
-                n1 -= 1;
+            while (curr != null && nCount != 0) {
+                curr = curr.next;
+                nCount--;
             }
-            if (dummy != null) 
-                dummy.next = head;
+            lastM.next = curr;
         }
-        return root;
+        return head;
     }
 }
