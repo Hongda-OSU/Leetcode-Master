@@ -8,6 +8,7 @@ class FirstUnique {
     }
     
     public int showFirstUnique() {
+        // remove non-uniques from the start of the queue
         while (!queue.isEmpty() && !map.get(queue.peek()))
             queue.remove();
         
