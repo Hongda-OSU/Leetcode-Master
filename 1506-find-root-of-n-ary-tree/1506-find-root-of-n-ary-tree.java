@@ -23,6 +23,7 @@ class Node {
 
 class Solution {
     public Node findRoot(List<Node> tree) {
+        // set that contains all the child nodes.
         HashSet<Integer> seen = new HashSet<>();
         for (Node node : tree) {
             for (Node child : node.children) {
