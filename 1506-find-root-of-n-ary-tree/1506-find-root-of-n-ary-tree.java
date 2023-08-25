@@ -23,21 +23,15 @@ class Node {
 
 class Solution {
     public Node findRoot(List<Node> tree) {
-
-        Integer valueSum = 0;
-
+        HashSet<Integer> seen = new HashSet<>();
         for (Node node : tree) {
-            // the value is added as a parent node
-            valueSum += node.val;
-            for (Node child : node.children)
-                // the value is deducted as a child node.
-                valueSum -= child.val;
+            for (Node child : node.children) {
+                seen.add(child.val);
+            }
         }
-
         Node root = null;
-        // the value of the root node is `valueSum`
         for (Node node : tree) {
-            if (node.val == valueSum) {
+            if (!seen.contains(node.val)) {
                 root = node;
                 break;
             }
