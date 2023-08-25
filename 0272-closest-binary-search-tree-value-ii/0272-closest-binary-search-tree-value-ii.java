@@ -15,27 +15,30 @@
  */
 class Solution {
     public List<Integer> closestKValues(TreeNode root, double target, int k) {
-        List<Integer> arr = new ArrayList<>();
-        dfs(root, arr);
+        LinkedList<Integer> result = new LinkedList<>();
         
-        Collections.sort(arr, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return Math.abs(o1 - target) < Math.abs(o2 - target) ? -1 : 1;
-            }
-        });
-        
-        return arr.subList(0, k);
-        
+        dfsInOrder(root, target, k, result);
+        return result;
     }
     
-    public void dfs(TreeNode node, List<Integer> arr) {
-        if (node == null) {
+    private void dfsInOrder(TreeNode root, double target, int k, LinkedList<Integer> result) {
+        if (root == null)
             return;
+        dfsInOrder(root.left, target, k, result);
+        if (result.size() < k) {
+            result.add(root.val);
+        } else {
+            double diff = Math.abs(root.val - target);
+            double diffLeft = Math.abs(result.peekFirst() - target);
+            double diffRight = Math.abs(result.peekLast() - target);
+            if (diff < diffLeft) {
+                result.removeFirst();
+                result.add(root.val);
+            } else if (diff < diffRight) {
+                result.removeFirst();
+                result.add(root.val);
+            }
         }
-        
-        arr.add(node.val);
-        dfs(node.left, arr);
-        dfs(node.right, arr);
+        dfsInOrder(root.right, target, k, result);
     }
 }
