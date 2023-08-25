@@ -23,20 +23,21 @@ class Node {
 
 class Solution {
     public Node findRoot(List<Node> tree) {
-        // set that contains all the child nodes.
-        HashSet<Integer> seen = new HashSet<Integer>();
 
-        // add all the child nodes into the set
+        Integer valueSum = 0;
+
         for (Node node : tree) {
+            // the value is added as a parent node
+            valueSum += node.val;
             for (Node child : node.children)
-                // we could either add the value or the node itself.
-                seen.add(child.val);
+                // the value is deducted as a child node.
+                valueSum -= child.val;
         }
 
         Node root = null;
-        // find the node that is not in the child node set.
+        // the value of the root node is `valueSum`
         for (Node node : tree) {
-            if (!seen.contains(node.val)) {
+            if (node.val == valueSum) {
                 root = node;
                 break;
             }
