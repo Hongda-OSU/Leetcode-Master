@@ -15,30 +15,23 @@
  */
 class Solution {
     public List<Integer> closestKValues(TreeNode root, double target, int k) {
-        LinkedList<Integer> result = new LinkedList<>();
+        Queue<Integer> heap = new PriorityQueue<>((a, b) -> Math.abs(a - target) > Math.abs(b - target) ? -1: 1);
+        dfs(root, heap, k);
         
-        dfsInOrder(root, target, k, result);
-        return result;
+        return new ArrayList<>(heap);
     }
     
-    private void dfsInOrder(TreeNode root, double target, int k, LinkedList<Integer> result) {
-        if (root == null)
+    public void dfs(TreeNode node, Queue<Integer> heap, int k) {
+        if (node == null) {
             return;
-        dfsInOrder(root.left, target, k, result);
-        if (result.size() < k) {
-            result.add(root.val);
-        } else {
-            double diff = Math.abs(root.val - target);
-            double diffLeft = Math.abs(result.peekFirst() - target);
-            double diffRight = Math.abs(result.peekLast() - target);
-            if (diff < diffLeft) {
-                result.removeFirst();
-                result.add(root.val);
-            } else if (diff < diffRight) {
-                result.removeFirst();
-                result.add(root.val);
-            }
         }
-        dfsInOrder(root.right, target, k, result);
+        
+        heap.add(node.val);
+        if (heap.size() > k) {
+            heap.remove();
+        }
+        
+        dfs(node.left, heap, k);
+        dfs(node.right, heap, k);
     }
 }
