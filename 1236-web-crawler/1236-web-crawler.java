@@ -10,26 +10,23 @@ class Solution {
     public List<String> crawl(String startUrl, HtmlParser htmlParser) {
         Set<String> set = new HashSet<>();
         Queue<String> queue = new LinkedList<>();
-        String hostname = getHostname(startUrl);
-        
+        String hostName = getHostName(startUrl);
         queue.offer(startUrl);
         set.add(startUrl);
-        
         while (!queue.isEmpty()) {
-            String currentUrl = queue.poll();
-            for (String url : htmlParser.getUrls(currentUrl)) {
-                if (url.contains(hostname) && !set.contains(url)) {
+            String curr = queue.poll();
+            for (String url : htmlParser.getUrls(curr)) {
+                if (url.contains(hostName) && !set.contains(url)) {
                     queue.offer(url);
                     set.add(url);
                 }
             }
         }
-        
-        return new ArrayList<String>(set);
+        return new ArrayList<>(set);
     }
     
-    private String getHostname(String Url) {
-        String[] ss = Url.split("/");
-        return ss[2];
+    private String getHostName(String url) {
+        String[] str = url.split("/");
+        return str[2];
     }
 }
