@@ -7,9 +7,6 @@
  */
 
 class Solution {
-    private String startHostname;
-    private HashSet<String> visited = new HashSet<String>();
-
     private String getHostname(String url) {
         // split url by slashes
         // for instance, "http://example.org/foo/bar" will be split into
@@ -18,18 +15,19 @@ class Solution {
         return url.split("/")[2];
     }
 
-    private void dfs(String url, HtmlParser htmlParser) {
-        visited.add(url);
-        for (String nextUrl : htmlParser.getUrls(url)) {
-            if (getHostname(nextUrl).equals(startHostname) && !visited.contains(nextUrl)) {
-                dfs(nextUrl, htmlParser);
+    public List<String> crawl(String startUrl, HtmlParser htmlParser) {
+        String startHostname = getHostname(startUrl);
+        Queue<String> q = new LinkedList<String>(Arrays.asList(startUrl));
+        HashSet<String> visited = new HashSet<String>(Arrays.asList(startUrl));
+        while (!q.isEmpty()) {
+            String url = q.remove();
+            for (String nextUrl : htmlParser.getUrls(url)) {
+                if (getHostname(nextUrl).equals(startHostname) && !visited.contains(nextUrl)) {
+                    q.add(nextUrl);
+                    visited.add(nextUrl);
+                }
             }
         }
-    }
-
-    public List<String> crawl(String startUrl, HtmlParser htmlParser) {
-        startHostname = getHostname(startUrl);
-        dfs(startUrl, htmlParser);
         return new ArrayList<>(visited);
     }
 }
