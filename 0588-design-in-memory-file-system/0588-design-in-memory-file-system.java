@@ -1,85 +1,62 @@
-public class FileSystem {
+class FileSystem {
     class File {
         boolean isFile = false;
-        Map<String, File> children = new HashMap<>();
+        HashMap<String, File> files = new HashMap<>();
         String content = "";
     }
-    
-    File root = null;
-    
+    public File root;
+
     public FileSystem() {
         root = new File();
     }
     
     public List<String> ls(String path) {
-        String[] dirs = path.split("/");
-        File node = root;
-        List<String> result = new ArrayList<>();
-        String name = "";
-        for (String dir : dirs) {
-            if (dir.length() == 0) continue;
-            if (!node.children.containsKey(dir)) {
-                return result;
+        File t = root;
+        List<String> files = new ArrayList<>();
+        if (!path.equals("/")) {
+            String[] d = path.split("/");
+            for (int i = 1; i < d.length; i++) {
+                t = t.files.get(d[i]);
             }
-            node = node.children.get(dir);
-            name = dir;
-        }
-        
-        if (node.isFile) {
-            result.add(name);
-        }
-        else {
-            for (String key : node.children.keySet()) {
-                result.add(key);
+            if (t.isFile) {
+                files.add(d[d.length - 1]);
+                return files;
             }
         }
-        
-        Collections.sort(result);
-        
-        return result;
+        List<String> resFiles = new ArrayList<>(t.files.keySet());
+        Collections.sort(resFiles);
+        return resFiles;
     }
     
     public void mkdir(String path) {
-        String[] dirs = path.split("/");
-        File node = root;
-        for (String dir : dirs) {
-            if (dir.length() == 0) continue;
-            if (!node.children.containsKey(dir)) {
-                File file = new File();
-                node.children.put(dir, file);
+        File t = root;
+        String[] d = path.split("/");
+        for (int i = 1; i < d.length; i++) {
+            if (!t.files.containsKey(d[i])) {
+                t.files.put(d[i], new File());
             }
-            node = node.children.get(dir);
+            t = t.files.get(d[i]);
         }
     }
     
     public void addContentToFile(String filePath, String content) {
-        String[] dirs = filePath.split("/");
-        File node = root;
-        for (String dir : dirs) {
-            if (dir.length() == 0) continue;
-            if (!node.children.containsKey(dir)) {
-                File file = new File();
-                node.children.put(dir, file);
-            }
-            node = node.children.get(dir);
-        }
-        node.isFile = true;
-        node.content += content;
+        File t = root;
+        String[] d = filePath.split("/");
+        for (int i = 1; i < d.length - 1; i++)
+            t = t.files.get(d[i]);
+        if (!t.files.containsKey(d[d.length - 1])) 
+            t.files.put(d[d.length - 1], new File());
+        t = t.files.get(d[d.length - 1]);
+        t.isFile = true;
+        t.content += content;
     }
     
     public String readContentFromFile(String filePath) {
-        String[] dirs = filePath.split("/");
-        File node = root;
-        for (String dir : dirs) {
-            if (dir.length() == 0) continue;
-            if (!node.children.containsKey(dir)) {
-                File file = new File();
-                node.children.put(dir, file);
-            }
-            node = node.children.get(dir);
-        }
-
-        return node.content;
+        File t = root;
+        String[] d = filePath.split("/");
+        for (int i = 1; i < d.length - 1; i++) 
+            t = t.files.get(d[i]);
+        return t.files.get(d[d.length - 1]).content;
     }
 }
 
