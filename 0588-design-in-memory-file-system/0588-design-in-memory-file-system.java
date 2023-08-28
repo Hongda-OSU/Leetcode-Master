@@ -1,70 +1,87 @@
 public class FileSystem {
-    class Dir {
-        HashMap < String, Dir > dirs = new HashMap < > ();
-        HashMap < String, String > files = new HashMap < > ();
+    class File {
+        boolean isFile = false;
+        Map<String, File> children = new HashMap<>();
+        String content = "";
     }
-    Dir root;
+    
+    File root = null;
+    
     public FileSystem() {
-        root = new Dir();
+        root = new File();
     }
-    public List < String > ls(String path) {
-        Dir t = root;
-        List < String > files = new ArrayList < > ();
-        if (!path.equals("/")) {
-            String[] d = path.split("/");
-            for (int i = 1; i < d.length - 1; i++) {
-                t = t.dirs.get(d[i]);
+    
+    public List<String> ls(String path) {
+        String[] dirs = path.split("/");
+        File node = root;
+        List<String> result = new ArrayList<>();
+        String name = "";
+        for (String dir : dirs) {
+            if (dir.length() == 0) continue;
+            if (!node.children.containsKey(dir)) {
+                return result;
             }
-            if (t.files.containsKey(d[d.length - 1])) {
-                files.add(d[d.length - 1]);
-                return files;
-            } else {
-                t = t.dirs.get(d[d.length - 1]);
+            node = node.children.get(dir);
+            name = dir;
+        }
+        
+        if (node.isFile) {
+            result.add(name);
+        }
+        else {
+            for (String key : node.children.keySet()) {
+                result.add(key);
             }
         }
-        files.addAll(new ArrayList < > (t.dirs.keySet()));
-        files.addAll(new ArrayList < > (t.files.keySet()));
-        Collections.sort(files);
-        return files;
+        
+        Collections.sort(result);
+        
+        return result;
     }
-
+    
     public void mkdir(String path) {
-        Dir t = root;
-        String[] d = path.split("/");
-        for (int i = 1; i < d.length; i++) {
-            if (!t.dirs.containsKey(d[i]))
-                t.dirs.put(d[i], new Dir());
-            t = t.dirs.get(d[i]);
+        String[] dirs = path.split("/");
+        File node = root;
+        for (String dir : dirs) {
+            if (dir.length() == 0) continue;
+            if (!node.children.containsKey(dir)) {
+                File file = new File();
+                node.children.put(dir, file);
+            }
+            node = node.children.get(dir);
         }
     }
-
+    
     public void addContentToFile(String filePath, String content) {
-        Dir t = root;
-        String[] d = filePath.split("/");
-        for (int i = 1; i < d.length - 1; i++) {
-            t = t.dirs.get(d[i]);
+        String[] dirs = filePath.split("/");
+        File node = root;
+        for (String dir : dirs) {
+            if (dir.length() == 0) continue;
+            if (!node.children.containsKey(dir)) {
+                File file = new File();
+                node.children.put(dir, file);
+            }
+            node = node.children.get(dir);
         }
-        t.files.put(d[d.length - 1], t.files.getOrDefault(d[d.length - 1], "") + content);
+        node.isFile = true;
+        node.content += content;
     }
-
+    
     public String readContentFromFile(String filePath) {
-        Dir t = root;
-        String[] d = filePath.split("/");
-        for (int i = 1; i < d.length - 1; i++) {
-            t = t.dirs.get(d[i]);
+        String[] dirs = filePath.split("/");
+        File node = root;
+        for (String dir : dirs) {
+            if (dir.length() == 0) continue;
+            if (!node.children.containsKey(dir)) {
+                File file = new File();
+                node.children.put(dir, file);
+            }
+            node = node.children.get(dir);
         }
-        return t.files.get(d[d.length - 1]);
+
+        return node.content;
     }
 }
-
-/**
- * Your FileSystem object will be instantiated and called as such:
- * FileSystem obj = new FileSystem();
- * List<String> param_1 = obj.ls(path);
- * obj.mkdir(path);
- * obj.addContentToFile(filePath,content);
- * String param_4 = obj.readContentFromFile(filePath);
- */
 
 /**
  * Your FileSystem object will be instantiated and called as such:
