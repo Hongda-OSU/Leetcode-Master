@@ -1,14 +1,13 @@
 class Solution {
-     public int connectSticks(int[] sticks) {
+    public int connectSticks(int[] sticks) {
         PriorityQueue<Integer> pq = new PriorityQueue<>();
-        for (int s : sticks) {
-            pq.offer(s);
-        }
+        for (int stick : sticks) 
+            pq.offer(stick);
         int sum = 0;
         while (pq.size() > 1) {
-            int two = pq.poll() + pq.poll();
-            sum += two;
-            pq.offer(two);
+            int temp = pq.poll() + pq.poll();
+            sum += temp;
+            pq.offer(temp);
         }
         return sum;
     }
