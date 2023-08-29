@@ -5,9 +5,11 @@ class Solution {
         Arrays.fill(wo, -1);
         Arrays.fill(bi, -1);
         PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> {
-             return a[0] != b[0] ? a[0] - b[0]
-                    : (a[1] != b[1] ? a[1] - b[1]
-                       : (a[2] - b[2]));
+            if (a[0] != b[0]) 
+                return Integer.compare(a[0], b[0]);
+            if (a[1] != b[1]) 
+                return Integer.compare(a[1], b[1]);
+            return Integer.compare(a[2], b[2]);
         });
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
