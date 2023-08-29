@@ -1,25 +1,15 @@
 class Solution {
-    public int connectSticks(int[] sticks) {
-        int totalCost = 0;
- 
+     public int connectSticks(int[] sticks) {
         PriorityQueue<Integer> pq = new PriorityQueue<>();
- 
-        // add all sticks to the min heap.
-        for (int stick : sticks) {
-            pq.add(stick);
+        for (int s : sticks) {
+            pq.offer(s);
         }
- 
-        // combine two of the smallest sticks until we are left with just one.
+        int sum = 0;
         while (pq.size() > 1) {
-            int stick1 = pq.remove();
-            int stick2 = pq.remove();
-            
-            int cost = stick1 + stick2;
-            totalCost += cost;
-            
-            pq.add(stick1 + stick2);
+            int two = pq.poll() + pq.poll();
+            sum += two;
+            pq.offer(two);
         }
- 
-        return totalCost;
+        return sum;
     }
 }
