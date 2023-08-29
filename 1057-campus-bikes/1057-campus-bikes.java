@@ -1,25 +1,31 @@
 class Solution {
     public int[] assignBikes(int[][] workers, int[][] bikes) {
-        int n = workers.length;
-        Queue<int[]> q = new PriorityQueue<int[]>((a, b)->(a[0] == b[0] ? (a[1] == b[1] ? a[2] - b[2] : a[1] - b[1]) : a[0] - b[0]));
-        int i = 0;
-        for (int[] worker : workers) {
-            int j = 0;
-            for (int[] bike : bikes) {
-               q.add(new int[]{Math.abs(bike[0] - worker[0]) + Math.abs(bike[1] - worker[1]), i, j++}); 
-            }
-            i++;
-        }
-        int[] res = new int[n];
-        Arrays.fill(res, -1);
-        Set<Integer> visited = new HashSet<>();
-        while (visited.size() < n) {
-            int[] temp = q.poll();
-            if (res[temp[1]] == -1 && !visited.contains(temp[2])) {   
-                res[temp[1]] = temp[2];
-                visited.add(temp[2]);
+        int m = workers.length, n = bikes.length;
+        int[] wo = new int[m], bi = new int[n];
+        Arrays.fill(wo, -1);
+        Arrays.fill(bi, -1);
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> {
+             return a[0] != b[0] ? a[0] - b[0]
+                    : (a[1] != b[1] ? a[1] - b[1]
+                       : (a[2] - b[2]));
+        });
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                int[] worker = workers[i];
+                int[] bike = bikes[j];
+                int dist = Math.abs(worker[0] - bike[0]) + Math.abs(worker[1] - bike[1]);
+                pq.offer(new int[]{dist, i, j});
             }
         }
-        return res;
+        int assigned = 0;
+        while (!pq.isEmpty() && assigned < m) {
+            int[] curr = pq.poll();
+            if (wo[curr[1]] == -1 && bi[curr[2]] == -1) {
+                wo[curr[1]] = curr[2];
+                bi[curr[2]] = curr[1];
+                assigned++;
+            }
+        }
+        return wo;
     }
 }
