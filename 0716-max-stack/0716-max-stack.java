@@ -1,42 +1,52 @@
 class MaxStack {
-
-    private TreeSet<int[]> stack;
-    private TreeSet<int[]> values;
+    private Stack<int[]> stack;
+    private Queue<int[]> heap;
+    private Set<Integer> removed;
     private int cnt;
 
     public MaxStack() {
-        Comparator<int[]> comp = (a, b) -> {
-            return a[0] == b[0] ? a[1] - b[1] : a[0] - b[0];
-        };
-        stack = new TreeSet<>(comp);
-        values = new TreeSet<>(comp);
-        cnt = 0;
+        stack = new Stack<>();
+        heap = new PriorityQueue<>((a, b) -> b[0] - a[0] == 0 ? b[1] - a[1] : b[0] - a[0]);
+        removed = new HashSet<>();
     }
 
     public void push(int x) {
-        stack.add(new int[] { cnt, x });
-        values.add(new int[] { x, cnt });
+        stack.add(new int[] { x, cnt });
+        heap.add(new int[] { x, cnt });
         cnt++;
     }
 
     public int pop() {
-        int[] pair = stack.pollLast();
-        values.remove(new int[] { pair[1], pair[0] });
-        return pair[1];
+        while (removed.contains(stack.peek()[1])) {
+            stack.pop();
+        }
+        int[] top = stack.pop();
+        removed.add(top[1]);
+        return top[0];
     }
 
     public int top() {
-        return stack.last()[1];
+        while (removed.contains(stack.peek()[1])) {
+            stack.pop();
+        }
+        return stack.peek()[0];
     }
 
     public int peekMax() {
-        return values.last()[0];
+        while (removed.contains(heap.peek()[1])) {
+            heap.poll();
+        }
+        return heap.peek()[0];
+
     }
 
     public int popMax() {
-        int[] pair = values.pollLast();
-        stack.remove(new int[] { pair[1], pair[0] });
-        return pair[0];
+        while (removed.contains(heap.peek()[1])) {
+            heap.poll();
+        }
+        int[] top = heap.poll();
+        removed.add(top[1]);
+        return top[0];
     }
 }
 /**
