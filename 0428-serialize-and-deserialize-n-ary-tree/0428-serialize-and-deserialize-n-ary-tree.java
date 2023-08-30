@@ -18,43 +18,57 @@ class Node {
 */
 
 class Codec {
-
-// Encodes a tree to a single string.
-public String serialize(Node root) {
-    StringBuilder sb = new StringBuilder();
-    serialize(root, sb);
-    return sb.toString();
-}
- 
-private void serialize(Node root, StringBuilder sb){
-    if(root == null) {
-      sb.append("#").append(",");   
-    }else{
-        sb.append(root.val).append(",");
-        sb.append(root.children.size()).append(",");
-        for(Node child : root.children){
-            serialize(child, sb);
+    class WrappableInt {
+        private int value;
+        
+        public WrappableInt(int x) {
+            this.value = x;
         }
-    }      
-}
-// Decodes your encoded data to tree.
-public Node deserialize(String data) {
-    Queue<String> q = new LinkedList<>(Arrays.asList(data.split(",")));
-    return deserialize(q);
-}
-private Node deserialize(Queue<String> q){
-    String s = q.poll();
-    if(s.equals("#")) return null;
-    
-    Node root = new Node(Integer.valueOf(s));
-    int children = Integer.valueOf(q.poll());
-    
-    root.children = new ArrayList<>();
-    for(int i=0; i< children; i++){
-        root.children.add(deserialize(q));
+        
+        public int getValue() {
+            return this.value;
+        }
+        
+        public void increment() {
+            this.value++;
+        }
     }
-    return root;
-}
+    
+    // Encodes a tree to a single string.
+    public String serialize(Node root) {
+        StringBuilder sb = new StringBuilder();
+        serializeHelper(root, sb);
+        return sb.toString();
+    }
+    
+    private void serializeHelper(Node root, StringBuilder sb) {
+        if (root == null)
+            return;
+        sb.append((char)(root.val + '0'));
+        sb.append((char)(root.children.size() + '0'));
+        for (Node child : root.children)
+            serializeHelper(child, sb);
+    }
+	
+    // Decodes your encoded data to tree.
+    public Node deserialize(String data) {
+        if (data.isEmpty())
+            return null;
+        return deserializeHelper(data, new WrappableInt(0));
+    }
+    
+    private Node deserializeHelper(String data, WrappableInt wi) {
+        if (wi.getValue() == data.length())
+            return null;
+        Node node = new Node(data.charAt(wi.getValue()) - '0', new ArrayList<>());
+        wi.increment();
+        int numChildren = data.charAt(wi.getValue()) - '0';
+        for (int i = 0; i < numChildren; i++) {
+            wi.increment();
+            node.children.add(deserializeHelper(data, wi));
+        }
+        return node;
+    }
 }
 
 // Your Codec object will be instantiated and called as such:
