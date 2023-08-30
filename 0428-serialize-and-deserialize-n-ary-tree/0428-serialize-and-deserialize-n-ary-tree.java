@@ -20,11 +20,11 @@ class Node {
 class Codec {
 
     class WrappableInt {
-        private Integer value;
-        public WrappableInt(Integer x) {
+        private int value;
+        public WrappableInt(int x) {
             this.value = x;
         }
-        public Integer getValue() {
+        public int getValue() {
             return this.value;
         }
         public void increment() {
@@ -32,39 +32,30 @@ class Codec {
         }
     }
     
-    // Was searching for typedef alternatives in Java and came across fake classes
-    // Mostly considered an anti-pattern but it definitely makes our code much more
-    // readable!
-    class DeserializedObject extends HashMap<Integer, Pair<Integer, Pair<Integer, Node>>> {}
-    
-    
     // Encodes a tree to a single string.
     public String serialize(Node root) {
         
         StringBuilder sb = new StringBuilder();
-        this._serializeHelper(root, sb, new WrappableInt(1), null);
+        this._serializeHelper(root, sb);
         return sb.toString();
     }
     
-    private void _serializeHelper(Node root, StringBuilder sb, WrappableInt identity, Integer parentId) {
+    private void _serializeHelper(Node root, StringBuilder sb) {
         
         if (root == null) {
             return;
         }
         
-        // Own identity
-        sb.append((char) (identity.getValue() + '0'));
-        
-        // Actual value
+        // Add the value of the node
         sb.append((char) (root.val + '0'));
         
-        // Parent's identity
-        sb.append((char) (parentId == null ? 'N' : parentId + '0'));
+        // Add the number of children
+        sb.append((char) (root.children.size() + '0'));
         
-        parentId = identity.getValue();
+        // Recurse on the subtrees and build the 
+        // string accordingly
         for (Node child : root.children) {
-            identity.increment();
-            this._serializeHelper(child, sb, identity, parentId);
+            this._serializeHelper(child, sb);
         }
     }
 
@@ -73,42 +64,27 @@ class Codec {
         if(data.isEmpty())
             return null;
         
-        return this._deserializeHelper(data);
+        return this._deserializeHelper(data, new WrappableInt(0));
     }
     
-    private Node _deserializeHelper(String data) {  
+    private Node _deserializeHelper(String data, WrappableInt index) {  
         
-        // HashMap explained in the algorithm
-        DeserializedObject nodesAndParents = new DeserializedObject();
-        
-        // Constructing the hashmap using the input string
-        for (int i = 0; i < data.length(); i+=3) {
-            int id = data.charAt(i) - '0';
-            int orgValue = data.charAt(i + 1) - '0';
-            int parentId = data.charAt(i + 2) - '0';
-            Pair<Integer, Pair<Integer, Node>> node = new Pair<Integer, Pair<Integer, Node>>(orgValue, 
-                                           new Pair<Integer, Node>(parentId, 
-                                           new Node(orgValue, new ArrayList<Node>())));
-            nodesAndParents.put(id, node);
+        if (index.getValue() == data.length()) {
+            return null;
         }
         
-        // A second pass for tying up the proper child connections
-        for (int i = 3; i < data.length(); i+=3) {
-            
-            // Current node
-            int id = data.charAt(i) - '0';
-            Node node = nodesAndParents.get(id).getValue().getValue();
-            
-            // Parent node
-            int parentId = data.charAt(i + 2) - '0';
-            Node parentNode = nodesAndParents.get(parentId).getValue().getValue();
-            
-            // Attach!
-            parentNode.children.add(node);
+        // The invariant here is that the "index" always
+        // points to a node and the value next to it 
+        // represents the number of children it has.
+        Node node = new Node(data.charAt(index.getValue()) - '0', new ArrayList<Node>());
+        index.increment();
+        int numChildren = data.charAt(index.getValue()) - '0';
+        for (int i = 0; i < numChildren; i++) {
+            index.increment();
+            node.children.add(this._deserializeHelper(data, index));
         }
         
-        // Return the root node.
-        return nodesAndParents.get(data.charAt(0) - '0').getValue().getValue();
+        return node;
     }
 }
 
