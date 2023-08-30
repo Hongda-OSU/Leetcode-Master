@@ -19,45 +19,23 @@ class Node {
 
 class Codec {
 
-    class WrappableInt {
-        private int value;
-        public WrappableInt(int x) {
-            this.value = x;
-        }
-        public int getValue() {
-            return this.value;
-        }
-        public void increment() {
-            this.value++;
-        }
-    }
-    
     // Encodes a tree to a single string.
     public String serialize(Node root) {
-        
-        StringBuilder sb = new StringBuilder();
-        this._serializeHelper(root, sb);
-        return sb.toString();
+        List<String> list=new LinkedList<>();
+        serializeHelper(root,list);
+        return String.join(",",list);
     }
     
-    private void _serializeHelper(Node root, StringBuilder sb) {
-        
-        if (root == null) {
+    private void serializeHelper(Node root, List<String> list){
+        if(root==null){
             return;
+        }else{
+            list.add(String.valueOf(root.val));
+            list.add(String.valueOf(root.children.size()));
+            for(Node child:root.children){
+                serializeHelper(child,list);
+            }
         }
-        
-        // Add the value of the node
-        sb.append((char) (root.val + '0'));
-        
-        // Recurse on the subtrees and build the 
-        // string accordingly
-        for (Node child : root.children) {
-            this._serializeHelper(child, sb);
-        }
-        
-        // Add the sentinel to indicate that all the children
-        // for the current node have been processed
-        sb.append('#');
     }
 
     // Decodes your encoded data to tree.
@@ -65,27 +43,20 @@ class Codec {
         if(data.isEmpty())
             return null;
         
-        return this._deserializeHelper(data, new WrappableInt(0));
+        String[] ss=data.split(",");
+        Queue<String> q=new LinkedList<>(Arrays.asList(ss));
+        return deserializeHelper(q);
     }
     
-    private Node _deserializeHelper(String data, WrappableInt index) {  
-        
-        if (index.getValue() == data.length()) {
-            return null;
+    private Node deserializeHelper(Queue<String> q){
+        Node root=new Node();
+        root.val=Integer.parseInt(q.poll());
+        int size=Integer.parseInt(q.poll());
+        root.children=new ArrayList<Node>(size);
+        for(int i=0;i<size;i++){
+            root.children.add(deserializeHelper(q));
         }
-        
-        Node node = new Node(data.charAt(index.getValue()) - '0', new ArrayList<Node>());
-        index.increment();
-        while (data.charAt(index.getValue()) != '#') {
-            node.children.add(this._deserializeHelper(data, index));
-        }
-        
-        // Discard the sentinel. Note that this also moves us
-        // forward in the input string. So, we don't have the index
-        // progressing inside the above while loop!
-        index.increment();
-        
-        return node;
+        return root;
     }
 }
 
