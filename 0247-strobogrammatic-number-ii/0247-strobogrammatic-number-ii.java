@@ -4,33 +4,41 @@ class Solution {
         {'6', '9'}, {'8', '8'}, {'9', '6'}
     };
     
-    public List<String> generateStroboNumbers(int n, int finalLength) {
-        if (n == 0) {
-            // 0-digit strobogrammatic number is an empty string.
-            return new ArrayList<>(List.of(""));
+    public List<String> findStrobogrammatic(int n) {
+        Queue<String> q = new LinkedList<>();
+        int currStringsLength;
+        
+        // When n is even, it means when decreasing by 2 we will go till 0.
+        if (n % 2 == 0) {
+            // We will start with 0-digit strobogrammatic numbers.
+            currStringsLength = 0;
+            q.add("");
+        } else {
+            // We will start with 1-digit strobogrammatic numbers.
+            currStringsLength = 1;
+            q.add("0");
+            q.add("1");
+            q.add("8");
         }
         
-        if (n == 1) {
-            // 1-digit strobogrammatic numbers.
-            return new ArrayList<>(List.of("0", "1", "8"));
-        }
-        
-        List<String> prevStroboNums = generateStroboNumbers(n - 2, finalLength);
-        List<String> currStroboNums = new ArrayList<>();
-        
-        for (String prevStroboNum : prevStroboNums) {
-            for (char[] pair : reversiblePairs) {
-                // We can only append 0's if it is not first digit.
-                if (pair[0] != '0' || n != finalLength) {
-                    currStroboNums.add(pair[0] + prevStroboNum + pair[1]);
+        while (currStringsLength < n) {
+            currStringsLength += 2;
+            for (int i = q.size(); i > 0; --i) {
+                String number = q.poll();
+                
+                for (char[] pair : reversiblePairs) {
+                    if (currStringsLength != n || pair[0] != '0') {
+                        q.add(pair[0] + number + pair[1]);
+                    }
                 }
             }
         }
         
-        return currStroboNums;
-    }
-    
-    public List<String> findStrobogrammatic(int n) {
-        return generateStroboNumbers(n, n);
+        List<String> stroboNums = new ArrayList<>();
+        while (!q.isEmpty()) {
+            stroboNums.add(q.poll());
+        }
+        
+        return stroboNums;
     }
 }
