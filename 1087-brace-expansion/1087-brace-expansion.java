@@ -1,45 +1,49 @@
 class Solution {
-    int storeFirstOptions(String s, int startPos, List<String> firstOptions) {
-        // If the first character is not '{', it means a single character
-        if (s.charAt(startPos) != '{') {
-            firstOptions.add(String.valueOf(s.charAt(startPos)));
-        } else {
-            // Store all the characters between '{' and '}'
-            while (s.charAt(startPos) != '}') {
-                if (s.charAt(startPos) >= 'a' && s.charAt(startPos) <= 'z') {
-                    firstOptions.add(String.valueOf(s.charAt(startPos)));
-                }
-                startPos++;
-            }
-            // Sort the list
-            Collections.sort(firstOptions);
+    public String[] expand(String S) {
+        
+        List<String> result = new ArrayList<>();
+        backtrack(S, 0, new StringBuilder(), result);
+        
+        String[] output = new String[result.size()];
+        for(int i=0; i<output.length; i++) {
+            output[i] = result.get(i);
         }
-        // Increment it to point to the next character to be considered
-        return startPos + 1;
+        
+        Arrays.sort(output);
+        return output;
+   
     }
     
-    String[] expand(String s) {
-        List<String> expandedWords = Arrays.asList("");
+    public void backtrack(String s, int start, StringBuilder sb, List<String> result) {
         
-        int startPos = 0;
-        while (startPos < s.length()) {
-            List<String> firstOptions = new ArrayList<>();
-            // Store the characters for the first index as string in firstOptions
-            int remStringStartPos = storeFirstOptions(s, startPos, firstOptions);
-            
-            List<String> currWords = new ArrayList<>();
-            // Append the string in the list firstOptions to string in expandedWords
-            for (String word : expandedWords) {
-                for (String c : firstOptions) {
-                    currWords.add(word + c);
-                }
-            }
-            // Update the list expandedWords to have all the words
-            expandedWords = currWords;
-            // Pointing to the next character to be considered
-            startPos = remStringStartPos;
+        if(s.length() == start) {
+            result.add(sb.toString());
+            return;
         }
         
-        return expandedWords.toArray(new String[0]);
-    }
+        if(Character.isLetter(s.charAt(start))) {
+            
+            sb.append(s.charAt(start));
+            backtrack(s, start+1, sb, result);
+            sb.deleteCharAt(sb.length()-1);
+            
+        } else if(s.charAt(start) == '{') {
+            
+            List<Character> list = new ArrayList<>();
+            while(s.charAt(start) != '}') {
+                start++;
+                if(Character.isLetter(s.charAt(start))) {
+                    list.add(s.charAt(start));
+                }
+            }
+            
+            for(Character c: list) {
+                sb.append(c);
+                backtrack(s, start+1, sb, result);
+                sb.deleteCharAt(sb.length()-1);
+            }
+            
+        }
+    } 
+    
 }
