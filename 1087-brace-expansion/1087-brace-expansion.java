@@ -1,54 +1,45 @@
 class Solution {
-    List<List<Character>> allOptions = new ArrayList<>();
-
-    void storeAllOptions(String s) {
-        for (int pos = 0; pos < s.length(); pos++) {
-            List<Character> currOptions = new ArrayList<>();
-            
-            // If the first character is not '{', it means a single character
-             if (s.charAt(pos) != '{') {
-                 currOptions.add(s.charAt(pos));
-             } else {
-                 // Store all the characters between '{' and '}'
-                 while (s.charAt(pos) != '}') {
-                     if (s.charAt(pos) >= 'a' && s.charAt(pos) <= 'z') {
-                         currOptions.add(s.charAt(pos));
-                     }
-                     pos++;
-                 }
-                 // Sort the list
-                 Collections.sort(currOptions);
-             }
-            
-            allOptions.add(currOptions);
+    int storeFirstOptions(String s, int startPos, List<String> firstOptions) {
+        // If the first character is not '{', it means a single character
+        if (s.charAt(startPos) != '{') {
+            firstOptions.add(String.valueOf(s.charAt(startPos)));
+        } else {
+            // Store all the characters between '{' and '}'
+            while (s.charAt(startPos) != '}') {
+                if (s.charAt(startPos) >= 'a' && s.charAt(startPos) <= 'z') {
+                    firstOptions.add(String.valueOf(s.charAt(startPos)));
+                }
+                startPos++;
+            }
+            // Sort the list
+            Collections.sort(firstOptions);
         }
+        // Increment it to point to the next character to be considered
+        return startPos + 1;
     }
     
-    void generateWords(StringBuilder currString, List<String> expandedWords) {
-        // If the currString is complete, we can store and return
-        if (currString.length() == allOptions.size()) {
-            expandedWords.add(currString.toString());
-            return;
-        }
+    String[] expand(String s) {
+        List<String> expandedWords = Arrays.asList("");
         
-        // Fetch the options for the current index
-        List<Character> currOptions = allOptions.get(currString.length());
+        int startPos = 0;
+        while (startPos < s.length()) {
+            List<String> firstOptions = new ArrayList<>();
+            // Store the characters for the first index as string in firstOptions
+            int remStringStartPos = storeFirstOptions(s, startPos, firstOptions);
             
-        // Add the character and go into recursion
-        for (char c : currOptions) {
-            currString.append(c);
-            generateWords(currString, expandedWords);
-            // Backtrack to previous state
-            currString.deleteCharAt(currString.length() - 1);
+            List<String> currWords = new ArrayList<>();
+            // Append the string in the list firstOptions to string in expandedWords
+            for (String word : expandedWords) {
+                for (String c : firstOptions) {
+                    currWords.add(word + c);
+                }
+            }
+            // Update the list expandedWords to have all the words
+            expandedWords = currWords;
+            // Pointing to the next character to be considered
+            startPos = remStringStartPos;
         }
-    }
-
-    public String[] expand(String s) {
-        // Store the character options for different indices
-        storeAllOptions(s);
         
-        List<String> expandedWords = new ArrayList<>();
-        generateWords(new StringBuilder(), expandedWords);
         return expandedWords.toArray(new String[0]);
     }
 }
