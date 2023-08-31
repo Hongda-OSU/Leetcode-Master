@@ -1,44 +1,24 @@
 class Solution {
-    public char[][] reversiblePairs = {
-        {'0', '0'}, {'1', '1'}, 
-        {'6', '9'}, {'8', '8'}, {'9', '6'}
-    };
-    
     public List<String> findStrobogrammatic(int n) {
-        Queue<String> q = new LinkedList<>();
-        int currStringsLength;
-        
-        // When n is even, it means when decreasing by 2 we will go till 0.
-        if (n % 2 == 0) {
-            // We will start with 0-digit strobogrammatic numbers.
-            currStringsLength = 0;
-            q.add("");
-        } else {
-            // We will start with 1-digit strobogrammatic numbers.
-            currStringsLength = 1;
-            q.add("0");
-            q.add("1");
-            q.add("8");
+        return findStrobogrammaticHelper(n, n);
+    }
+    
+    private List<String> findStrobogrammaticHelper(int m, int n) {
+        if (m == 0)
+            return new ArrayList<>(Arrays.asList(""));
+        if (m == 1) 
+            return new ArrayList<>(Arrays.asList("0", "1", "8"));
+        List<String> list = findStrobogrammaticHelper(m - 2, n);
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String str = list.get(i);
+            if (m != n)
+                result.add("0" + str + "0");
+            result.add("1" + str + "1");
+            result.add("6" + str + "9");
+            result.add("8" + str + "8");
+            result.add("9" + str + "6");
         }
-        
-        while (currStringsLength < n) {
-            currStringsLength += 2;
-            for (int i = q.size(); i > 0; --i) {
-                String number = q.poll();
-                
-                for (char[] pair : reversiblePairs) {
-                    if (currStringsLength != n || pair[0] != '0') {
-                        q.add(pair[0] + number + pair[1]);
-                    }
-                }
-            }
-        }
-        
-        List<String> stroboNums = new ArrayList<>();
-        while (!q.isEmpty()) {
-            stroboNums.add(q.poll());
-        }
-        
-        return stroboNums;
+        return result;
     }
 }
