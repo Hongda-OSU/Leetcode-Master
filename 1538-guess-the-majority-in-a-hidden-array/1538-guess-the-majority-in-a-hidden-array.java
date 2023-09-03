@@ -15,26 +15,26 @@
  */
 
 class Solution {
-    int cntEqual = 1, cntDiffer = 0, indexDiffer = -1;
-
-    private void f(boolean equal, int i) {
-        if (equal) {
+    private int cntEqual = 1, cntDiff = 0, indexDiff = -1;
+    
+    public int guessMajority(ArrayReader reader) {
+        int n = reader.length(), queryA = reader.query(0, 1, 2, 3), queryB = reader.query(1, 2, 3, 4);
+        guessMajorityHelper(queryA == queryB, 4);
+        for (int i = 5; i < n; i++) {
+            guessMajorityHelper(reader.query(1, 2, 3, i) == queryA, i);
+        }
+        guessMajorityHelper(reader.query(0, 2, 3, 4) == queryB, 1);
+        guessMajorityHelper(reader.query(0, 1, 3, 4) == queryB, 2);
+        guessMajorityHelper(reader.query(0, 1, 2, 4) == queryB, 3);
+        return cntEqual > cntDiff ? 0 : cntDiff > cntEqual ? indexDiff : -1;
+    }
+    
+    private void guessMajorityHelper(boolean eq, int i) {
+        if (eq) {
             cntEqual++;
         } else {
-            cntDiffer++;
-            indexDiffer = i;
+            cntDiff++;
+            indexDiff = i;
         }
-    }
-
-    public int guessMajority(ArrayReader reader) {
-        int n = reader.length(), query0123 = reader.query(0, 1, 2, 3), query1234 = reader.query(1, 2, 3, 4);
-        f(query1234 == query0123, 4);
-        for (int i = 5; i < n; i++) {
-            f(reader.query(1, 2, 3, i) == query0123, i);
-        }
-        f(reader.query(0, 2, 3, 4) == query1234, 1);
-        f(reader.query(0, 1, 3, 4) == query1234, 2);
-        f(reader.query(0, 1, 2, 4) == query1234, 3);
-        return cntEqual > cntDiffer ? 0 : cntDiffer > cntEqual ? indexDiffer : -1;
     }
 }
